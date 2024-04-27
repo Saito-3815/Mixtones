@@ -8,14 +8,15 @@ import { getTokenFromUrl } from './urls/Spotify';
 
 function App() {
 
+  
   const [token, setToken] = useState(null);
-
+  
   useEffect(() => {
     const hash = getTokenFromUrl();
     console.log(hash )
     window.location.hash = ""; //URLからアクセストークンの表示を削除
     const token = hash.access_token;
-
+    
     if (token) {
       setToken(token)
     }
@@ -28,7 +29,7 @@ function App() {
     // </div>
 
 <div className="App">
-{ token ? <LoggedIn accesToken={token}/> : <Login/> } 
+{ token ? <LoggedIn accessToken={token}/> : <Login/> } 
 </div> 
   );
 }
