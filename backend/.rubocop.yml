@@ -1,0 +1,56 @@
+inherit_from: .rubocop_todo.yml
+
+require:
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rspec
+  - ./config/initializers/inflections
+
+AllCops:
+  SuggestExtensions: false
+  # 最新のルールを適用する
+  NewCops: enable
+  # 何のルールに引っかかったか表示する
+  DisplayCopNames: true
+
+  # rubocop対象外(リポジトリ毎で調節)
+  Exclude:
+    - "Gemfile"
+    - "bin/**/*"
+    - "db/**/*"
+    - "log/**/*"
+    - "tmp/**/*"
+    - "vendor/**/*"
+    - "lib/tasks/**/*"
+    - "bin/*"
+    - "config/environments/*"
+    - "config/initializers/**/*"
+    - "config/puma.rb"
+    - "public/**/*"
+    - "storage/**/*"
+
+  ### ルールのカスタマイズ
+
+# 設定が厳しいので一旦全てfalseにする
+Metrics:
+  Enabled: false
+
+# デフォルトをダブルクォーテーションに設定
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+# コントローラ等のモジュールをネストしての宣言
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# クラスにコメントを残さなくても良い
+Style/Documentation:
+  Enabled: false
+
+# 文字列のfreeze（Ruby3からは自動でfreezeされるので要らない）
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# 日本語のコメントを許可
+Style/AsciiComments:
+  Enabled: false
