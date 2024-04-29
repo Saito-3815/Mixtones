@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $(dirname $0)/.. # docker-compose.ymlがあるディレクトリに移動
+
+OPTION=$(test -p /dev/stdin && echo '-T') # 標準入力を受ける場合もそうでない場合もいい感じに動くよう、`-T`オプションの有無を制御
+docker compose exec $OPTION api rubocop --server $@ # --serverオプションを入れつつ、他の引数をそのまま渡す
