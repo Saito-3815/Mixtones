@@ -54,3 +54,10 @@ Style/FrozenStringLiteralComment:
 # 日本語のコメントを許可
 Style/AsciiComments:
   Enabled: false
+
+# 文字列のダブルクォートチェック
+Style/StringLiterals:
+  Enabled: false
+
+RSpecRails/InferredSpecType:
+  Enabled: false
