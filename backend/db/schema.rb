@@ -34,8 +34,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_01_085735) do
   end
 
   create_table "communities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "name"
-    t.text "introduction"
+    t.string "name", limit: 40, null: false
+    t.text "introduction", size: :tiny
     t.string "avatar"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -47,6 +47,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_01_085735) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["tune_id"], name: "index_likes_on_tune_id"
+    t.index ["user_id", "tune_id"], name: "index_likes_on_user_id_and_tune_id", unique: true
     t.index ["user_id"], name: "index_likes_on_user_id"
   end
 
@@ -70,24 +71,26 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_01_085735) do
   end
 
   create_table "tunes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "name"
-    t.string "artist"
-    t.string "album"
-    t.string "avatar"
-    t.string "spotify_uri"
+    t.string "name", null: false
+    t.string "artist", null: false
+    t.string "album", null: false
+    t.string "avatar", null: false
+    t.string "spotify_uri", null: false
     t.string "preview_url"
-    t.string "added_at"
+    t.string "added_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["spotify_uri"], name: "index_tunes_on_spotify_uri", unique: true
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "name"
-    t.text "introduction"
+    t.string "name", limit: 40, null: false
+    t.text "introduction", size: :tiny
     t.string "avatar"
     t.string "spotify_uri"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["spotify_uri"], name: "index_users_on_spotify_uri", unique: true
   end
 
   add_foreign_key "checks", "tunes"

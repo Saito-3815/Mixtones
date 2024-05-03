@@ -59,5 +59,9 @@ Style/AsciiComments:
 Style/StringLiterals:
   Enabled: false
 
+# シンボルによる配列の%記法のチェック
+Style/SymbolArray:
+  Enabled: false
+
 RSpecRails/InferredSpecType:
   Enabled: false
