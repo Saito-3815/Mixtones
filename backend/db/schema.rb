@@ -18,6 +18,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_01_085735) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["tune_id"], name: "index_checks_on_tune_id"
+    t.index ["user_id", "tune_id"], name: "index_checks_on_user_id_and_tune_id", unique: true
     t.index ["user_id"], name: "index_checks_on_user_id"
   end
 
@@ -25,7 +26,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_01_085735) do
     t.bigint "user_id", null: false
     t.bigint "community_id", null: false
     t.bigint "tune_id", null: false
-    t.text "body"
+    t.text "body", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["community_id"], name: "index_comments_on_community_id"
@@ -57,6 +58,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_01_085735) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["community_id"], name: "index_memberships_on_community_id"
+    t.index ["user_id", "community_id"], name: "index_memberships_on_user_id_and_community_id", unique: true
     t.index ["user_id"], name: "index_memberships_on_user_id"
   end
 
@@ -66,6 +68,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_01_085735) do
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["community_id", "tune_id"], name: "index_playlists_on_community_id_and_tune_id", unique: true
     t.index ["community_id"], name: "index_playlists_on_community_id"
     t.index ["tune_id"], name: "index_playlists_on_tune_id"
   end

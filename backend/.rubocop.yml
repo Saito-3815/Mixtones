@@ -37,6 +37,7 @@ Metrics:
 
 # デフォルトをダブルクォーテーションに設定
 Style/StringLiterals:
+  Enabled: false
   EnforcedStyle: double_quotes
 
 # コントローラ等のモジュールをネストしての宣言
@@ -55,13 +56,13 @@ Style/FrozenStringLiteralComment:
 Style/AsciiComments:
   Enabled: false
 
-# 文字列のダブルクォートチェック
-Style/StringLiterals:
-  Enabled: false
-
 # シンボルによる配列の%記法のチェック
 Style/SymbolArray:
   Enabled: false
 
 RSpecRails/InferredSpecType:
+  Enabled: false
+
+# describeクラスを使わない
+RSpec/DescribedClass:
   Enabled: false

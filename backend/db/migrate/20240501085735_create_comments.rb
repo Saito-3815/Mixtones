@@ -4,7 +4,7 @@ class CreateComments < ActiveRecord::Migration[7.0]
       t.references :user,       null: false, foreign_key: true
       t.references :community,  null: false, foreign_key: true
       t.references :tune,       null: false, foreign_key: true
-      t.text :body
+      t.text :body,             null: false, limit: 2000
 
       t.timestamps
     end
