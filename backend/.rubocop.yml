@@ -66,3 +66,7 @@ RSpecRails/InferredSpecType:
 # describeクラスを使わない
 RSpec/DescribedClass:
   Enabled: false
+
+# itブロックの長さを10行に制限
+RSpec/ExampleLength:
+  Max: 10

@@ -14,6 +14,10 @@ Rails.application.routes.draw do
       end
 
       resources :tunes, only: [:show, :create]
+
+      get 'comments/community_id/:user_id/:tune_id', to: 'comments#index'
+      post 'comments/community_id/:user_id/:tune_id', to: 'comments#create'
+      delete 'comments/community_id/:user_id/:tune_id/:id', to: 'comments#destroy'
     end
   end
 end
