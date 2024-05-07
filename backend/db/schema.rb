@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_01_085735) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_07_050353) do
   create_table "checks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "tune_id", null: false
@@ -90,10 +90,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_01_085735) do
     t.string "name", limit: 40, null: false
     t.text "introduction", size: :tiny
     t.string "avatar"
-    t.string "spotify_uri"
+    t.string "spotify_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["spotify_uri"], name: "index_users_on_spotify_uri", unique: true
+    t.index ["spotify_id"], name: "index_users_on_spotify_id", unique: true
   end
 
   add_foreign_key "checks", "tunes"

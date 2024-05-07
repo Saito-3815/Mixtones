@@ -9,5 +9,5 @@ class User < ApplicationRecord
 
   validates :name,          presence: true, length: { maximum: 40 }
   validates :introduction,  length: { maximum: 160 }
-  validates :spotify_uri,   uniqueness: true
+  validates :spotify_id,    uniqueness: true
 end
