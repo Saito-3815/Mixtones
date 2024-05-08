@@ -58,20 +58,20 @@ RSpec.describe User, type: :model do
     end
 
     # spotify_uri が重複している場合、無効であること
-    context "when spotify_uri is duplicated" do
+    context "when spotify_id is duplicated" do
       before do
-        User.create(name: 'User', introduction: 'This is a user.', spotify_uri: 'spotify:uri:1')
+        User.create(name: 'User', introduction: 'This is a user.', spotify_id: 'spotify:id:1')
       end
 
-      let(:user) { User.new(name: 'User', introduction: 'This is a user.', spotify_uri: 'spotify:uri:1') }
+      let(:user) { User.new(name: 'User', introduction: 'This is a user.', spotify_id: 'spotify:id:1') }
 
-      it 'is not valid with duplicated spotify_uri' do
+      it 'is not valid with duplicated spotify_id' do
         expect(user).not_to be_valid
       end
 
-      it 'adds an error message when spotify_uri is duplicated' do
+      it 'adds an error message when spotify_id is duplicated' do
         user.valid?
-        expect(user.errors[:spotify_uri]).to include('has already been taken')
+        expect(user.errors[:spotify_id]).to include('has already been taken')
       end
     end
     # Add more validation tests here
