@@ -37,6 +37,7 @@ Metrics:
 
 # デフォルトをダブルクォーテーションに設定
 Style/StringLiterals:
+  Enabled: false
   EnforcedStyle: double_quotes
 
 # コントローラ等のモジュールをネストしての宣言
@@ -54,3 +55,18 @@ Style/FrozenStringLiteralComment:
 # 日本語のコメントを許可
 Style/AsciiComments:
   Enabled: false
+
+# シンボルによる配列の%記法のチェック
+Style/SymbolArray:
+  Enabled: false
+
+RSpecRails/InferredSpecType:
+  Enabled: false
+
+# describeクラスを使わない
+RSpec/DescribedClass:
+  Enabled: false
+
+# itブロックの長さを10行に制限
+RSpec/ExampleLength:
+  Max: 10
