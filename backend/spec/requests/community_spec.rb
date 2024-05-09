@@ -12,15 +12,22 @@ RSpec.describe Community, type: :request do
 
   # createアクションのテスト
   describe 'POST /api/v1/communities' do
-    let(:user) { create(:user) }
-    
+    let(:user) { create(:user, :with_like_tunes) }
+
     before do
-      post '/api/v1/communities', params: { user_name: user.name }
+      post '/api/v1/communities', params: { user_id: user.id, user_name: user.name }
     end
 
     # communityオブジェクトに紐づくmembershipを作成すること
     it 'creates a membership' do
-      expect(Membership.count).to eq 1
+      community = Community.last
+      expect(community.members.count).to eq 1
+    end
+
+    # communityオブジェクトに紐づくplaylistにlike_tunesを追加すること
+    it 'creates a playlist' do
+      community = Community.last
+      expect(community.playlist_tunes.count).to eq user.like_tunes.count
     end
 
     # 201ステータスコードを返すこと
@@ -42,6 +49,48 @@ RSpec.describe Community, type: :request do
     it 'returns 200 status code if community object exists' do
       get "/api/v1/communities/#{community.id}"
       expect(response).to have_http_status(:ok)
+    end
+  end
+
+  # editアクションのテスト
+  describe 'GET /api/v1/communities/:id/edit' do
+    let(:community) { create(:community) }
+
+    # communityオブジェクトが存在する場合、200ステータスコードを返すこと
+    it 'returns 200 status code if community object exists' do
+      get "/api/v1/communities/#{community.id}/edit"
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  # updateアクションのテスト
+  it 'returns 200 status code if community object exists' do
+    community = create(:community)
+    patch "/api/v1/communities/#{community.id}",
+          params: { community: { name: 'Test', introduction: 'Test Introduction', avatar: 'Test Avatar' } }
+    expect(response).to have_http_status(:ok)
+  end
+
+  # destroyアクションのテスト
+  describe 'DELETE /api/v1/communities/:id' do
+    let(:community) { create(:community, :with_members, :with_playlist_tunes) }
+
+    before do
+      delete "/api/v1/communities/#{community.id}"
+    end
+
+    it 'returns 204 status code if community object exists' do
+      expect(response).to have_http_status(:no_content)
+    end
+
+    # communityオブジェクトに紐づくmembershipを削除すること
+    it 'deletes a membership' do
+      expect { community.destroy }.to change(Membership, :count).by(-community.members.count)
+    end
+
+    # communityオブジェクトに紐づくplaylistを削除すること
+    it 'deletes a playlist' do
+      expect { community.destroy }.to change(Playlist, :count).by(-community.playlist_tunes.count)
     end
   end
 end
