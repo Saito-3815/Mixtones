@@ -1,7 +1,6 @@
 class Tune < ApplicationRecord
   has_many :playlist_tunes, dependent: :destroy
   has_many :likes, dependent: :destroy
-  # has_many :users, through: :likes
   has_many :checks, dependent: :destroy
   has_many :comments, dependent: :destroy
 

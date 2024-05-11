@@ -92,7 +92,7 @@ RSpec.describe Tune, type: :model do
           name: 'Tune',
           artist: 'Artist',
           album: 'Album',
-          avatar: 'avatar.jpg',
+          images: 'images.jpg',
           added_at: Time.zone.now,
           spotify_uri: 'spotify:track:1234567890'
         )
@@ -103,7 +103,7 @@ RSpec.describe Tune, type: :model do
           name: 'Tune',
           artist: 'Artist',
           album: 'Album',
-          avatar: 'avatar.jpg',
+          images: 'images.jpg',
           added_at: Time.zone.now,
           spotify_uri: 'spotify:track:1234567890'
         )
