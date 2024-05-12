@@ -8,7 +8,7 @@ module Api
 
       def show
         @community = Community.find(params[:id])
-        render json: @community
+        render json: @community, include: ['members']
       end
 
       def edit
@@ -17,7 +17,12 @@ module Api
       end
 
       def create
-        @community = Community.new(name: "#{params[:user_name]}のコミュニティ", introduction: "", avatar: "")
+        @community = Community.new(
+          name: "#{params[:user_name]}のコミュニティ",
+          introduction: "",
+          avatar: "",
+          playlist_name: "#{params[:user_name]}のプレイリスト"
+        )
         if @community.save
           # communityに紐づくmembershipを作成
           @community.memberships.create(user_id: params[:user_id])

@@ -3,6 +3,7 @@ FactoryBot.define do
     name { "MyString" }
     introduction { "MyText" }
     avatar { "MyString" }
+    playlist_name { "MyString" }
   end
 
   trait :with_playlist_tunes do
@@ -22,6 +23,16 @@ FactoryBot.define do
 
     after(:create) do |community, evaluator|
       create_list(:membership, evaluator.members_count, community:)
+    end
+  end
+
+  trait :with_comments do
+    transient do
+      comments_count { 5 }
+    end
+
+    after(:create) do |community, evaluator|
+      create_list(:comment, evaluator.comments_count, community:)
     end
   end
 end

@@ -12,13 +12,29 @@ module Api
       end
 
       def create
-        @user = User.new(name: user_params[:name], avatar: user_params[:avatar], spotify_id: user_params[:spotify_id])
+        @user = User.new(
+          name: user_create_params[:name],
+          avatar: user_create_params[:avatar],
+          spotify_id: user_create_params[:spotify_id]
+        )
         if @user.save
-          # userに紐づくlike_tunesを作成
-          # @user.like_tunes.create(user_params[:like_tunes].map(&:attributes))
-          # user_params[:like_tunes]配列からlike_tuneハッシュを取り出し、それぞれの要素をlike_tuneとしてcreate
-          user_params[:like_tunes].each do |like_tune|
-            @user.like_tunes.create(like_tune)
+          user_create_params[:like_tunes].each do |like_tune|
+            existing_record = Tune.find_by(spotify_uri: like_tune[:spotify_uri])
+
+            if existing_record.nil?
+              @user.like_tunes.create!(
+                name: like_tune[:name],
+                artist: like_tune[:artist],
+                album: like_tune[:album],
+                images: like_tune[:images],
+                spotify_uri: like_tune[:spotify_uri],
+                preview_url: like_tune[:preview_url],
+                added_at: like_tune[:added_at]
+              )
+            else
+              # 既存のレコードが存在する場合、既存のレコードをlike_tunesに追加
+              @user.like_tunes << existing_record
+            end
           end
           render json: @user, status: :created
         else
@@ -26,24 +42,33 @@ module Api
         end
       end
 
-      # def update
-      #   @user = User.find(params[:id])
-      #   if @user.update(user_params)
-      #     render json: @user
-      #   else
-      #     render json: @user.errors, status: :unprocessable_entity
-      #   end
-      # end
+      def update
+        @user = User.find(params[:id])
+        if @user.update(user_update_params)
+          render json: @user
+        else
+          render json: @user.errors, status: :unprocessable_entity
+        end
+      end
 
-      # def destroy
-      #   @user = User.find(params[:id])
-      #   @user.destroy
-      # end
+      def destroy
+        @user = User.find(params[:id])
+        @user.destroy
+      end
 
       private
 
-      def user_params
-        params.require(:user).permit(:name, :avatar, :spotify_id, like_tunes: [[[:name, :artist, :album, :images, :spotify_uri, :preview_url, :added_at]]])
+      def user_create_params
+        params.require(:user).permit(
+          :name,
+          :avatar,
+          :spotify_id,
+          like_tunes: [:name, :artist, :album, :images, :spotify_uri, :preview_url, :added_at]
+        )
+      end
+
+      def user_update_params
+        params.require(:user).permit(:name, :introduction, :avatar)
       end
     end
   end

@@ -4,7 +4,7 @@ Rails.application.routes.draw do
       root 'communities#index'
 
       resources :communities, only: [:index, :show, :create, :edit, :update, :destroy] do
-        resources :memberships, only: [:index, :create, :destroy]
+        resources :memberships, only: [:create, :destroy]
         resources :playlists, only: [:index, :create, :destroy]
       end
 
@@ -13,7 +13,7 @@ Rails.application.routes.draw do
         resources :checks, only: [:index, :create, :destroy]
       end
 
-      resources :tunes, only: [:show, :create]
+      # resources :tunes, only: [:show, :create]
 
       get 'comments/community_id/:user_id/:tune_id', to: 'comments#index'
       post 'comments/community_id/:user_id/:tune_id', to: 'comments#create'

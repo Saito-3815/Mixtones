@@ -7,4 +7,5 @@ class Community < ApplicationRecord
 
   validates :name,    presence: true, length: { maximum: 40 }
   validates :introduction, length: { maximum: 160 }
+  validates :playlist_name, presence: true, length: { maximum: 40 }
 end

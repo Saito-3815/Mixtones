@@ -2,7 +2,8 @@
   community = Community.create!(
     name: "test_community_#{n + 1}",
     introduction: "test_community_#{n + 1} introduction",
-    avatar: "test_community_#{n + 1}.png"
+    avatar: "test_community_#{n + 1}.png",
+    playlist_name: "test_playlist_#{n + 1}"
   )
 
   4.times do |m|
@@ -20,7 +21,7 @@
         name: "test_tune_#{o + 1}",
         artist: "test_artist_#{o + 1}",
         album: "test_album_#{o + 1}",
-        avatar: "test_tune_#{o + 1}.png",
+        images: "test_tune_#{o + 1}.png",
         spotify_uri: "spotify:track:#{SecureRandom.hex(10)}",
         preview_url: "https://test.com/preview_#{o + 1}.mp3",
         # added_atにランダムな日付をISO8601形式で設定
@@ -43,7 +44,7 @@
         name: "test_tune_#{p + 1}",
         artist: "test_artist_#{p + 1}",
         album: "test_album_#{p + 1}",
-        avatar: "test_tune_#{p + 1}.png",
+        images: "test_tune_#{p + 1}.png",
         spotify_uri: "spotify:track:#{SecureRandom.hex(10)}",
         preview_url: "https://test.com/preview_#{p + 1}.mp3",
         added_at: Time.at(rand * Time.now.to_i).iso8601

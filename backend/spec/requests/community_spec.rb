@@ -64,11 +64,32 @@ RSpec.describe Community, type: :request do
   end
 
   # updateアクションのテスト
-  it 'returns 200 status code if community object exists' do
-    community = create(:community)
-    patch "/api/v1/communities/#{community.id}",
-          params: { community: { name: 'Test', introduction: 'Test Introduction', avatar: 'Test Avatar' } }
-    expect(response).to have_http_status(:ok)
+  describe 'PATCH /api/v1/communities/:id' do
+    it 'returns 200 status code if community object exists' do
+      community = create(:community)
+      patch "/api/v1/communities/#{community.id}",
+            params: { community: {
+              name: 'Test',
+              introduction: 'Test Introduction',
+              avatar: 'Test Avatar',
+              playlist_name: 'Test Playlist'
+            } }
+      expect(response).to have_http_status(:ok)
+    end
+
+    # communityオブジェクトの属性を更新すること
+    it 'updates a community' do
+      community = create(:community)
+      patch "/api/v1/communities/#{community.id}",
+            params: { community: {
+              name: 'Test',
+              introduction: 'Test Introduction',
+              avatar: 'Test Avatar',
+              playlist_name: 'Test Playlist'
+            } }
+      community.reload
+      expect(community.name).to eq 'Test'
+    end
   end
 
   # destroyアクションのテスト
@@ -83,6 +104,11 @@ RSpec.describe Community, type: :request do
       expect(response).to have_http_status(:no_content)
     end
 
+    # communityオブジェクトを削除すること
+    it 'deletes a community' do
+      expect(Community.find_by(id: community)).to be_nil
+    end
+
     # communityオブジェクトに紐づくmembershipを削除すること
     it 'deletes a membership' do
       expect { community.destroy }.to change(Membership, :count).by(-community.members.count)
@@ -91,6 +117,11 @@ RSpec.describe Community, type: :request do
     # communityオブジェクトに紐づくplaylistを削除すること
     it 'deletes a playlist' do
       expect { community.destroy }.to change(Playlist, :count).by(-community.playlist_tunes.count)
+    end
+
+    # communityオブジェクトに紐づくcommentを削除すること
+    it 'deletes a comment' do
+      expect { community.destroy }.to change(Comment, :count).by(-community.comments.count)
     end
   end
 end
