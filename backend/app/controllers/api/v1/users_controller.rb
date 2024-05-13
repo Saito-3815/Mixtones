@@ -18,6 +18,7 @@ module Api
           spotify_id: user_create_params[:spotify_id]
         )
         if @user.save
+          # like_tunesを一緒に登録
           user_create_params[:like_tunes].each do |like_tune|
             existing_record = Tune.find_by(spotify_uri: like_tune[:spotify_uri])
 
@@ -58,6 +59,8 @@ module Api
 
       private
 
+      # ユーザー作成時のパラメータ
+      # ユーザー作成時には、like_tunesも一緒に登録する
       def user_create_params
         params.require(:user).permit(
           :name,

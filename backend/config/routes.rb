@@ -4,12 +4,14 @@ Rails.application.routes.draw do
       root 'communities#index'
 
       resources :communities, only: [:index, :show, :create, :edit, :update, :destroy] do
-        resources :memberships, only: [:create, :destroy]
-        resources :playlists, only: [:index, :create, :destroy]
+        resources :memberships, only: [:create]
+        delete :'memberships/:user_id', to: 'memberships#destroy'
+        resources :playlists, only: [:index]
       end
 
       resources :users, only: [:show, :create, :edit, :update, :destroy] do
-        resources :likes, only: [:index, :create, :destroy]
+        resources :likes, only: [:create] # お気に入りを追加登録
+        get 'likes/latest', to: 'likes#latest' # 最新のlike_tunesを取得
         resources :checks, only: [:index, :create, :destroy]
       end
 

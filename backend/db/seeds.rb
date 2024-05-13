@@ -36,6 +36,8 @@
           body: "test_comment_#{q + 1}"
         )
       end
+
+      community.playlist_tunes << community.members[m].like_tunes[o]
     end
 
     # membersごとにcheck_tunesを作成
@@ -51,4 +53,19 @@
       )
     end
   end
+
+
+
+  # communityに紐づくplaylist_tunesを作成
+  # 10.times do |r|
+  #   community.playlist_tunes.create!(
+  #     name: "test_tune_#{r + 1}",
+  #     artist: "test_artist_#{r + 1}",
+  #     album: "test_album_#{r + 1}",
+  #     images: "test_tune_#{r + 1}.png",
+  #     spotify_uri: "spotify:track:#{SecureRandom.hex(10)}",
+  #     preview_url: "https://test.com/preview_#{r + 1}.mp3",
+  #     added_at: Time.at(rand * Time.now.to_i).iso8601
+  #   )
+  # end
 end

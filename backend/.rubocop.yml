@@ -75,3 +75,7 @@ RSpec/ExampleLength:
 Lint/ShadowingOuterLocalVariable:
   Exclude:
     - 'spec/rails_helper.rb'
+
+# ガード節の提案
+Style/GuardClause:
+  Enabled: false
