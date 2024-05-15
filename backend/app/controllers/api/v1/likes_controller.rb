@@ -7,29 +7,29 @@ module Api
         # userオブジェクトが存在する場合、user.like_tunesにlike_tunesを追加
         user = User.find(params[:user_id])
         if user&.like_tunes.present?
-          # user.like_tunesにlike_tunesと重複しているレコードが無ければ追加
+          # Tunesにlike_tunesと重複しているレコードが無ければ追加
           like_params[:like_tunes].each do |like_tune|
-            existing_record = user.like_tunes.find_by(spotify_uri: like_tune[:spotify_uri])
+            existing_record = Tune.find_by(spotify_uri: like_tune[:spotify_uri])
 
-            # existing_recordがnilでないならすれば処理をスキップする
-            next unless existing_record.nil?
-
-            user.like_tunes.create!(
-              name: like_tune[:name],
-              artist: like_tune[:artist],
-              album: like_tune[:album],
-              images: like_tune[:images],
-              spotify_uri: like_tune[:spotify_uri],
-              preview_url: like_tune[:preview_url],
-              added_at: like_tune[:added_at]
-            )
+            if existing_record.nil?
+              user.like_tunes.create!(
+                name: like_tune[:name],
+                artist: like_tune[:artist],
+                album: like_tune[:album],
+                images: like_tune[:images],
+                spotify_uri: like_tune[:spotify_uri],
+                preview_url: like_tune[:preview_url],
+                added_at: like_tune[:added_at]
+              )
+            else
+              # exising_recordが存在する場合、user.like_tunesに追加
+              user.like_tunes << existing_record
+            end
           end
           # user.like_tunesをuserが所属するcommunityのplaylist_tunesに追加
           add_like_tunes_to_playlist(user)
         end
-        # @likeに追加したlike_tunesを返す
-        @like = user.like_tunes
-        render json: @like, status: :created
+        render json: { message: 'Like tune added' }, status: :created
       end
 
       # ユーザーの最新のお気に入り曲を取得

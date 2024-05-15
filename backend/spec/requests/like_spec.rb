@@ -18,6 +18,18 @@ RSpec.describe Like, type: :request do
       } }
     end
 
+    # Tuneにlike_tunesと重複しているレコードが存在する時に、Like関連を作成すること
+    it 'creates Like records when duplicate records exist in Tune' do
+      Tune.create!(like_params[:like][:like_tunes][0])
+      post "/api/v1/users/#{user.id}/likes", params: like_params
+      user.reload
+      expect(user.like_tunes.pluck(:spotify_uri)).to include(
+        "test_spotify_uri1",
+        "test_spotify_uri2",
+        "test_spotify_uri3"
+      )
+    end
+
     # userオブジェクトが存在する場合、201ステータスコードを返すこと
     it 'returns 201 status code if user object exists' do
       post "/api/v1/users/#{user.id}/likes", params: like_params
