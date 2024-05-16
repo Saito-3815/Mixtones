@@ -4,20 +4,20 @@ Rails.application.routes.draw do
       root 'communities#index'
 
       resources :communities, only: [:index, :show, :create, :edit, :update, :destroy] do
-        resources :memberships, only: [:index, :create, :destroy]
-        resources :playlists, only: [:index, :create, :destroy]
+        resources :memberships, only: [:create]
+        delete :'memberships/:user_id', to: 'memberships#destroy'
+        resources :playlists, only: [:index]
+        get 'tunes/:tune_id/comments', to: 'comments#index'
+        post 'tunes/:tune_id/users/:user_id/comments', to: 'comments#create'
+        delete 'tunes/:tune_id/users/:user_id/comments/:id', to: 'comments#destroy'
       end
 
       resources :users, only: [:show, :create, :edit, :update, :destroy] do
-        resources :likes, only: [:index, :create, :destroy]
+        resources :likes, only: [:create] # お気に入りを追加登録
+        get 'likes/latest', to: 'likes#latest' # 最新のlike_tunesを取得
         resources :checks, only: [:index, :create, :destroy]
       end
 
-      resources :tunes, only: [:show, :create]
-
-      get 'comments/community_id/:user_id/:tune_id', to: 'comments#index'
-      post 'comments/community_id/:user_id/:tune_id', to: 'comments#create'
-      delete 'comments/community_id/:user_id/:tune_id/:id', to: 'comments#destroy'
     end
   end
 end

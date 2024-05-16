@@ -3,13 +3,18 @@ require 'rails_helper'
 RSpec.describe Community, type: :model do
   # communityオブジェクトがnameとintroductionを持っている場合、有効であること
   it 'is valid with name and introduction' do
-    community = Community.new(name: 'Community', introduction: 'This is a community.')
+    community = Community.new(name: 'Community', introduction: 'This is a community.', playlist_name: 'Playlist')
     expect(community).to be_valid
   end
 
   # communityオブジェクトがname、introduction、avatarを持っている場合、有効であること
   it 'is valid with name, introduction, and avatar' do
-    community = Community.new(name: 'Community', introduction: 'This is a community.', avatar: 'avatar.jpg')
+    community = Community.new(
+      name: 'Community',
+      introduction: 'This is a community.',
+      avatar: 'avatar.jpg',
+      playlist_name: 'Playlist'
+    )
     expect(community).to be_valid
   end
 

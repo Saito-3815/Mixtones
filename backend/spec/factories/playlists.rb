@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :playlist do
-    community_id { 1 }
-    tune_id { 1 }
+    community
+    tune
     active { false }
   end
 end
