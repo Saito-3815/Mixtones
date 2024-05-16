@@ -1,6 +1,8 @@
 module Api
   module V1
     class MembershipsController < ApplicationController
+      # コミュニティにメンバーを追加
+      # Userのlike_tunesをCommunityのplaylist_tunesに追加
       def create
         @membership = Membership.new(
           community_id: params[:community_id],
@@ -17,13 +19,15 @@ module Api
               Playlist.create(community_id: community.id, tune_id: like_tune.id) if existing_record.nil?
             end
           end
-          # add_missing_like_tunes_to_playlist(community)
           render json: @membership, status: :created
         else
           render json: @membership.errors, status: :unprocessable_entity
         end
       end
 
+      # コミュニティからメンバーを削除
+      # Userのlike_tunesをCommunityのplaylist_tunesから削除
+      # Communityのplaylist_tunesに他のmembersの重複していたlike_tunesを追加
       def destroy
         @membership = Membership.find_by(community_id: params[:community_id], user_id: params[:user_id])
         if @membership.destroy

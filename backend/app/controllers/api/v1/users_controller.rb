@@ -3,14 +3,16 @@ module Api
     class UsersController < ApplicationController
       def show
         @user = User.find(params[:id])
-        render json: @user
+        render json: @user, only: [:name, :introduction, :avatar]
       end
 
       def edit
         @user = User.find(params[:id])
-        render json: @user
+        render json: @user, only: [:name, :introduction, :avatar]
       end
 
+      # ユーザー作成
+      # ユーザー作成時には、like_tunesも一緒に登録する
       def create
         @user = User.new(
           name: user_create_params[:name],
@@ -55,6 +57,7 @@ module Api
       def destroy
         @user = User.find(params[:id])
         @user.destroy
+        render json: { message: 'User deleted' }, status: :ok
       end
 
       private

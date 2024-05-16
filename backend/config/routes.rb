@@ -7,6 +7,9 @@ Rails.application.routes.draw do
         resources :memberships, only: [:create]
         delete :'memberships/:user_id', to: 'memberships#destroy'
         resources :playlists, only: [:index]
+        get 'tunes/:tune_id/comments', to: 'comments#index'
+        post 'tunes/:tune_id/users/:user_id/comments', to: 'comments#create'
+        delete 'tunes/:tune_id/users/:user_id/comments/:id', to: 'comments#destroy'
       end
 
       resources :users, only: [:show, :create, :edit, :update, :destroy] do
@@ -15,11 +18,6 @@ Rails.application.routes.draw do
         resources :checks, only: [:index, :create, :destroy]
       end
 
-      # resources :tunes, only: [:show, :create]
-
-      get 'comments/:community_id/:user_id/:tune_id', to: 'comments#index'
-      post 'comments/:community_id/:user_id/:tune_id', to: 'comments#create'
-      delete 'comments/:community_id/:user_id/:tune_id/:id', to: 'comments#destroy'
     end
   end
 end

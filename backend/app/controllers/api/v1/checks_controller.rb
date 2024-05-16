@@ -1,6 +1,7 @@
 module Api
   module V1
     class ChecksController < ApplicationController
+      # ユーザーのチェックした曲を新しい順に取得
       def index
         user = User.find(params[:user_id])
         if user&.check_tunes.present?
@@ -11,6 +12,7 @@ module Api
         end
       end
 
+      # チェックした曲を受け取り、user.check_tunesに追加
       def create
         user = User.find_by(id: params[:user_id])
         return render json: { message: 'User not found' }, status: :not_found if user.nil?
@@ -23,6 +25,7 @@ module Api
         render json: { message: 'Check tune added' }, status: :created
       end
 
+      # チェックした曲をuser.check_tunesから削除
       def destroy
         user = User.find_by(id: params[:user_id])
         return render json: { message: 'User not found' }, status: :not_found if user.nil?

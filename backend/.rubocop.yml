@@ -69,7 +69,7 @@ RSpec/DescribedClass:
 
 # itブロックの長さを10行に制限
 RSpec/ExampleLength:
-  Max: 10
+  Max: 15
 
 # 同じスコープ内で同じ名前のローカル変数を再定義
 Lint/ShadowingOuterLocalVariable:
