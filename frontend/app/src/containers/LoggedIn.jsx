@@ -30,7 +30,7 @@ import PropTypes from 'prop-types';
       return (
         
         <div>
-      <h1>spotifyへログインしました</h1>
+      <h1>spotifyへログインしました!</h1>
     </div>
   );
 }
