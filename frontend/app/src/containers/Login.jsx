@@ -1,5 +1,5 @@
-import React from 'react'
-import { accessUrl } from "../urls/Spotify";
+import React from 'react';
+import { accessUrl } from '../urls/Spotify';
 
 function Login() {
   return (
@@ -7,7 +7,7 @@ function Login() {
       <h2>ログイン前です</h2>
       <a href={accessUrl}>spotifyへログイン</a>
     </div>
-  )
+  );
 }
 
-export default Login
+export default Login;
