@@ -9,7 +9,7 @@
     "lint": "eslint src",
     "preview": "vite preview",
     "fix": "eslint src --fix",
-    "prepare": "cd ../.. && husky frontend/.husky"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.2.1",
@@ -30,7 +30,8 @@
     "eslint-plugin-react-refresh": "^0.4.6",
     "globals": "^15.2.0",
     "husky": "^9.0.11",
-    "lint-staged": "^15.2.2"
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5"
   },
   "optionalDependencies": {
     "@swc/core": "^1.5.7",
