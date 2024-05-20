@@ -14,10 +14,16 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.0.2",
     "@vitejs/plugin-react": "^4.2.1",
     "axios": "^1.6.8",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.378.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.3.0",
+    "tailwindcss-animate": "^1.0.7",
     "vite": "^5.2.11"
   },
   "devDependencies": {
@@ -33,6 +39,7 @@
     "@storybook/test": "^8.1.1",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
+    "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -43,9 +50,11 @@
     "globals": "^15.2.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
+    "postcss": "^8.4.38",
     "prettier": "^3.2.5",
     "prop-types": "^15.8.1",
-    "storybook": "^8.1.1"
+    "storybook": "^8.1.1",
+    "tailwindcss": "^3.4.3"
   },
   "optionalDependencies": {
     "@swc/core": "^1.5.7",
