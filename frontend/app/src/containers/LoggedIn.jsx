@@ -28,7 +28,7 @@ function LoggedIn({ accessToken }) {
 
   return (
     <div>
-      <h1>spotifyへログインしました!!!</h1>
+      <h1>spotifyへログインしました</h1>
     </div>
   );
 }
