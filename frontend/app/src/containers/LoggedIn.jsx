@@ -1,10 +1,11 @@
-import React, { Fragment, useEffect } from "react";
+import React, { useEffect } from "react";
 
-import { fetchUser } from '../apis/users'; 
+import { fetchUser } from "../apis/users";
 
+import PropTypes from "prop-types";
 
 // function LoggedIn(accessToken) {
-  
+
 //   useEffect(() => {
 //     fetchUser(accessToken)
 //     .then((data) =>
@@ -25,12 +26,15 @@ function LoggedIn({ accessToken }) {
     fetchData();
   }, []);
 
-return (
-    
+  return (
     <div>
       <h1>spotifyへログインしました</h1>
     </div>
   );
 }
+
+LoggedIn.propTypes = {
+  accessToken: PropTypes.string.isRequired,
+};
 
 export default LoggedIn;
