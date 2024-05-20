@@ -5,7 +5,7 @@ function Login() {
   return (
     <div className="Login">
       <h2>ログイン前です</h2>
-      <a href={accessUrl}>spotifyログイン</a>
+      <a href={accessUrl}>spotifyログインします</a>
     </div>
   );
 }
