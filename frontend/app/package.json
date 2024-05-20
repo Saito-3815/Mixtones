@@ -9,7 +9,7 @@
     "lint": "eslint src",
     "preview": "vite preview",
     "fix": "eslint src --fix",
-    "prepare": "cd ../.. && husky frontend/app/.husky",
+    "prepare": "cd ../..   && husky frontend/app/.husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
