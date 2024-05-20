@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import Login from "./containers/Login";
-import LoggedIn from "./containers/LoggedIn";
+import Login from "@/containers/Login";
+import LoggedIn from "@/containers/LoggedIn";
 import { getTokenFromUrl } from "./urls/Spotify";
 
 function App() {

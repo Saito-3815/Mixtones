@@ -9,7 +9,9 @@
     "lint": "eslint src",
     "preview": "vite preview",
     "fix": "eslint src --fix",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.2.1",
@@ -19,7 +21,16 @@
     "vite": "^5.2.11"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^1.4.0",
     "@eslint/js": "^9.2.0",
+    "@storybook/addon-essentials": "^8.1.1",
+    "@storybook/addon-interactions": "^8.1.1",
+    "@storybook/addon-links": "^8.1.1",
+    "@storybook/addon-onboarding": "^8.1.1",
+    "@storybook/blocks": "^8.1.1",
+    "@storybook/react": "^8.1.1",
+    "@storybook/react-vite": "^8.1.1",
+    "@storybook/test": "^8.1.1",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "eslint": "^8.57.0",
@@ -28,10 +39,13 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "eslint-plugin-storybook": "^0.8.0",
     "globals": "^15.2.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "prop-types": "^15.8.1",
+    "storybook": "^8.1.1"
   },
   "optionalDependencies": {
     "@swc/core": "^1.5.7",
