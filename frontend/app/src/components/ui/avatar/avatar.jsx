@@ -63,7 +63,7 @@ export function AvatarSet({ src }) {
   return (
     <Avatar>
       <AvatarImage src={src} alt="avatar" />
-      <AvatarFallback>
+      <AvatarFallback className="bg-gray-300">
         <FontAwesomeIcon icon={faUser} className="text-gray-500" />
       </AvatarFallback>
     </Avatar>

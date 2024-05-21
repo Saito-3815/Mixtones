@@ -1,5 +1,5 @@
 import { fn } from "@storybook/test";
-import { Button } from "./button";
+import { Button } from "./Button";
 
 export default {
   title: "Button",

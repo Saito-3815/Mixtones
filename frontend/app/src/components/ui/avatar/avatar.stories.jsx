@@ -1,16 +1,35 @@
-import { AvatarSet } from "./avatar";
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faUser } from '@fortawesome/free-solid-svg-icons'
-// import { icon } from '@fortawesome/fontawesome-svg-core/import.macro'
+import { AvatarSet } from "./Avatar";
 
 export default {
   title: "Avatar",
   component: AvatarSet,
+  parameters: {
+    layout: "centered",
+  },
+  tags: ["autodocs"],
+  argTypes: {
+    src: {
+      control: {
+        type: "radio",
+      },
+      options: ["https://picsum.photos/200", ""],
+    },
+  },
 };
 
-export const User = {
-  component: AvatarSet,
+export const NoImage = (args) => <AvatarSet {...args} />;
+
+export const WithImage = NoImage.bind({});
+WithImage.args = {
+  src: "https://picsum.photos/200",
 };
+
+// export const User = {
+//   component: AvatarSet,
+//   args: {
+//     src: "https://picsum.photos/200",
+//   },
+// };
 
 // export function Default() {
 //   return (
