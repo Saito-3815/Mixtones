@@ -257,8 +257,6 @@ export function BarMenu({ user, onLogin, onLogout, onCreateAccount }) {
       ) : (
         <>
           <DropdownMenuContent>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onCreateAccount}>
               サインアップ
             </DropdownMenuItem>

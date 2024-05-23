@@ -23,21 +23,3 @@ export const WithImage = NoImage.bind({});
 WithImage.args = {
   src: "https://picsum.photos/200",
 };
-
-// export const User = {
-//   component: AvatarSet,
-//   args: {
-//     src: "https://picsum.photos/200",
-//   },
-// };
-
-// export function Default() {
-//   return (
-//     <Avatar>
-//       <AvatarImage src="" alt="avatar" />
-//       <AvatarFallback>
-//         <FontAwesomeIcon icon={faUser} className="text-gray-500"/>
-//       </AvatarFallback>
-//     </Avatar>
-//   )
-// }

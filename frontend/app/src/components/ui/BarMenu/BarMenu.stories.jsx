@@ -9,4 +9,12 @@ export default {
   tags: ["autodocs"],
 };
 
-export const Default = (args) => <BarMenu {...args} />;
+export const LogIn = {
+  args: {
+    user: {
+      name: "Jane Doe",
+    },
+  },
+};
+
+export const LogOut = {};

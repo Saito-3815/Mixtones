@@ -21,7 +21,8 @@ module.exports = {
     },
     extend: {
       colors: {
-        "theme-gray": "#292929",
+        "theme-black": "#292929",
+        "theme-gray": "#727272",
         "theme-orange": "#FB6C04",
         "theme-green": "#1ed760",
         border: "hsl(var(--border))",
