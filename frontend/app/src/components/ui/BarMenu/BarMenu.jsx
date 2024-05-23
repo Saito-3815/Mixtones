@@ -1,7 +1,9 @@
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";
-import { AvatarSet } from "../Avatar/Avatar";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 import { cn } from "@/lib/utils";
 
@@ -227,19 +229,43 @@ export {
   DropdownMenuRadioGroup,
 };
 
-export function DropdownMenuSet() {
+BarMenu.propTypes = {
+  user: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+  }),
+  onLogin: PropTypes.func.isRequired,
+  onLogout: PropTypes.func.isRequired,
+  onCreateAccount: PropTypes.func.isRequired,
+};
+
+export function BarMenu({ user, onLogin, onLogout, onCreateAccount }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <AvatarSet src="https://picsum.photos/200" />
+        <FontAwesomeIcon icon={faBars} className="text-white text-4xl" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>プロフィール</DropdownMenuItem>
-        <DropdownMenuItem>ログアウト</DropdownMenuItem>
-        <DropdownMenuItem>アカウント削除</DropdownMenuItem>
-      </DropdownMenuContent>
+      {user ? (
+        <>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>プロフィール</DropdownMenuItem>
+            <DropdownMenuItem onClick={onLogout}>ログアウト</DropdownMenuItem>
+            <DropdownMenuItem>アカウント削除</DropdownMenuItem>
+          </DropdownMenuContent>
+        </>
+      ) : (
+        <>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onCreateAccount}>
+              サインアップ
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onLogin}>ログイン</DropdownMenuItem>
+          </DropdownMenuContent>
+        </>
+      )}
     </DropdownMenu>
   );
 }

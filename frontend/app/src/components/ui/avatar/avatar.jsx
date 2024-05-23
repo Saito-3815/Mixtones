@@ -12,7 +12,7 @@ const Avatar = React.forwardRef(({ className, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
     className={cn(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+      "relative flex h-12 w-12 shrink-0 overflow-hidden rounded-full",
       className,
     )}
     {...props}
@@ -64,7 +64,7 @@ export function AvatarSet({ src }) {
     <Avatar>
       <AvatarImage src={src} alt="avatar" />
       <AvatarFallback className="bg-gray-300">
-        <FontAwesomeIcon icon={faUser} className="text-gray-500" />
+        <FontAwesomeIcon icon={faUser} className="text-gray-500 text-2xl" />
       </AvatarFallback>
     </Avatar>
   );

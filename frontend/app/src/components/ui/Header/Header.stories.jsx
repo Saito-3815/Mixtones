@@ -13,6 +13,9 @@ export default {
     onLogout: fn(),
     onCreateAccount: fn(),
   },
+  // argTypes: {
+  //   backgroundColor: { control: 'color' },
+  // },
 };
 
 export const LogIn = {
