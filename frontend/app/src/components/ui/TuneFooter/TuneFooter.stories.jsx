@@ -15,13 +15,13 @@ const Template = (args) => <TuneFooter {...args} />;
 export const WithProps = Template.bind({});
 WithProps.args = {
   tune: {
-    name: "Test Name",
+    name: "Test Tune Name has long text virsion, this is a test text for long text.",
     artist: "Test Artist",
     album: "Test Album",
     images: {
       small: "https://picsum.photos/200", // 200x200のランダムな画像
       large: "https://picsum.photos/500", // 500x500のランダムな画像
     },
-    time: "Test Time",
+    time: "3:33",
   },
 };
