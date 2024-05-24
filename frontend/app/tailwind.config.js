@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  mode: "jit",
   darkMode: ["class"],
   content: [
     "./pages/**/*.{js,jsx}",
@@ -22,6 +23,7 @@ module.exports = {
     extend: {
       colors: {
         "theme-black": "#292929",
+        "theme-white": "#B3B3B3",
         "theme-gray": "#727272",
         "theme-orange": "#FB6C04",
         "theme-green": "#1ed760",
@@ -79,6 +81,7 @@ module.exports = {
         },
       },
       animation: {
+        marquee: "marquee 10s linear infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
