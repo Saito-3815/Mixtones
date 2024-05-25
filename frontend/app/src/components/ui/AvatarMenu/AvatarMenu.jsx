@@ -247,7 +247,15 @@ export function AvatarMenu() {
             cancelText="キャンセル"
           />
         </DropdownMenuItem>
-        <DropdownMenuItem>アカウント削除</DropdownMenuItem>
+        <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+          <AlertDialogSet
+            triggerComponent={<span>アカウント削除</span>}
+            dialogTitle="あなたのユーザー情報を削除します。よろしいですか？"
+            dialogText="アカウントを削除するとSpotifyアカウントとの連携も解除されます。"
+            actionText="アカウントを削除する"
+            cancelText="キャンセル"
+          />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

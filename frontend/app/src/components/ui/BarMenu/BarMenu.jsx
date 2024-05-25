@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";
+import { AlertDialogSet } from "../AlertDialog/AlertDialog";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
@@ -238,7 +239,7 @@ BarMenu.propTypes = {
   onCreateAccount: PropTypes.func.isRequired,
 };
 
-export function BarMenu({ user, onLogin, onLogout, onCreateAccount }) {
+export function BarMenu({ user, onLogin, onCreateAccount }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -250,8 +251,26 @@ export function BarMenu({ user, onLogin, onLogout, onCreateAccount }) {
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>プロフィール</DropdownMenuItem>
-            <DropdownMenuItem onClick={onLogout}>ログアウト</DropdownMenuItem>
-            <DropdownMenuItem>アカウント削除</DropdownMenuItem>
+            {/* <DropdownMenuItem onClick={onLogout}>ログアウト</DropdownMenuItem> */}
+            <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+              <AlertDialogSet
+                triggerComponent={<span>ログアウト</span>}
+                dialogTitle="ログアウトします。よろしいですか？"
+                dialogText="ログアウトするとあなたのお気に入りの更新がストップします。"
+                actionText="ログアウトする"
+                cancelText="キャンセル"
+              />
+            </DropdownMenuItem>
+            {/* <DropdownMenuItem>アカウント削除</DropdownMenuItem> */}
+            <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+              <AlertDialogSet
+                triggerComponent={<span>アカウント削除</span>}
+                dialogTitle="あなたのユーザー情報を削除します。よろしいですか？"
+                dialogText="アカウントを削除するとSpotifyアカウントとの連携も解除されます。"
+                actionText="アカウントを削除する"
+                cancelText="キャンセル"
+              />
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </>
       ) : (

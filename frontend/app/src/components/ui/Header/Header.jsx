@@ -24,7 +24,7 @@ export const Header = ({ user, onLogin, onCreateAccount }) => (
                 triggerComponent={
                   <Button variant="secondary" label="コミュニティを作る" />
                 }
-                dialogTitle="新しいコミュニティが作成されます。\nよろしいですか？"
+                dialogTitle="新しいコミュニティが作成されます。よろしいですか？"
                 dialogText="コミュニティを作成するとあなたのお気に入りが共有されます。"
                 actionText="コミュニティを作る"
                 cancelText="キャンセル"
