@@ -2,6 +2,7 @@ import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";
 import { AvatarSet } from "../Avatar/Avatar";
+import { AlertDialogSet } from "../AlertDialog/AlertDialog";
 
 import { cn } from "@/lib/utils";
 
@@ -237,7 +238,15 @@ export function AvatarMenu() {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>プロフィール</DropdownMenuItem>
-        <DropdownMenuItem>ログアウト</DropdownMenuItem>
+        <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+          <AlertDialogSet
+            triggerComponent={<span>ログアウト</span>}
+            dialogTitle="ログアウトします。よろしいですか？"
+            dialogText="ログアウトするとあなたのお気に入りの更新がストップします。"
+            actionText="ログアウトする"
+            cancelText="キャンセル"
+          />
+        </DropdownMenuItem>
         <DropdownMenuItem>アカウント削除</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -16,7 +16,7 @@ import { PlayIcon } from "../PlayIcon/PlayIcon";
 
 export const TuneFooter = ({ tune }) => (
   <footer className="mx-1 my-1">
-    <div className="grid grid-cols-3 items-center bg-theme-black rounded-sm h-[72px]">
+    <div className="grid grid-cols-1 md:grid-cols-3 items-center bg-theme-black rounded-sm md:h-[72px]">
       {/* 楽曲データ */}
       <div className="flex flex-grow flex-shrink justify-start items-center space-x-3 pr-5 col-span-3 md:col-span-1">
         <img
@@ -35,7 +35,7 @@ export const TuneFooter = ({ tune }) => (
         />
       </div>
       {/* 再生コントロール */}
-      <div className="flex-grow flex-shrink justify-center items-center hidden md:flex">
+      <div className="flex-grow flex-shrink justify-center items-center col-span-3 md:col-span-1 md:flex px-3 md:px-0">
         <div className="items-center w-full">
           <div className="flex justify-center items-center space-x-5 mt-2">
             <ColorIcon icon={faShuffle} />
@@ -57,7 +57,6 @@ export const TuneFooter = ({ tune }) => (
           </div>
         </div>
       </div>
-      {/* モバイル再生ボタン */}
       {/* 音量調整 */}
       <div className="flex-grow flex-shrink justify-end items-center hidden md:flex">
         <div className="flex flex-grow flex-shrink justify-end items-center space-x-3 mr-10">
