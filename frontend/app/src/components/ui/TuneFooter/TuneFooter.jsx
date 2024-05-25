@@ -18,7 +18,7 @@ export const TuneFooter = ({ tune }) => (
   <footer className="mx-1 my-1">
     <div className="grid grid-cols-1 md:grid-cols-3 items-center bg-theme-black rounded-sm md:h-[72px]">
       {/* 楽曲データ */}
-      <div className="flex flex-grow flex-shrink justify-start items-center space-x-3 pr-5 col-span-3 md:col-span-1">
+      <div className="flex flex-grow flex-shrink justify-start items-center space-x-3 pr-5 col-span-3 md:col-span-1 py-3 lg:py-0">
         <img
           src={`${tune.images.large}`}
           alt="images"
