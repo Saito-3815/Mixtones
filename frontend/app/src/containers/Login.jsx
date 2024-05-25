@@ -1,6 +1,6 @@
 import React from "react";
 import { accessUrl } from "../urls/Spotify";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button/Button";
 
 function Login() {
   return (
