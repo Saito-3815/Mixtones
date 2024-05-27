@@ -1,6 +1,6 @@
 export const WordFooter = () => (
   <footer className="bg-transparent text-white border-t border-theme-gray h-16 p-0 w-full">
-    <div className="container flex justify-between">
+    <div className="container flex justify-between px-0">
       <p className="mb-4 text-sm">
         &copy; {new Date().getFullYear()} All rights reserved.
       </p>
