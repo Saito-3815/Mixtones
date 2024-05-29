@@ -19,12 +19,7 @@ import {
 // TypeScriptのinterfaceをPropTypesで置き換えます
 import PropTypes from "prop-types";
 
-DataTable.propTypes = {
-  columns: PropTypes.array.isRequired,
-  data: PropTypes.array.isRequired,
-};
-
-const DataTable = ({ data, columns }) => {
+export const DataTable = ({ data, columns }) => {
   const table = useReactTable({
     data,
     columns,
@@ -59,9 +54,23 @@ const DataTable = ({ data, columns }) => {
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
               >
-                {row.getVisibleCells().map((cell) => (
+                {/* {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))} */}
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {typeof cell.value === "string" &&
+                    cell.value.startsWith("http") ? (
+                      <img
+                        src={cell.value}
+                        alt="cell content"
+                        style={{ width: "40px", height: "40px" }}
+                      />
+                    ) : (
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    )}
                   </TableCell>
                 ))}
               </TableRow>
@@ -77,4 +86,9 @@ const DataTable = ({ data, columns }) => {
       </Table>
     </div>
   );
+};
+
+DataTable.propTypes = {
+  columns: PropTypes.array.isRequired,
+  data: PropTypes.array.isRequired,
 };

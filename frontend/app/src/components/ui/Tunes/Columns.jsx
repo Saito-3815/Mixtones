@@ -8,22 +8,52 @@ import PropTypes from "prop-types";
 // You can use a Zod schema here if you want.
 export const Tune = {
   id: PropTypes.string,
-  amount: PropTypes.number,
+  image: PropTypes.string,
+  index: PropTypes.number,
+  name: PropTypes.string,
+  album: PropTypes.string,
+  added_at: PropTypes.string,
+  time: PropTypes.string,
   status: PropTypes.oneOf(["pending", "processing", "success", "failed"]),
-  email: PropTypes.string,
 };
 
 export const columns = [
+  {
+    accessorKey: "index",
+    header: "#",
+  },
+  {
+    accessorKey: "image",
+    header: "",
+    cell: ({ value }) => {
+      console.log(value);
+      return (
+        <img
+          src={value}
+          alt="Album cover"
+          style={{ width: "40px", height: "40px" }}
+        />
+      );
+    },
+  },
+  {
+    accessorKey: "name",
+    header: "タイトル",
+  },
+  {
+    accessorKey: "album",
+    header: "アルバム",
+  },
+  {
+    accessorKey: "added_at",
+    header: "追加日",
+  },
   {
     accessorKey: "status",
     header: "Status",
   },
   {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "amount",
-    header: "Amount",
+    accessorKey: "time",
+    header: "time",
   },
 ];

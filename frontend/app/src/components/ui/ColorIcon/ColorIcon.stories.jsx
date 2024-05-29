@@ -4,7 +4,7 @@ import {
   faForwardStep,
   faRepeat,
 } from "@fortawesome/free-solid-svg-icons";
-import ColorIcon from "./ColorIcon";
+import { ColorIcon } from "./ColorIcon";
 
 export default {
   title: "ColorIcon",
