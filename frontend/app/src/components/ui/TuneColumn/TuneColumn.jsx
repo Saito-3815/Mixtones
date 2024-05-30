@@ -55,23 +55,16 @@ export const TuneColumn = ({ tune, index }) => {
   const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 
   return (
-    // <div
-    //   className={`cursor-pointer bg-theme-black ${isClicked ? "bg-theme-black/90" : "hover:bg-theme-black/90"} text-theme-gray ${isClicked ? "text-white" : "hover:text-white"} h-[56px] lg:w-[1200px]`}
-    //   onClick={handleClick}
-    //   onMouseEnter={handleMouseEnter}
-    //   onMouseLeave={handleMouseLeave}
-    // >
-    //   <tr className={`flex justify-start items-center h-full w-full `}>
     <tr
-      className={`cursor-pointer bg-theme-black ${isClicked ? "bg-theme-black/90" : "hover:bg-theme-black/90"} text-theme-gray ${isClicked ? "text-white" : "hover:text-white"} h-[56px] lg:w-[1200px] flex justify-start items-center`}
-      onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      className={`cursor-pointer bg-theme-black ${isClicked ? "bg-theme-black/90" : "hover:bg-theme-black/90"} text-theme-gray ${isClicked ? "text-white" : "hover:text-white"} h-[56px] w-full`}
     >
       {/* 番号 */}
-      <td>
+      <td className="h-[56px] w-[50px] hidden sm:table-cell">
         <div
-          className={`w-[18px] h-[18px] items-center justify-center ml-5 hidden sm:inline-block hover:text-white ${isClicked ? "text-theme-orange" : "text-theme-gray"}`}
+          className={`w-[18px] h-[18px] items-center justify-center ml-5 hidden sm:flex hover:text-white ${isClicked ? "text-theme-orange" : "text-theme-gray"}`}
+          onClick={handleClick}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           {isHovered && !isClicked ? (
             <FontAwesomeIcon
@@ -99,61 +92,74 @@ export const TuneColumn = ({ tune, index }) => {
         </div>
       </td>
       {/* 曲名セクション */}
-      <td className="flex justify-start items-center">
-        {/* 画像 */}
-        <img
-          src={`${tune.images}`}
-          alt="images"
-          className="object-cover h-10 w-10 rounded-sm ml-5"
-        />
-        {/* 曲名・アーティスト */}
-        <div className="w-[300px] overflow-hidden ml-5">
-          <h1
-            ref={tuneNameRef}
-            className={`text-sm font-extralight whitespace-nowrap overflow-x-visible ${
-              isClicked ? "text-theme-orange" : "text-white"
-            } `}
-          >{`${tune.name}`}</h1>
-          <h2
-            ref={tuneArtistRef}
-            className="text-xs font-extralight whitespace-nowrap overflow-x-visible"
-          >{`${tune.artist}`}</h2>
+      <td className="h-[56px] w-[300px] max-w-[300px] items-center overflow-hidden">
+        <div
+          className="flex items-center w-full h-full ml-5 sm:ml-0"
+          onClick={handleClick}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* 画像 */}
+          <img
+            src={`${tune.images}`}
+            alt="images"
+            className="object-cover h-10 w-10 rounded-sm flex-shrink-0"
+          />
+          {/* 曲名・アーティスト */}
+          <div className="overflow-hidden ml-5 w-full flex-shrink">
+            <h1
+              ref={tuneNameRef}
+              className={`text-sm font-extralight whitespace-nowrap overflow-x-hidden ${
+                isClicked ? "text-theme-orange" : "text-white"
+              } `}
+            >{`${tune.name}`}</h1>
+            <h2
+              ref={tuneArtistRef}
+              className="text-xs font-extralight whitespace-nowrap overflow-x-hidden"
+            >{`${tune.artist}`}</h2>
+          </div>
         </div>
       </td>
       {/* アルバムセクション */}
-      <td>
-        <div className="w-[300px] overflow-hidden ml-5">
+      <td className="h-[56px] w-[300px] overflow-hidden hidden lg:table-cell">
+        <div className="flex items-center w-full whitespace-nowrap pl-5">
           <h1
             ref={tuneAlbumRef}
-            className="text-sm font-extralight hidden sm:flex whitespace-nowrap overflow-x-visible"
+            className="text-sm font-extralight overflow-hidden"
           >
             {tune.album}
           </h1>
         </div>
       </td>
       {/* 追加日セクション */}
-      <td className="hidden sm:flex items-center justify-between w-[330px] mx-5">
-        {/* 追加日 */}
-        {/* YYYY年M月D日で日付を表示 */}
-        <span className="hidden lg:flex text-sm font-extralight">
-          {formattedDate}
-        </span>
-        {/* チェックボタン */}
-        <ColorIcon icon={faCircleCheck} />
-        {/* レコメンドボタン */}
-        <ColorIcon icon={faThumbsUp} />
-        {/* コメントボタン */}
-        <ColorIcon icon={faCommentDots} />
+      <td className="hidden h-[56px] w-[300px] sm:table-cell justify-between mx-5 overflow-hidden">
+        <div className="flex items-center justify-start space-x-14 pl-5 w-full">
+          {/* 追加日 */}
+          {/* YYYY年M月D日で日付を表示 */}
+          <span className="hidden sm:flex text-sm font-extralight ">
+            {formattedDate}
+          </span>
+          {/* チェックボタン */}
+          <ColorIcon icon={faCircleCheck} />
+          {/* レコメンドボタン */}
+          <ColorIcon icon={faThumbsUp} />
+          {/* コメントボタン */}
+          <ColorIcon icon={faCommentDots} />
+        </div>
       </td>
       {/* 再生時間 */}
-      <td className="mx-5">
-        <span className="text-sm font-extralight">{tune.time}</span>
+      <td className="mx-5 h-[56px] w-[150px] overflow-hidden hidden lg:table-cell">
+        <div className="flex items-center">
+          <span className="text-sm font-extralight">{tune.time}</span>
+        </div>
       </td>
-      <div className="md:hidden mr-5">
-        <DotsMenu />
-      </div>
+      {/* ドットメニュー */}
+      <td className="sm:hidden">
+        <div className="md:hidden justify-center px-4">
+          <DotsMenu />
+        </div>
+      </td>
     </tr>
-    // </div>
   );
 };
 

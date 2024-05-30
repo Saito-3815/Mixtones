@@ -1,23 +1,99 @@
+import { useState, useEffect, useRef } from "react";
 import { TuneColumn } from "@/components/ui/TuneColumn/TuneColumn";
+import { faClock } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
+import { faList, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 export const TuneTable = ({ tunes }) => {
+  // 検索機能
+  const [searchText, setSearchText] = useState("");
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+  const filteredTunes = tunes.filter(
+    (tune) =>
+      tune.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      tune.artist.toLowerCase().includes(searchText.toLowerCase()) ||
+      tune.album.toLowerCase().includes(searchText.toLowerCase()),
+  );
+
+  // ドロップダウンメニューの外側をクリックした場合に非表示にする
+  const node = useRef();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (node.current.contains(e.target)) {
+        // inside click
+        return;
+      }
+      // outside click
+      setIsSearchVisible(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <table>
-      <thead>
-        <tr>
-          <th className="text-left">#</th>
-          <th className="text-left">タイトル</th>
-          <th className="text-left">アルバム</th>
-          <th className="text-left">追加日</th>
-        </tr>
-      </thead>
-      <tbody>
-        {tunes.map((tune, index) => (
-          <TuneColumn tune={tune} index={index} key={index} />
-        ))}
-      </tbody>
-    </table>
+    <div className="flex flex-col items-end max-w-[1200px]">
+      <div className="flex justify-end pb-10" ref={node}>
+        {isSearchVisible ? (
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="pl-10 bg-theme-black text-theme-gray"
+            />
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-theme-gray"
+            />
+          </div>
+        ) : (
+          <FontAwesomeIcon
+            icon={faMagnifyingGlass}
+            className="text-theme-gray mr-5"
+            onClick={() => setIsSearchVisible(!isSearchVisible)}
+          />
+        )}
+        <FontAwesomeIcon icon={faList} className="text-theme-gray" />
+      </div>
+      <table className="table-fixed lg:w-[1200px]">
+        <thead className="sm:text-theme-gray sm:table-header sm:table-row-group hidden">
+          <tr>
+            <th className="text-left w-[50px] border-b border-theme-gray pl-6 hidden sm:table-cell">
+              #
+            </th>
+            <th className="text-left sm:w-[300px] border-b border-theme-gray">
+              タイトル
+            </th>
+            <th className="text-left w-[300px] border-b border-theme-gray pl-5 hidden lg:table-cell">
+              アルバム
+            </th>
+            <th className="text-left w-[400px] border-b border-theme-gray pl-5 hidden sm:table-cell">
+              追加日
+            </th>
+            <th className="text-left w-[50px] border-b border-theme-gray pl-1 hidden lg:table-cell">
+              <FontAwesomeIcon
+                icon={faClock}
+                className="hidden sm:inline-block"
+              />
+            </th>
+            <th className="sm:hidden"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredTunes.map((tune, index) => (
+            <TuneColumn tune={tune} index={index} key={index} />
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
