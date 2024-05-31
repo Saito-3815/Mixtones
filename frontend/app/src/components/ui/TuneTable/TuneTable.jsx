@@ -4,6 +4,7 @@ import { faClock } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import { faList, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { PlayIcon } from "../PlayIcon/PlayIcon";
 
 export const TuneTable = ({ tunes }) => {
   // 検索機能
@@ -39,29 +40,37 @@ export const TuneTable = ({ tunes }) => {
 
   return (
     <div className="flex flex-col items-end max-w-[1200px]">
-      <div className="flex justify-end pb-10" ref={node}>
-        {isSearchVisible ? (
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              className="pl-10 bg-theme-black text-theme-gray"
-            />
+      <div
+        className="flex justify-between pb-16 items-center h-10 w-full"
+        ref={node}
+      >
+        <div className="pl-10">
+          <PlayIcon color="text-theme-orange" size="10" />
+        </div>
+        <div className="flex">
+          {isSearchVisible ? (
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="pl-10 bg-transparent text-theme-gray mr-5 focus:outline-none"
+              />
+              <FontAwesomeIcon
+                icon={faMagnifyingGlass}
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 text-theme-gray"
+              />
+            </div>
+          ) : (
             <FontAwesomeIcon
               icon={faMagnifyingGlass}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-theme-gray"
+              className="text-theme-gray mr-5"
+              onClick={() => setIsSearchVisible(!isSearchVisible)}
             />
-          </div>
-        ) : (
-          <FontAwesomeIcon
-            icon={faMagnifyingGlass}
-            className="text-theme-gray mr-5"
-            onClick={() => setIsSearchVisible(!isSearchVisible)}
-          />
-        )}
-        <FontAwesomeIcon icon={faList} className="text-theme-gray" />
+          )}
+          <FontAwesomeIcon icon={faList} className="text-theme-gray" />
+        </div>
       </div>
       <table className="table-fixed lg:w-[1200px]">
         <thead className="sm:text-theme-gray sm:table-header sm:table-row-group hidden">

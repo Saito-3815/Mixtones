@@ -49,11 +49,11 @@ function App() {
   // };
 
   return (
-    <div className="flex flex-col min-h-screen bg-black relative">
+    <div className="flex flex-col min-h-screen w-screen min-w-screen bg-black relative overflow-hidden">
       <div className="fixed z-10 w-full">
         <Header />
       </div>
-      <main className="flex flex-col flex-grow mb-[72px] mt-16">
+      <main className="flex flex-col flex-grow mb-[72px] mt-16 w-full">
         <Router>
           <Routes>
             {/* コミュニティ一覧 */}

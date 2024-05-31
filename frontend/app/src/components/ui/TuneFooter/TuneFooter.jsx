@@ -63,7 +63,7 @@ export const TuneFooter = ({ tune }) => {
                 icon={faBackwardStep}
                 className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
               />
-              <PlayIcon />
+              <PlayIcon color="text-white" size="8" />
               <FontAwesomeIcon
                 icon={faForwardStep}
                 className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
