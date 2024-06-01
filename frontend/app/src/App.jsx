@@ -44,17 +44,17 @@ function App() {
     time: "00:00",
   };
 
-  // const user = {
-  //   name: "User Name",
-  // };
+  const user = {
+    name: "User Name",
+  };
 
   return (
     <div className="flex flex-col min-h-screen w-screen min-w-screen bg-black relative overflow-hidden">
-      <div className="fixed z-10 w-full">
-        <Header />
-      </div>
-      <main className="flex flex-col flex-grow mb-[72px] mt-16 w-full">
-        <Router>
+      <Router>
+        <div className="fixed z-10 w-full">
+          <Header user={user} />
+        </div>
+        <main className="flex flex-col flex-grow mb-[72px] mt-16 w-full">
           <Routes>
             {/* コミュニティ一覧 */}
             <Route path="/" element={<Top />} />
@@ -63,7 +63,10 @@ function App() {
             {/* ログイン */}
             <Route path="/login" element={<Login />} />
             {/* コミュニティ情報 */}
-            <Route path="/communities/:communitiesId" element={<Community />} />
+            <Route
+              path="/communities/:communitiesId"
+              element={<Community user={""} />}
+            />
             {/* コミュニティ編集 */}
             <Route
               path="/communities/:communitiesId/edit"
@@ -74,14 +77,14 @@ function App() {
             {/* ユーザー編集 */}
             <Route path="/users/:usersId/edit" element={<UserEdit />} />
           </Routes>
-        </Router>
-        <div className="px-16">
-          <WordFooter />
+          <div className="px-16">
+            <WordFooter />
+          </div>
+        </main>
+        <div className="fixed bottom-0 z-10 w-full">
+          {tune && <TuneFooter tune={tune} />}
         </div>
-      </main>
-      <div className="fixed bottom-0 z-10 w-full">
-        {tune && <TuneFooter tune={tune} />}
-      </div>
+      </Router>
     </div>
   );
 }

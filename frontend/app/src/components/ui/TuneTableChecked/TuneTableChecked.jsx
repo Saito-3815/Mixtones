@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { TuneColumn } from "@/components/ui/TuneColumn/TuneColumn";
+import { TuneColumnChecked } from "@/components/ui/TuneColumnChecked/TuneColumnChecked";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import { faList, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
 
-export const TuneTable = ({ tunes }) => {
+export const TuneTableChecked = ({ tunes }) => {
   // 検索機能
   const [searchText, setSearchText] = useState("");
   const [isSearchVisible, setIsSearchVisible] = useState(false);
@@ -100,7 +100,7 @@ export const TuneTable = ({ tunes }) => {
         </thead>
         <tbody>
           {filteredTunes.map((tune, index) => (
-            <TuneColumn tune={tune} index={index} key={index} />
+            <TuneColumnChecked tune={tune} index={index} key={index} />
           ))}
         </tbody>
       </table>
@@ -108,7 +108,7 @@ export const TuneTable = ({ tunes }) => {
   );
 };
 
-TuneTable.propTypes = {
+TuneTableChecked.propTypes = {
   tunes: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string,

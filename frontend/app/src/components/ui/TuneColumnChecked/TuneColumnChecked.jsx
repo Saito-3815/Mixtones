@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import { ColorIcon } from "../ColorIcon/ColorIcon";
 import {
   faCircleCheck,
-  faCommentDots,
   faPause,
   faPlay,
-  faThumbsUp,
 } from "@fortawesome/free-solid-svg-icons";
-import { DotsMenu } from "../DotsMenu/DotsMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export const TuneColumn = ({ tune, index }) => {
+export const TuneColumnChecked = ({ tune, index }) => {
   if (!tune) {
     return null;
   }
@@ -109,23 +105,23 @@ export const TuneColumn = ({ tune, index }) => {
           <div className="overflow-hidden ml-5 w-full flex-shrink">
             <h1
               ref={tuneNameRef}
-              className={`text-sm font-extralight whitespace-nowrap overflow-x-hidden ${
+              className={`text-sm font-extralight whitespace-nowrap ${
                 isClicked ? "text-theme-orange" : "text-white"
               } `}
             >{`${tune.name}`}</h1>
             <h2
               ref={tuneArtistRef}
-              className="text-xs font-extralight whitespace-nowrap overflow-x-hidden"
+              className="text-xs font-extralight whitespace-nowrap"
             >{`${tune.artist}`}</h2>
           </div>
         </div>
       </td>
       {/* アルバムセクション */}
-      <td className="h-[56px] w-[300px] overflow-hidden hidden lg:table-cell">
-        <div className="flex items-center w-full whitespace-nowrap pl-5">
+      <td className="h-[56px] w-[300px] max-w-[300px] overflow-hidden hidden lg:table-cell items-center">
+        <div className="flex w-full pl-5 overflow-hidden flex-shrink items-center">
           <h1
             ref={tuneAlbumRef}
-            className="text-sm font-extralight overflow-hidden"
+            className="text-sm font-extralight whitespace-nowrap"
           >
             {tune.album}
           </h1>
@@ -133,18 +129,14 @@ export const TuneColumn = ({ tune, index }) => {
       </td>
       {/* 追加日セクション */}
       <td className="hidden h-[56px] w-[300px] sm:table-cell justify-between mx-5 overflow-hidden">
-        <div className="flex items-center justify-start space-x-14 pl-5 w-full">
+        <div className="flex items-center justify-between space-x-14 pl-5 pr-36 w-full">
           {/* 追加日 */}
           {/* YYYY年M月D日で日付を表示 */}
           <span className="hidden sm:flex text-sm font-extralight ">
             {formattedDate}
           </span>
           {/* チェックボタン */}
-          <ColorIcon icon={faCircleCheck} />
-          {/* レコメンドボタン */}
-          <ColorIcon icon={faThumbsUp} />
-          {/* コメントボタン */}
-          <ColorIcon icon={faCommentDots} />
+          <FontAwesomeIcon icon={faCircleCheck} className="text-theme-orange" />
         </div>
       </td>
       {/* 再生時間 */}
@@ -153,17 +145,11 @@ export const TuneColumn = ({ tune, index }) => {
           <span className="text-sm font-extralight">{tune.time}</span>
         </div>
       </td>
-      {/* ドットメニュー */}
-      <td className="sm:hidden">
-        <div className="md:hidden justify-center px-4">
-          <DotsMenu />
-        </div>
-      </td>
     </tr>
   );
 };
 
-TuneColumn.propTypes = {
+TuneColumnChecked.propTypes = {
   tune: PropTypes.shape({
     name: PropTypes.string.isRequired,
     artist: PropTypes.string.isRequired,
