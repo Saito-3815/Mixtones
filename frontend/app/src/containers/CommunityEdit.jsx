@@ -1,28 +1,58 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
-// import { useParams } from "react-router-dom";
+import { Switch } from "@/components/ui/Switch/Switch";
+import { Button } from "@/components/ui/Button/Button";
+import { useParams } from "react-router-dom";
 
 const CommunityEdit = () => {
-  // const { communitiesId } = useParams();
+  const { communitiesId } = useParams();
 
-  const userImageUrl = "https://picsum.photos/500";
+  const community = {
+    communityName: `${communitiesId}のコミュニティネーム`,
+    playlistName: `コミュニティ${communitiesId}のプレイリストネーム`,
+    introduction: "",
+    communityImage: "https://picsum.photos/500",
+  };
+
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  useEffect(() => {
+    setValue("communityName", community.communityName);
+    setValue("playlistName", community.playlistName);
+    setValue("introduction", community.introduction);
+  }, [setValue]);
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
 
   return (
     <div className="container flex flex-col justify-start items-center mt-20 max-w-[900px] bg-theme-black">
-      <form action="" className="flex flex-col justify-start w-full px-5">
+      <form
+        action=""
+        className="flex flex-col justify-start w-full sm:px-28 px-6 py-10"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         {/* 画像セクション */}
         <input
           type="file"
           id="image"
           accept="image/*"
           style={{ display: "none" }}
+          {...register("image")}
         />
         <label htmlFor="image">
           <div className="w-40 h-40 mx-auto bg-gray-400 rounded-sm flex items-center justify-center cursor-pointer">
-            {userImageUrl ? (
+            {community.communityImage ? (
               <img
-                src={userImageUrl}
+                src={community.communityImage}
                 alt=""
                 className="object-cover object-center w-full h-full rounded-sm"
               />
@@ -33,18 +63,77 @@ const CommunityEdit = () => {
               />
             )}
           </div>
-          <p className="text-white text-center">コミュニティ画像を変更する</p>
+          <p className="text-white text-center text-xl pt-8">
+            コミュニティ画像
+          </p>
         </label>
         {/* コミュニティ名 */}
-        <label htmlFor="communityName" className="text-white">
+        <label htmlFor="communityName" className="text-white pt-8 text-lg">
           コミュニティネーム
         </label>
-        <input type="text" id="communityName" />
+        <input
+          type="text"
+          id="communityName"
+          className="p-1"
+          {...register("communityName", {
+            required: "コミュニティネームは必須です",
+            maxLength: { value: 40, message: "40文字以内で入力してください" },
+          })}
+        />
+        {errors.communityName && (
+          <p className="text-red-500">{errors.communityName.message}</p>
+        )}
+        <label htmlFor="playlistName" className="text-white pt-8 text-lg">
+          プレイリストネーム
+        </label>
+        <input
+          type="text"
+          id="playlistName"
+          className="p-1"
+          {...register("playlistName", {
+            required: "プレイリストネームは必須です",
+            maxLength: { value: 40, message: "40文字以内で入力してください" },
+          })}
+        />
+        {errors.playlistName && (
+          <p className="text-red-500">{errors.playlistName.message}</p>
+        )}
         {/* 紹介文 */}
-        <label htmlFor="Introduction" className="text-white">
+        <label htmlFor="Introduction" className="text-white pt-8 text-lg">
           紹介文
         </label>
-        <input type="text" id="introduction" />
+        <textarea
+          id="introduction"
+          className="h-[80px] p-1"
+          {...register("introduction", {
+            maxLength: { value: 160, message: "160文字以内で入力してください" },
+          })}
+        ></textarea>
+        {errors.introduction && (
+          <p className="text-red-500">{errors.introduction.message}</p>
+        )}
+        {/* スイッチ制御 */}
+        <div className="flex justify-between items-center w-full pt-8 text-lg">
+          <div className="flex flex-col">
+            <h2 className="text-white">コメント</h2>
+            <p className="text-theme-gray text-sm">
+              コミュニティ外のコメントを許可
+            </p>
+          </div>
+          <Switch className="sm:mr-10 mr-0" />
+        </div>
+        <div className="flex justify-between items-center w-full pt-8 text-lg">
+          <div className="flex flex-col">
+            <h2 className="text-white">公開</h2>
+            <p className="text-theme-gray text-sm">
+              コミュニティプレイリストを公開する
+            </p>
+          </div>
+          <Switch className="sm:mr-10 mr-0" />
+        </div>
+        <div className="flex justify-center pt-16">
+          <Button label="更新する" variant="secondary" type="submit" />
+        </div>
       </form>
     </div>
   );

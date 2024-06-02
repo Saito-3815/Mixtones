@@ -68,7 +68,10 @@ export function AvatarSet({ src, size }) {
     <Avatar size={size}>
       <AvatarImage src={src} alt="avatar" />
       <AvatarFallback className="bg-gray-300">
-        <FontAwesomeIcon icon={faUser} className="text-gray-500 text-2xl" />
+        <FontAwesomeIcon
+          icon={faUser}
+          className={`text-gray-500 h-[${size}*3px] w-[${size}*3px] `}
+        />
       </AvatarFallback>
     </Avatar>
   );
