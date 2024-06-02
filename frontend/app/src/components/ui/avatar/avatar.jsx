@@ -64,13 +64,15 @@ AvatarSet.propTypes = {
 export { Avatar, AvatarImage, AvatarFallback };
 
 export function AvatarSet({ src, size }) {
+  const iconSize = size * 3;
   return (
     <Avatar size={size}>
       <AvatarImage src={src} alt="avatar" />
       <AvatarFallback className="bg-gray-300">
         <FontAwesomeIcon
           icon={faUser}
-          className={`text-gray-500 h-[${size}*3px] w-[${size}*3px] `}
+          style={{ height: `${iconSize}px`, width: `${iconSize}px` }}
+          className="text-gray-500"
         />
       </AvatarFallback>
     </Avatar>

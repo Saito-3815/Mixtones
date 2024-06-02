@@ -131,6 +131,7 @@ const CommunityEdit = () => {
           </div>
           <Switch className="sm:mr-10 mr-0" />
         </div>
+        {/* 更新ボタン */}
         <div className="flex justify-center pt-16">
           <Button label="更新する" variant="secondary" type="submit" />
         </div>

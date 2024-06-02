@@ -9,7 +9,7 @@ const userEdit = () => {
   const { usersId } = useParams();
 
   const user = {
-    name: `${usersId}のコミュニティネーム`,
+    name: `${usersId}のユーザーネーム`,
     introduction: "",
     image: "",
   };
@@ -48,22 +48,20 @@ const userEdit = () => {
         />
         <label htmlFor="image">
           <div className="mx-auto flex items-center justify-center cursor-pointer">
-            <AvatarSet src={`${user.image}`} size="40" />
+            <AvatarSet src={`${user.image}`} size={40} />
           </div>
-          <p className="text-white text-center text-xl pt-8">
-            コミュニティ画像
-          </p>
+          <p className="text-white text-center text-xl pt-8">ユーザー画像</p>
         </label>
-        {/* コミュニティ名 */}
+        {/* ユーザー名 */}
         <label htmlFor="name" className="text-white pt-8 text-lg">
-          コミュニティネーム
+          ユーザーネーム
         </label>
         <input
           type="text"
           id="name"
           className="p-1"
           {...register("name", {
-            required: "コミュニティネームは必須です",
+            required: "ユーザーネームは必須です",
             maxLength: { value: 40, message: "40文字以内で入力してください" },
           })}
         />
@@ -85,22 +83,14 @@ const userEdit = () => {
         {/* スイッチ制御 */}
         <div className="flex justify-between items-center w-full pt-8 text-lg">
           <div className="flex flex-col">
-            <h2 className="text-white">コメント</h2>
-            <p className="text-theme-gray text-sm">
-              コミュニティ外のコメントを許可
-            </p>
-          </div>
-          <Switch className="sm:mr-10 mr-0" />
-        </div>
-        <div className="flex justify-between items-center w-full pt-8 text-lg">
-          <div className="flex flex-col">
             <h2 className="text-white">公開</h2>
             <p className="text-theme-gray text-sm">
-              コミュニティプレイリストを公開する
+              チェックした楽曲を公開する
             </p>
           </div>
           <Switch className="sm:mr-10 mr-0" />
         </div>
+        {/* 更新ボタン */}
         <div className="flex justify-center pt-16">
           <Button label="更新する" variant="secondary" type="submit" />
         </div>
