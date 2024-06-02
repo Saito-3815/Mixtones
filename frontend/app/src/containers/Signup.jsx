@@ -1,15 +1,17 @@
 import { Button } from "@/components/ui/Button/Button";
 import { Switch } from "@/components/ui/Switch/Switch";
 
-const Login = () => {
+const Signup = () => {
   return (
     <div className="container flex flex-col bg-theme-black max-w-[890px] max-h-[840px] h-full mx-auto my-8 rounded-sm justify-center items-center overflow-hidden">
       <div className="w-full max-w-[550px] mx-auto items-center text-center">
         <h1 className="text-white text-2xl pt-24 ">
-          Spotifyへログインしますか？
+          サインアップにはSpotifyへのログインが必要です。
+          <br />
+          ログインしますか？
         </h1>
         <p className="text-theme-gray pt-12">
-          ログインすると最新のSpotifyのユーザープロフィールと「お気に入りの曲」がこのアプリケーションと連携されます。ログイン情報を保持するとSpotifyの更新が自動で連携されます。
+          ログインするとSpotifyのユーザープロフィールと「お気に入りの曲」がこのアプリケーションと連携されます。ログイン情報を保持するとSpotifyの更新が自動で連携されます。
           <br />
           ゲストログインすると一部を除いたアプリケーションの全機能が使えるようになります。
         </p>
@@ -32,4 +34,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

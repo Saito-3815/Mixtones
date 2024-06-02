@@ -8,17 +8,20 @@ import { cn } from "@/lib/utils";
 
 import PropTypes from "prop-types";
 
-const Avatar = React.forwardRef(({ className, ...props }, ref) => (
+const Avatar = React.forwardRef(({ className, size, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
     className={cn(
-      "relative flex h-12 w-12 shrink-0 overflow-hidden rounded-full",
+      `relative flex h-${size} w-${size} shrink-0 overflow-hidden rounded-full`,
       className,
     )}
     {...props}
   />
 ));
 Avatar.displayName = AvatarPrimitive.Root.displayName;
+Avatar.propTypes = {
+  size: PropTypes.string,
+};
 
 const AvatarImage = React.forwardRef(({ className, ...props }, ref) => (
   <AvatarPrimitive.Image
@@ -55,16 +58,22 @@ AvatarFallback.propTypes = {
 
 AvatarSet.propTypes = {
   src: PropTypes.string.isRequired,
+  size: PropTypes.string,
 };
 
 export { Avatar, AvatarImage, AvatarFallback };
 
-export function AvatarSet({ src }) {
+export function AvatarSet({ src, size }) {
+  const iconSize = size * 3;
   return (
-    <Avatar>
+    <Avatar size={size}>
       <AvatarImage src={src} alt="avatar" />
       <AvatarFallback className="bg-gray-300">
-        <FontAwesomeIcon icon={faUser} className="text-gray-500 text-2xl" />
+        <FontAwesomeIcon
+          icon={faUser}
+          style={{ height: `${iconSize}px`, width: `${iconSize}px` }}
+          className="text-gray-500"
+        />
       </AvatarFallback>
     </Avatar>
   );

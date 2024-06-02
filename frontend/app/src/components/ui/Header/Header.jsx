@@ -1,4 +1,4 @@
-import React from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,7 +9,7 @@ import { AvatarMenu } from "../AvatarMenu/AvatarMenu";
 import { BarMenu } from "@/components/ui/BarMenu/BarMenu";
 import { AlertDialogSet } from "../AlertDialog/AlertDialog";
 
-export const Header = ({ user, onLogin, onCreateAccount }) => (
+export const Header = ({ user }) => (
   <header className="mx-1 my-1">
     <div className="flex justify-between items-center px-4 py-5 bg-theme-black rounded-sm h-16">
       <div className="flex space-x-2 items-center">
@@ -34,13 +34,12 @@ export const Header = ({ user, onLogin, onCreateAccount }) => (
           </>
         ) : (
           <>
-            <Button
-              variant="link"
-              primary
-              onClick={onCreateAccount}
-              label="サインアップ"
-            />
-            <Button variant="secondary" onClick={onLogin} label="ログイン" />
+            <Link to="/signup">
+              <Button variant="link" label="サインアップ" />
+            </Link>
+            <Link to="/login">
+              <Button variant="secondary" label="ログイン" />
+            </Link>
           </>
         )}
       </div>
@@ -55,9 +54,6 @@ Header.propTypes = {
   user: PropTypes.shape({
     name: PropTypes.string.isRequired,
   }),
-  onLogin: PropTypes.func.isRequired,
-  onLogout: PropTypes.func.isRequired,
-  onCreateAccount: PropTypes.func.isRequired,
 };
 
 Header.defaultProps = {

@@ -3,6 +3,7 @@ module.exports = {
   mode: "jit",
   darkMode: ["class"],
   content: [
+    "index.html",
     "./pages/**/*.{js,jsx}",
     "./components/**/*.{js,jsx}",
     "./app/**/*.{js,jsx}",
@@ -22,7 +23,7 @@ module.exports = {
     },
     extend: {
       colors: {
-        "theme-black": "#292929",
+        "theme-black": "#121212",
         "theme-white": "#B3B3B3",
         "theme-gray": "#727272",
         "theme-orange": "#FB6C04",

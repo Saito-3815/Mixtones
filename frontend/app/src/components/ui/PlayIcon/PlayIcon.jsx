@@ -4,7 +4,7 @@ import { faCirclePlay, faPauseCircle } from "@fortawesome/free-solid-svg-icons";
 
 import PropTypes from "prop-types";
 
-export const PlayIcon = () => {
+export const PlayIcon = ({ color, size }) => {
   const [currentIcon, setCurrentIcon] = useState(faCirclePlay);
 
   const handleClick = () => {
@@ -17,11 +17,12 @@ export const PlayIcon = () => {
     <FontAwesomeIcon
       icon={currentIcon}
       onClick={handleClick}
-      className="h-8 w-8 transform transition-transform duration-200 hover:scale-110 text-white"
+      className={`h-${size} w-${size} transform transition-transform duration-200 hover:scale-110 ${color}`} // colorプロパティで色を変更できるようにする
     />
   );
 };
 
 PlayIcon.propTypes = {
-  icon: PropTypes.object.isRequired,
+  color: PropTypes.string,
+  size: PropTypes.string,
 };

@@ -1,19 +1,16 @@
 export const WordFooter = () => (
-  <footer className="bg-theme-black text-white border-t border-theme-gray h-16">
-    <div className="container mx-auto text-center flex justify-between">
+  <footer className="bg-transparent text-white border-t border-theme-gray h-16 p-0 w-full">
+    <div className="container flex justify-between px-0">
       <p className="mb-4 text-sm">
         &copy; {new Date().getFullYear()} All rights reserved.
       </p>
       <div>
-        <a
-          href="/privacy-policy"
-          className="mx-2 underline text-theme-white text-sm"
-        >
+        <a href="/privacy-policy" className="underline text-theme-gray text-sm">
           プライバシーポリシー
         </a>
         <a
           href="/terms-of-service"
-          className="mx-2 underline text-theme-white text-sm"
+          className="underline text-theme-gray text-sm"
         >
           利用規約
         </a>

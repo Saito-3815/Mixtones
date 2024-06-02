@@ -23,3 +23,6 @@ export const WithImage = NoImage.bind({});
 WithImage.args = {
   src: "https://picsum.photos/200",
 };
+
+// export const AvatarWithImage = () => <AvatarSet src="https://picsum.photos/200" />;
+// AvatarWithImage.storyName = 'Avatar with image';
