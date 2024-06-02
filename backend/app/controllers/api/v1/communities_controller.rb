@@ -61,6 +61,7 @@ module Api
         @community.memberships.create(user_id: params[:user_id])
       end
 
+      # コミュニティに参加したmemberのlike_tunesをplaylistに追加
       def add_like_tunes_to_playlist
         user = User.find_by(id: params[:user_id])
         if user&.like_tunes.present?

@@ -1,11 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-// import { useState } from "react";
-// import "./App.css";
-// import './styles.css';
-// import Login from "@/containers/Login";
-// import LoggedIn from "@/containers/LoggedIn";
-// import { getTokenFromUrl } from "./urls/Spotify";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Header } from "@/components/ui/Header/Header";
 import { WordFooter } from "@/components/ui/WordFooter/WordFooter";
 import { TuneFooter } from "@/components/ui/TuneFooter/TuneFooter";
@@ -18,20 +12,7 @@ import User from "./containers/User";
 import UserEdit from "./containers/UserEdit";
 
 function App() {
-  // const [token, setToken] = useState(null);
-
-  // useEffect(() => {
-  //   const hash = getTokenFromUrl();
-  //   console.log(hash);
-  //   window.location.hash = ""; // URLからアクセストークンの表示を削除
-  //   const token = hash.access_token;
-
-  //   if (token) {
-  //     setToken(token);
-  //   }
-  // }, []);
-
-  //
+  const queryClient = new QueryClient();
 
   const tune = {
     name: "Song Name",
@@ -44,48 +25,50 @@ function App() {
     time: "00:00",
   };
 
-  const user = {
-    name: "User Name",
-  };
+  // const user = {
+  //   name: "User Name",
+  // };
 
   return (
-    <div className="flex flex-col min-h-screen w-screen min-w-screen bg-black relative overflow-hidden">
+    <QueryClientProvider client={queryClient}>
       <Router>
-        <div className="fixed z-10 w-full">
-          <Header user={user} />
-        </div>
-        <main className="flex flex-col flex-grow mb-[72px] mt-16 w-full">
-          <Routes>
-            {/* コミュニティ一覧 */}
-            <Route path="/" element={<Top />} />
-            {/* サインアップ */}
-            <Route path="/signup" element={<Signup />} />
-            {/* ログイン */}
-            <Route path="/login" element={<Login />} />
-            {/* コミュニティ情報 */}
-            <Route
-              path="/communities/:communitiesId"
-              element={<Community user={""} />}
-            />
-            {/* コミュニティ編集 */}
-            <Route
-              path="/communities/:communitiesId/edit"
-              element={<CommunityEdit />}
-            />
-            {/* ユーザー情報 */}
-            <Route path="/users/:usersId" element={<User />} />
-            {/* ユーザー編集 */}
-            <Route path="/users/:usersId/edit" element={<UserEdit />} />
-          </Routes>
-          <div className="px-16">
-            <WordFooter />
+        <div className="flex flex-col min-h-screen w-screen min-w-screen bg-black relative overflow-hidden">
+          <div className="fixed z-10 w-full">
+            <Header user={""} />
           </div>
-        </main>
-        <div className="fixed bottom-0 z-10 w-full">
-          {tune && <TuneFooter tune={tune} />}
+          <main className="flex flex-col flex-grow mb-[72px] mt-16 w-full">
+            <Routes>
+              {/* コミュニティ一覧 */}
+              <Route path="/" element={<Top />} />
+              {/* サインアップ */}
+              <Route path="/signup" element={<Signup />} />
+              {/* ログイン */}
+              <Route path="/login" element={<Login />} />
+              {/* コミュニティ情報 */}
+              <Route
+                path="/communities/:communitiesId"
+                element={<Community user={""} />}
+              />
+              {/* コミュニティ編集 */}
+              <Route
+                path="/communities/:communitiesId/edit"
+                element={<CommunityEdit />}
+              />
+              {/* ユーザー情報 */}
+              <Route path="/users/:usersId" element={<User />} />
+              {/* ユーザー編集 */}
+              <Route path="/users/:usersId/edit" element={<UserEdit />} />
+            </Routes>
+            <div className="px-16">
+              <WordFooter />
+            </div>
+          </main>
+          <div className="fixed bottom-0 z-10 w-full">
+            {tune && <TuneFooter tune={tune} />}
+          </div>
         </div>
       </Router>
-    </div>
+    </QueryClientProvider>
   );
 }
 

@@ -32,7 +32,7 @@ const userEdit = () => {
   };
 
   return (
-    <div className="container flex flex-col justify-start items-center mt-20 max-w-[900px] bg-theme-black">
+    <div className="container flex flex-col justify-start items-center my-20 max-w-[900px] bg-theme-black">
       <form
         action=""
         className="flex flex-col justify-start w-full sm:px-28 px-6 py-10"
