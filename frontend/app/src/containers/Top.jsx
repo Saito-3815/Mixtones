@@ -2,23 +2,18 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CommunityItem } from "@/components/ui/CommunityItem/CommunityItem";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
-import axios from "axios";
-import { communitiesIndex } from "@/urls/index";
+import { Link } from "react-router-dom";
+import { fetchCommunities } from "@/api/communities";
 
 const Top = () => {
-  const { data, status } = useQuery({
+  const { data, status, error } = useQuery({
     queryKey: ["communities"],
-    queryFn: async () => {
-      const { data } = await axios.get(communitiesIndex);
-
-      return data;
-    },
+    queryFn: fetchCommunities,
   });
 
-  // , error, isFetching
-
-  console.log(status);
-  console.log(data);
+  if (error) {
+    return <div>Error</div>;
+  }
 
   return (
     <div className="flex justify-center py-4">
@@ -28,7 +23,7 @@ const Top = () => {
         </h1>
         {status == "pending" ? (
           <>
-            {[...Array(5)].map((_, i) => (
+            {[...Array(10)].map((_, i) => (
               <div
                 key={i}
                 className="flex flex-col space-y-3 w-[280px] h-[340px] sm:w-[200px] sm:h-[260px]"
@@ -44,13 +39,14 @@ const Top = () => {
         ) : (
           <>
             {data.map((community) => (
-              <CommunityItem
-                key={community.id}
-                communityName={community.name}
-                playlistName={community.playlist_name}
-                introduction={community.introduction}
-                imgSrc={community.avatar}
-              />
+              <Link to={`/communities/${community.id}`} key={community.id}>
+                <CommunityItem
+                  communityName={community.name}
+                  playlistName={community.playlist_name}
+                  introduction={community.introduction}
+                  imgSrc={community.avatar}
+                />
+              </Link>
             ))}
           </>
         )}

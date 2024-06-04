@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { fetchUser } from "../apis/users";
+import { fetchUser } from "../api/users";
 
 import PropTypes from "prop-types";
 

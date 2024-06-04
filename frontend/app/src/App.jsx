@@ -10,6 +10,7 @@ import CommunityEdit from "./containers/CommunityEdit";
 import Login from "./containers/Login";
 import User from "./containers/User";
 import UserEdit from "./containers/UserEdit";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 function App() {
   const queryClient = new QueryClient();
@@ -68,6 +69,7 @@ function App() {
           </div>
         </div>
       </Router>
+      <ReactQueryDevtools />
     </QueryClientProvider>
   );
 }
