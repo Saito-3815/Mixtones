@@ -1,12 +1,12 @@
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";
-import { AvatarSet } from "../Avatar/Avatar";
 import { AlertDialogSet } from "../AlertDialog/AlertDialog";
 
 import { cn } from "@/lib/utils";
 
 import PropTypes from "prop-types";
+import { AvatarSet } from "@/components/ui/Avatar/Avatar";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

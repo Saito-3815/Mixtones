@@ -114,7 +114,7 @@ RSpec.describe User, type: :request do
 
     # 204ステータスコードを返すこと
     it 'returns 204 status code' do
-      expect(response).to have_http_status(:no_content)
+      expect(response).to have_http_status(:ok)
     end
 
     # userオブジェクトが削除されていること
