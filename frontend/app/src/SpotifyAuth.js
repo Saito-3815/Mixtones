@@ -1,58 +1,56 @@
-import crypto from "crypto";
 import axios from "axios";
 import qs from "qs";
 
-export const authEndpoint = "https://accounts.spotify.com/authorize";
-export const tokenEndpoint = "https://accounts.spotify.com/api/token";
-
-const redirectUri = "http://localhost:3000/";
+const authEndpoint = "https://accounts.spotify.com/authorize";
 const clientId = "5b2ac842f6c044f984dbb35520a349fd";
-
+const redirectUri = encodeURIComponent("http://localhost:3000/");
 // 対応する範囲を決める
-const scopes = ["user-library-read", "user-read-private"];
+export const scope = ["user-library-read", "user-read-private"];
 
 // コードチャレンジとコードバリデータの生成
 // コード検証子の作成
-const generateRandomString = (length) => {
+export const generateRandomString = (length) => {
   const possible =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const values = crypto.getRandomValues(new Uint8Array(length));
-  return values.reduce((acc, x) => acc + possible[x % possible.length], "");
+  let text = "";
+  for (let i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
 };
-const codeVerifier = generateRandomString(64);
+
+const state = encodeURIComponent(generateRandomString(16));
+
+// SpotifyのログインページのURL
+export const accessUrl = `${authEndpoint}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+
+export const tokenEndpoint = "https://accounts.spotify.com/api/token";
+
+export const codeVerifier = generateRandomString(64);
 
 // コード チャレンジ生成
 // ハッシュの作成
-const sha256 = async (plain) => {
+export const sha256 = async (plain) => {
   const encoder = new TextEncoder();
   const data = encoder.encode(plain);
   return window.crypto.subtle.digest("SHA-256", data);
 };
-
 // Base64エンコード
-const base64encode = (input) => {
+export const base64encode = (input) => {
   return btoa(String.fromCharCode(...new Uint8Array(input)))
     .replace(/=/g, "")
     .replace(/\+/g, "-")
     .replace(/\//g, "_");
 };
 
-// 上記を組み合わせてコードチャレンジを生成
-// const hashed = await sha256(codeVerifier)
-// const codeChallenge = base64encode(hashed);
-
 let codeChallenge;
 
-const generateCodeChallenge = async () => {
+export const generateCodeChallenge = async () => {
   const codeVerifier = generateRandomString(64);
   const hashed = await sha256(codeVerifier);
   codeChallenge = base64encode(hashed);
+  return codeChallenge; // 追加：生成したcodeChallengeを返す
 };
-
-generateCodeChallenge();
-
-// 認証リクエストのURL
-export const authUrl = `${authEndpoint}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes.join("%20")}&response_type=code&code_challenge_method=S256&code_challenge=${codeChallenge}`;
 
 // URLから認証コードを取得
 export const getCodeFromUrl = () => {

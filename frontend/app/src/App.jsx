@@ -11,8 +11,10 @@ import CommunityEdit from "./containers/CommunityEdit";
 import Login from "./containers/Login";
 import User from "./containers/User";
 import UserEdit from "./containers/UserEdit";
+// import { useEffect } from "react";
+// import { getTokenFromUrl } from "./urls/Spotify";
 import { useEffect } from "react";
-import { getTokenFromUrl } from "./urls/Spotify";
+import { getCodeFromUrl, getAccessToken } from "@/SpotifyAuth";
 
 function App() {
   const queryClient = new QueryClient();
@@ -28,17 +30,18 @@ function App() {
     time: "00:00",
   };
 
-  // const [token, setToken] = useState(null);
-
   useEffect(() => {
-    const hash = getTokenFromUrl();
-    console.log(hash);
-    window.location.hash = "";
-    // const token = hash.access_token;
+    const fetchAccessToken = async () => {
+      const code = getCodeFromUrl();
+      console.log(`Got code from URL: ${code}`);
 
-    // if (token) {
-    //   setToken(token)
-    // }
+      if (code) {
+        const accessToken = await getAccessToken(code);
+        console.log(`Got access token: ${accessToken}`);
+      }
+    };
+
+    fetchAccessToken();
   }, []);
 
   return (
