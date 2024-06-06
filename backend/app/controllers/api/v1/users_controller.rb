@@ -16,14 +16,17 @@ module Api
       # ユーザー作成
       # ユーザー作成時には、like_tunesも一緒に登録する
       def create
-        access_token = fetch_spotify_tokens(params[:code])[:access_token]
+        tokens = fetch_spotify_tokens(params[:code])
+        access_token = tokens[:access_token]
+        refresh_token = tokens[:refresh_token]
         user_create_params = fetch_authenticated_user_data(access_token)
 
         User.transaction do
           @user = User.create!(
             name: user_create_params[:name],
             avatar: user_create_params[:avatar],
-            spotify_id: user_create_params[:spotify_id]
+            spotify_id: user_create_params[:spotify_id],
+            refresh_token: refresh_token
           )
 
           user_create_params[:like_tunes].each do |like_tune|
@@ -43,6 +46,8 @@ module Api
               @user.like_tunes << existing_record
             end
           end
+        rescue StandardError => e
+          Rails.logger.info e.message
         end
 
         render json: @user, status: :created

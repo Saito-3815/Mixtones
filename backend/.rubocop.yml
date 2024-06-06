@@ -79,3 +79,7 @@ Lint/ShadowingOuterLocalVariable:
 # ガード節の提案
 Style/GuardClause:
   Enabled: false
+
+# ハッシュ値の省略記法を不可
+Style/HashSyntax:
+  Enabled: false
