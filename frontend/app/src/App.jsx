@@ -14,7 +14,7 @@ import UserEdit from "./containers/UserEdit";
 // import { useEffect } from "react";
 // import { getTokenFromUrl } from "./urls/Spotify";
 import { useEffect } from "react";
-import { getCodeFromUrl, getAccessToken } from "@/SpotifyAuth";
+import { getCodeFromUrl } from "@/SpotifyAuth";
 
 function App() {
   const queryClient = new QueryClient();
@@ -31,17 +31,17 @@ function App() {
   };
 
   useEffect(() => {
-    const fetchAccessToken = async () => {
+    const fetchCode = async () => {
       const code = getCodeFromUrl();
       console.log(`Got code from URL: ${code}`);
 
-      if (code) {
-        const accessToken = await getAccessToken(code);
-        console.log(`Got access token: ${accessToken}`);
-      }
+      // if (code) {
+      //   const accessToken = await getAccessToken(code);
+      //   console.log(`Got access token: ${accessToken}`);
+      // }
     };
 
-    fetchAccessToken();
+    fetchCode();
   }, []);
 
   return (

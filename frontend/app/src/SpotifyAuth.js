@@ -22,7 +22,9 @@ export const generateRandomString = (length) => {
 const state = encodeURIComponent(generateRandomString(16));
 
 // SpotifyのログインページのURL
-export const accessUrl = `${authEndpoint}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+export const accessUrl = `${authEndpoint}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope.join(
+  "%20",
+)}&state=${state}&show_dialog=true`;
 
 export const tokenEndpoint = "https://accounts.spotify.com/api/token";
 
