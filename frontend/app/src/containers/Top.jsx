@@ -4,14 +4,49 @@ import { CommunityItem } from "@/components/ui/CommunityItem/CommunityItem";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
 import { Link } from "react-router-dom";
 import { fetchCommunities } from "@/api/communities";
+import { getCodeFromUrl } from "@/SpotifyAuth";
+import axios from "axios";
+import { usersCreate } from "@/urls";
 
 const Top = () => {
-  const { data, status, error } = useQuery({
+  // コミュニティー一覧を取得
+  const {
+    data: communitiesData,
+    status: communitiesStatus,
+    error: communitiesError,
+  } = useQuery({
     queryKey: ["communities"],
     queryFn: fetchCommunities,
   });
 
-  if (error) {
+  if (communitiesError) {
+    return <div>Error</div>;
+  }
+
+  // ユーザー情報をバックエンドに送信
+  const { data: userData, error: userError } = useQuery({
+    queryKey: "user",
+    queryFn: async () => {
+      const code = getCodeFromUrl();
+      console.log(`Got code from URL: ${code}`);
+
+      // codeが存在する場合のみバックエンドにフェッチ
+      if (code) {
+        // codeをBase64でエンコード
+        const encodedCode = btoa(code);
+
+        // バックエンドにcodeを送信
+        const { data } = await axios.post(usersCreate, { code: encodedCode });
+        return data;
+      }
+    },
+  });
+
+  if (userData) {
+    console.log("User data:", userData);
+  }
+
+  if (userError) {
     return <div>Error</div>;
   }
 
@@ -21,7 +56,7 @@ const Top = () => {
         <h1 className="text-white font-bold text-xl col-span-full mt-8 ml-5">
           コミュニティ
         </h1>
-        {status == "pending" ? (
+        {communitiesStatus == "pending" ? (
           <>
             {[...Array(10)].map((_, i) => (
               <div
@@ -38,7 +73,7 @@ const Top = () => {
           </>
         ) : (
           <>
-            {data.map((community) => (
+            {communitiesData.map((community) => (
               <Link to={`/communities/${community.id}`} key={community.id}>
                 <CommunityItem
                   communityName={community.name}

@@ -3,6 +3,8 @@ require 'rspotify'
 module Api
   module V1
     class UsersController < ApplicationController
+      extend SpotifyAuth
+
       def show
         @user = User.find(params[:id])
         render json: @user, only: [:name, :introduction, :avatar]
@@ -16,10 +18,11 @@ module Api
       # ユーザー作成
       # ユーザー作成時には、like_tunesも一緒に登録する
       def create
-        tokens = fetch_spotify_tokens(params[:code])
+        decoded_code = Base64.decode64(params[:code])
+        tokens = SpotifyAuth.fetch_spotify_tokens(decoded_code)
         access_token = tokens[:access_token]
         refresh_token = tokens[:refresh_token]
-        user_create_params = fetch_authenticated_user_data(access_token)
+        user_create_params = SpotifyAuth.fetch_authenticated_user_data(access_token)
 
         User.transaction do
           @user = User.create!(
@@ -87,55 +90,55 @@ module Api
         params.require(:user).permit(:name, :introduction, :avatar)
       end
 
-      # トークンの取得
-      def fetch_spotify_tokens(code)
-        # .envファイルからクライアントIDとクライアントシークレットを読み込む
-        client_id = ENV.fetch['SPOTIFY_CLIENT_ID']
-        client_secret = ENV.fetch['SPOTIFY_CLIENT_SECRET']
+      # # トークンの取得
+      # def fetch_spotify_tokens(code)
+      #   # .envファイルからクライアントIDとクライアントシークレットを読み込む
+      #   client_id = ENV.fetch['SPOTIFY_CLIENT_ID']
+      #   client_secret = ENV.fetch['SPOTIFY_CLIENT_SECRET']
 
-        # RSpotifyにクライアントIDとクライアントシークレットを設定
-        RSpotify.authenticate(client_id, client_secret)
+      #   # RSpotifyにクライアントIDとクライアントシークレットを設定
+      #   RSpotify.authenticate(client_id, client_secret)
 
-        # フロントエンドから送信された認証コード
-        auth_code = code
+      #   # フロントエンドから送信された認証コード
+      #   auth_code = code
 
-        # 認証コードを使用してアクセストークンとリフレッシュトークンを取得
-        credentials = RSpotify::Account.new(code: auth_code).credentials
+      #   # 認証コードを使用してアクセストークンとリフレッシュトークンを取得
+      #   credentials = RSpotify::Account.new(code: auth_code).credentials
 
-        # アクセストークンとリフレッシュトークンを返す
-        { access_token: credentials[:access_token], refresh_token: credentials[:refresh_token] }
-      end
+      #   # アクセストークンとリフレッシュトークンを返す
+      #   { access_token: credentials[:access_token], refresh_token: credentials[:refresh_token] }
+      # end
 
-      # Spotifyからユーザーデータを取得
-      def fetch_authenticated_user_data(access_token)
-        # アクセストークンを使用して認証されたユーザーのデータを取得
-        user = RSpotify::User.new('token' => access_token)
+      # # Spotifyからユーザーデータを取得
+      # def fetch_authenticated_user_data(access_token)
+      #   # アクセストークンを使用して認証されたユーザーのデータを取得
+      #   user = RSpotify::User.new('token' => access_token)
 
-        # 必要なユーザーデータを抽出
-        user_create_params = {
-          name: user.display_name,
-          avatar: user.images.first['url'],
-          spotify_id: user.id
-        }
+      #   # 必要なユーザーデータを抽出
+      #   user_create_params = {
+      #     name: user.display_name,
+      #     avatar: user.images.first['url'],
+      #     spotify_id: user.id
+      #   }
 
-        # ユーザーの保存したトラックを取得
-        saved_tracks = user.saved_tracks
+      #   # ユーザーの保存したトラックを取得
+      #   saved_tracks = user.saved_tracks
 
-        # 保存したトラックの情報を抽出
-        user_create_params[:like_tunes] = saved_tracks.map do |track|
-          {
-            name: track.name,
-            artist: track.artists.first.name,
-            album: track.album.name,
-            images: track.album.images,
-            spotify_uri: track.uri,
-            preview_url: track.preview_url,
-            added_at: track.added_at
-          }
-        end
+      #   # 保存したトラックの情報を抽出
+      #   user_create_params[:like_tunes] = saved_tracks.map do |track|
+      #     {
+      #       name: track.name,
+      #       artist: track.artists.first.name,
+      #       album: track.album.name,
+      #       images: track.album.images,
+      #       spotify_uri: track.uri,
+      #       preview_url: track.preview_url,
+      #       added_at: track.added_at
+      #     }
+      #   end
 
-        user_create_params
-      end
+      #   user_create_params
+      # end
     end
   end
 end

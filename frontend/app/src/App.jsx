@@ -13,8 +13,6 @@ import User from "./containers/User";
 import UserEdit from "./containers/UserEdit";
 // import { useEffect } from "react";
 // import { getTokenFromUrl } from "./urls/Spotify";
-import { useEffect } from "react";
-import { getCodeFromUrl } from "@/SpotifyAuth";
 
 function App() {
   const queryClient = new QueryClient();
@@ -30,19 +28,11 @@ function App() {
     time: "00:00",
   };
 
-  useEffect(() => {
-    const fetchCode = async () => {
-      const code = getCodeFromUrl();
-      console.log(`Got code from URL: ${code}`);
-
-      // if (code) {
-      //   const accessToken = await getAccessToken(code);
-      //   console.log(`Got access token: ${accessToken}`);
-      // }
-    };
-
-    fetchCode();
-  }, []);
+  // useEffect(() => {
+  //   if (error) {
+  //     return <div>Error</div>;
+  //   }
+  // }, [error]);
 
   return (
     <QueryClientProvider client={queryClient}>
