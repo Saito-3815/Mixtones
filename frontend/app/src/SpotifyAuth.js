@@ -3,7 +3,7 @@ import qs from "qs";
 
 const authEndpoint = "https://accounts.spotify.com/authorize";
 const clientId = "5b2ac842f6c044f984dbb35520a349fd";
-const redirectUri = encodeURIComponent("http://localhost:3000/");
+export const redirectUri = "http://localhost:3000/";
 // 対応する範囲を決める
 export const scope = ["user-library-read", "user-read-private"];
 
@@ -28,8 +28,6 @@ export const accessUrl = `${authEndpoint}?response_type=code&client_id=${clientI
 
 export const tokenEndpoint = "https://accounts.spotify.com/api/token";
 
-export const codeVerifier = generateRandomString(64);
-
 // コード チャレンジ生成
 // ハッシュの作成
 export const sha256 = async (plain) => {
@@ -46,12 +44,13 @@ export const base64encode = (input) => {
 };
 
 let codeChallenge;
+let codeVerifier;
 
 export const generateCodeChallenge = async () => {
-  const codeVerifier = generateRandomString(64);
+  codeVerifier = generateRandomString(64);
   const hashed = await sha256(codeVerifier);
   codeChallenge = base64encode(hashed);
-  return codeChallenge; // 追加：生成したcodeChallengeを返す
+  return { codeChallenge, codeVerifier }; // 追加：生成したcodeChallengeとcodeVerifierを返す
 };
 
 // URLから認証コードを取得
@@ -61,13 +60,16 @@ export const getCodeFromUrl = () => {
 };
 
 // アクセストークンのリクエストと取得
-export const getAccessToken = async (code) => {
+export const getAccessToken = async (code, codeVerifier) => {
+  console.log("codeVerifier:", codeVerifier);
+
   const body = {
     client_id: clientId,
     grant_type: "authorization_code",
     code,
     redirect_uri: redirectUri,
     code_verifier: codeVerifier,
+    client_secret: "6da90d9caf9d442b8ae62fe18ec2354d",
   };
   const response = await axios.post(tokenEndpoint, qs.stringify(body), {
     headers: {

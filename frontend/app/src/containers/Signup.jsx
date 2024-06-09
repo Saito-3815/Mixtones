@@ -8,8 +8,13 @@ const Signup = () => {
   // ログインボタンをクリックしたときにコードチャレンジを生成してSpotifyのログインページにリダイレクトする
   const handleLogin = async () => {
     try {
-      const codeChallenge = await generateCodeChallenge();
+      const { codeChallenge, codeVerifier } = await generateCodeChallenge();
       console.log(`Generated code challenge: ${codeChallenge}`);
+      console.log(`Generated code verifier: ${codeVerifier}`);
+
+      // codeVerifierをセッションストレージに保存
+      sessionStorage.setItem("codeVerifier", codeVerifier);
+
       window.location.href = accessUrl;
     } catch (error) {
       console.error("Failed to generate code challenge:", error);

@@ -1,5 +1,5 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useEffect } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { CommunityItem } from "@/components/ui/CommunityItem/CommunityItem";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
 import { Link } from "react-router-dom";
@@ -23,32 +23,40 @@ const Top = () => {
     return <div>Error</div>;
   }
 
-  // ユーザー情報をバックエンドに送信
-  const { data: userData, error: userError } = useQuery({
-    queryKey: "user",
-    queryFn: async () => {
-      const code = getCodeFromUrl();
-      console.log(`Got code from URL: ${code}`);
-
-      // codeが存在する場合のみバックエンドにフェッチ
-      if (code) {
-        // codeをBase64でエンコード
-        const encodedCode = btoa(code);
-
-        // バックエンドにcodeを送信
-        const { data } = await axios.post(usersCreate, { code: encodedCode });
-        return data;
-      }
+  //  ユーザー作成リクエスト関数
+  const usesCreate = useMutation({
+    mutationFn: (code) => {
+      const encodedCode = btoa(code);
+      return axios.post(usersCreate, { code: encodedCode });
+    },
+    onSuccess: (data) => {
+      console.log("User data:", data);
+    },
+    onError: (error) => {
+      console.error(error);
     },
   });
 
-  if (userData) {
-    console.log("User data:", userData);
-  }
+  // 認証ページからリダイレクトされた際にコードを取得し、ユーザー作成リクエストを送信
+  useEffect(() => {
+    const code = getCodeFromUrl();
+    console.log(`Got code from URL: ${code}`);
 
-  if (userError) {
-    return <div>Error</div>;
-  }
+    // セッションストレージからcodeVerifierを取得
+    // const codeVerifier = sessionStorage.getItem('codeVerifier');
+
+    // getAccessToken(code, codeVerifier)
+    // .then(token => {
+    //   console.log(`Got token from URL: ${token}`);
+    // })
+    // .catch(error => {
+    //   console.error('Failed to get access token:', error);
+    // });
+
+    if (code) {
+      usesCreate.mutate(code);
+    }
+  }, []);
 
   return (
     <div className="flex justify-center py-4">
