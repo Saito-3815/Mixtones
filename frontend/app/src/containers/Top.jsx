@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { fetchCommunities } from "@/api/communities";
 import { getCodeFromUrl } from "@/SpotifyAuth";
 import axios from "axios";
-import { usersCreate } from "@/urls";
+import { usersCreate } from "@/urls/index";
 
 const Top = () => {
   // コミュニティー一覧を取得
@@ -24,10 +24,14 @@ const Top = () => {
   }
 
   //  ユーザー作成リクエスト関数
-  const usesCreate = useMutation({
-    mutationFn: (code) => {
+  const userCreate = useMutation({
+    mutationFn: ({ code, codeVerifier, cancelToken }) => {
       const encodedCode = btoa(code);
-      return axios.post(usersCreate, { code: encodedCode });
+      return axios.post(
+        usersCreate,
+        { user: { code: encodedCode, code_verifier: codeVerifier } },
+        { cancelToken },
+      );
     },
     onSuccess: (data) => {
       console.log("User data:", data);
@@ -39,11 +43,15 @@ const Top = () => {
 
   // 認証ページからリダイレクトされた際にコードを取得し、ユーザー作成リクエストを送信
   useEffect(() => {
+    // axiosのCancelTokenを生成
+    const source = axios.CancelToken.source();
+
     const code = getCodeFromUrl();
     console.log(`Got code from URL: ${code}`);
 
     // セッションストレージからcodeVerifierを取得
-    // const codeVerifier = sessionStorage.getItem('codeVerifier');
+    const codeVerifier = sessionStorage.getItem("codeVerifier");
+    console.log("codeVerifier:", codeVerifier);
 
     // getAccessToken(code, codeVerifier)
     // .then(token => {
@@ -53,9 +61,14 @@ const Top = () => {
     //   console.error('Failed to get access token:', error);
     // });
 
-    if (code) {
-      usesCreate.mutate(code);
+    if (code && codeVerifier) {
+      userCreate.mutate({ code, codeVerifier });
     }
+
+    // クリーンアップ関数でリクエストをキャンセル
+    return () => {
+      source.cancel();
+    };
   }, []);
 
   return (

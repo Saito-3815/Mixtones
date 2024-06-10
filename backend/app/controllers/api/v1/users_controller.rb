@@ -18,10 +18,16 @@ module Api
       # ユーザー作成
       # ユーザー作成時には、like_tunesも一緒に登録する
       def create
-        decoded_code = Base64.decode64(params[:code])
-        tokens = SpotifyAuth.fetch_spotify_tokens(decoded_code)
+        decoded_code = Base64.decode64(params[:user][:code])
+        code_verifier = params[:user][:code_verifier]
+        tokens = SpotifyAuth.fetch_spotify_tokens(decoded_code, code_verifier)
         access_token = tokens[:access_token]
         refresh_token = tokens[:refresh_token]
+
+        # Log the token values
+        Rails.logger.info "Access Token: #{access_token}"
+        Rails.logger.info "Refresh Token: #{refresh_token}"
+
         user_create_params = SpotifyAuth.fetch_authenticated_user_data(access_token)
 
         User.transaction do
@@ -55,6 +61,8 @@ module Api
 
         render json: @user, status: :created
       rescue StandardError => e
+        Rails.logger.error "An error occurred: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
         render json: { error: e.message }, status: :unprocessable_entity
       end
 
