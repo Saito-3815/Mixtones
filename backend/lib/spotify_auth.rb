@@ -40,10 +40,6 @@ module SpotifyAuth
 
       token_info = JSON.parse(response.body)
 
-      # # アクセストークンとリフレッシュトークンをログに出力
-      # Rails.logger.info "access_token: #{token_info['access_token']}"
-      # Rails.logger.info "refresh_token: #{token_info['refresh_token']}"
-
       # アクセストークンとリフレッシュトークンを返す
       { access_token: token_info['access_token'], refresh_token: token_info['refresh_token'] }
     rescue => e
@@ -56,7 +52,17 @@ module SpotifyAuth
   def self.fetch_authenticated_user_data(access_token)
     begin
       # アクセストークンを使用して認証されたユーザーのデータを取得
-      user = RSpotify::User.find(access_token)
+      uri = URI.parse("https://api.spotify.com/v1/me")
+      request = Net::HTTP::Get.new(uri)
+      request["Authorization"] = "Bearer #{access_token}"
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
+        http.request(request)
+      end
+
+      user = JSON.parse(response.body)
+
+      # userの内容をログに出力
+      Rails.logger.info "Fetched user data: #{user}"
 
       # userがnilでないことを確認
       if user.nil?
@@ -66,18 +72,38 @@ module SpotifyAuth
 
       # 必要なユーザーデータを抽出
       user_create_params = {
-        name: user.display_name,
-        avatar: user.images.first['url'],
-        spotify_id: user.id
+        name: user['display_name'],
+        avatar: user['images'].dig(0, 'url'),
+        spotify_id: user['id']
       }
 
-      # ユーザーの保存したトラックを取得
-      saved_tracks = user.saved_tracks
+      uri = URI("https://api.spotify.com/v1/users/#{user['id']}/tracks")
+      req = Net::HTTP::Get.new(uri)
+      req['Authorization'] = "Bearer #{access_token}"
+
+      res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+        http.request(req)
+      end
+
+      saved_tracks = JSON.parse(res.body)
+
+      # Rails.logger.info "Fetched saved tracks: #{saved_tracks}"
 
       # 保存したトラックの情報を抽出
-      user_create_params[:like_tunes] = saved_tracks.map do |track|
-        # ...
+      user_create_params[:like_tunes] = saved_tracks['items'].map do |item|
+        track = item['track']
+        {
+          name: track['name'],
+          artist: track['artists'].map { |artist| artist['name'] }.join(', '),
+          album: track['album']['name'],
+          images: track['album']['images'],
+          spotify_uri: track['uri'],
+          preview_url: track['preview_url'],
+          added_at: item['added_at']
+        }
       end
+
+      user_create_params
     rescue => e
       Rails.logger.error "Error fetching authenticated user data: #{e.message}"
       raise

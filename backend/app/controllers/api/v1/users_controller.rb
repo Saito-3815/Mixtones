@@ -29,6 +29,7 @@ module Api
         Rails.logger.info "Refresh Token: #{refresh_token}"
 
         user_create_params = SpotifyAuth.fetch_authenticated_user_data(access_token)
+        Rails.logger.info "User Create Params: #{user_create_params}"
 
         User.transaction do
           @user = User.create!(

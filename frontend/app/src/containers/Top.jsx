@@ -37,7 +37,11 @@ const Top = () => {
       console.log("User data:", data);
     },
     onError: (error) => {
-      console.error(error);
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
     },
   });
 
@@ -62,12 +66,12 @@ const Top = () => {
     // });
 
     if (code && codeVerifier) {
-      userCreate.mutate({ code, codeVerifier });
+      userCreate.mutate({ code, codeVerifier, cancelToken: source.token });
     }
 
     // クリーンアップ関数でリクエストをキャンセル
     return () => {
-      source.cancel();
+      source.cancel("Operation canceled by the user.");
     };
   }, []);
 
