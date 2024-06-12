@@ -28,5 +28,8 @@ module Api
 
     # config.autoload_paths += %W(#{config.root}/lib)
     config.eager_load_paths << Rails.root.join('lib')
+
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::RedisStore
   end
 end

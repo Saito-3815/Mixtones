@@ -25,6 +25,7 @@ services:
     # db起動後にapiを起動
     depends_on:
       - db
+      - redis
     tty: true
     stdin_open: true
 
@@ -40,6 +41,11 @@ services:
     # ホットリロードを行うための設定
     environment:
       - CHOKIDAR_USEPOLLING=true
+
+  redis:
+    image: redis:7.0
+    ports:
+      - "6379:6379"
   
 volumes:
   db-volume:

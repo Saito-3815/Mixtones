@@ -83,3 +83,7 @@ Style/GuardClause:
 # ハッシュ値の省略記法を不可
 Style/HashSyntax:
   Enabled: false
+
+# mapメソッドの代わりにpluckメソッドを使用することを推奨
+Rails/Pluck:
+  Enabled: false

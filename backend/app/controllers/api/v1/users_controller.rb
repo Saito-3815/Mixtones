@@ -29,6 +29,8 @@ module Api
         Rails.logger.info "Refresh Token: #{refresh_token}"
 
         user_create_params = SpotifyAuth.fetch_authenticated_user_data(access_token)
+        spotify_id = user_create_params[:spotify_id]
+        SpotifyAuth.fetch_saved_tracks(spotify_id, access_token, user_create_params)
         Rails.logger.info "User Create Params: #{user_create_params}"
 
         User.transaction do
@@ -56,11 +58,14 @@ module Api
               @user.like_tunes << existing_record
             end
           end
+
+          session[:user_id] = @user.id
+
         rescue StandardError => e
           Rails.logger.info e.message
         end
 
-        render json: @user, status: :created
+        render json: { user: @user, session_id: session[:session_id] }, status: :created
       rescue StandardError => e
         Rails.logger.error "An error occurred: #{e.message}"
         Rails.logger.error e.backtrace.join("\n")
