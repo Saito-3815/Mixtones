@@ -26,14 +26,27 @@ RSpec.describe User, type: :request do
   # createアクションのテスト
   describe 'POST /api/v1/users' do
     let(:spotify_code) { Base64.encode64('dummy_code') }
+    let(:code_verifier) { 'dummy_code_verifier' }
     let(:access_token) { 'dummy_access_token' }
     let(:refresh_token) { 'dummy_refresh_token' }
-    let(:user_data) do
+    let(:user_create_params) do
       {
         name: 'Test User',
         avatar: 'http://example.com/avatar.jpg',
         spotify_id: 'testuser',
-        like_tunes: [
+        like_tunes: []
+      }
+    end
+
+    before do
+      # SpotifyAuthモジュールのメソッドをモック化
+      allow(SpotifyAuth).to receive(:fetch_spotify_tokens).with('dummy_code', 'dummy_code_verifier').and_return(
+        access_token: access_token,
+        refresh_token: refresh_token
+      )
+      allow(SpotifyAuth).to receive(:fetch_authenticated_user_data).with(access_token).and_return(user_create_params)
+      allow(SpotifyAuth).to receive(:fetch_saved_tracks).with('testuser', access_token, user_create_params) do
+        user_create_params[:like_tunes] = [
           { name: "test_tune1", artist: "test_artist1", album: "test_album1", images: "test_images1",
             spotify_uri: "test_spotify_uri1", preview_url: "test_preview_url1", added_at: "test_added_at1" },
           { name: "test_tune2", artist: "test_artist2", album: "test_album2", images: "test_images2",
@@ -41,18 +54,10 @@ RSpec.describe User, type: :request do
           { name: "test_tune3", artist: "test_artist3", album: "test_album3", images: "test_images3",
             spotify_uri: "test_spotify_uri3", preview_url: "test_preview_url3", added_at: "test_added_at3" }
         ]
-      }
-    end
+        user_create_params
+      end
 
-    before do
-      # SpotifyAuthモジュールのメソッドをモック化
-      allow(SpotifyAuth).to receive(:fetch_spotify_tokens).with('dummy_code').and_return(
-        access_token: access_token,
-        refresh_token: refresh_token
-      )
-      allow(SpotifyAuth).to receive(:fetch_authenticated_user_data).with(access_token).and_return(user_data)
-
-      # データベースにuser_dataと同じtuneオブジェクトを追加しておく
+      # データベースにuser_create_paramsと同じtuneオブジェクトを追加しておく
       Tune.create!(
         id: 1,
         name: "test_tune1",
@@ -65,62 +70,56 @@ RSpec.describe User, type: :request do
       )
     end
 
-    # モックの振る舞いを確認する
-    # it 'calls fetch_spotify_tokens' do
-    #   expect(SpotifyAuth).to receive(:fetch_spotify_tokens).with(spotify_code).and_return(
-    #     access_token: access_token,
-    #     refresh_token: refresh_token
-    #   )
-    #   post '/api/v1/users', params: { code: spotify_code }
-    # end
-
-    # it 'calls fetch_authenticated_user_data' do
-    #   expect(SpotifyAuth).to receive(:fetch_authenticated_user_data).with(access_token).and_return(user_data)
-    #   post '/api/v1/users', params: { code: spotify_code }
-    # end
-
     # 201ステータスコードを返すこと
     it 'creates the user' do
-      post '/api/v1/users', params: { code: spotify_code }
+      post '/api/v1/users', params: { user: { code: spotify_code, code_verifier: code_verifier } }
+      puts response.body # レスポンスボディを出力
+      puts response.status # ステータスコードを出力
       expect(response).to have_http_status(:created)
     end
 
     # レスポンスがuser.nameの文字列が含まれること
     it 'creates a new user and has user.name' do
-      post '/api/v1/users', params: { code: spotify_code }
+      post '/api/v1/users', params: { user: { code: spotify_code, code_verifier: code_verifier } }
       json = response.parsed_body
-      expect(json['name']).to eq(user_data[:name])
+      expect(json['user']['name']).to eq(user_create_params[:name])
     end
 
     # userオブジェクトに紐づくlike_tunesを追加すること
     it 'increase user $ like counts' do
       expect do
-        post '/api/v1/users', params: { code: spotify_code }
+        post '/api/v1/users', params: { user: { code: spotify_code, code_verifier: code_verifier } }
       end.to change(User, :count).by(1)
     end
 
     it 'creates user has name of user data' do
-      post '/api/v1/users', params: { code: spotify_code }
-      expect(User.last.name).to eq(user_data[:name])
+      post '/api/v1/users', params: { user: { code: spotify_code, code_verifier: code_verifier } }
+      expect(User.last.name).to eq(user_create_params[:name])
     end
 
     it 'creates a new like_tunes' do
-      post '/api/v1/users', params: { code: spotify_code }
-      expect(User.last.like_tunes.first.name).to eq(user_data[:like_tunes].first[:name])
+      post '/api/v1/users', params: { user: { code: spotify_code, code_verifier: code_verifier } }
+      expect(User.last.like_tunes.first.name).to eq(user_create_params[:like_tunes].first[:name])
     end
 
     # userオブジェクトに紐づくlike_tunesを追加すること
     it 'creates like_tunes' do
-      post '/api/v1/users', params: { code: spotify_code }
+      post '/api/v1/users', params: { user: { code: spotify_code, code_verifier: code_verifier } }
       user = User.last
       expect(user.like_tunes.count).to eq 3
     end
 
     # userオブジェクトに紐づくlike_tunesに既存の重複したtuneオブジェクトが含まれること
     it 'includes tune1' do
-      post '/api/v1/users', params: { code: spotify_code }
+      post '/api/v1/users', params: { user: { code: spotify_code, code_verifier: code_verifier } }
       user = User.last
       expect(user.like_tunes.pluck(:id)).to include(1)
+    end
+
+    # 新規ユーザーがログインしていること
+    it 'logs in the new user' do
+      post '/api/v1/users', params: { user: { code: spotify_code, code_verifier: code_verifier } }
+      expect(session[:user_id]).to eq User.last.id
     end
   end
 

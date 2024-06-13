@@ -4,6 +4,7 @@ module Api
   module V1
     class UsersController < ApplicationController
       extend SpotifyAuth
+      include SessionsHelper
 
       def show
         @user = User.find(params[:id])
@@ -59,10 +60,7 @@ module Api
             end
           end
 
-          session[:user_id] = @user.id
-
-        rescue StandardError => e
-          Rails.logger.info e.message
+          log_in(@user)
         end
 
         render json: { user: @user, session_id: session[:session_id] }, status: :created
