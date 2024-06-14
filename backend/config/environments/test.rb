@@ -63,4 +63,6 @@ Rails.application.configure do
   rescue => e
     Rails.logger.error "Failed to connect to Redis: #{e.message}, #{e.backtrace.join("\n")}"
   end
+
+  config.log_level = :debug
 end

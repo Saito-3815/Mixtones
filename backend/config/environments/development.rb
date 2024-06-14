@@ -63,4 +63,6 @@ Rails.application.configure do
   # config.action_cable.disable_request_forgery_protection = true
 
   config.log_level = :debug
+
+  config.session_store :redis_store, { servers: ["redis://redis:6379/0/session"] }
 end
