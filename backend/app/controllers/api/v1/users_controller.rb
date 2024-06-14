@@ -63,7 +63,7 @@ module Api
           log_in(@user)
         end
 
-        render json: { user: @user, session_id: session[:session_id] }, status: :created
+        render json: { user: @user.as_json(except: :refresh_token), session_id: session[:session_id] }, status: :created
       rescue StandardError => e
         Rails.logger.error "An error occurred: #{e.message}"
         Rails.logger.error e.backtrace.join("\n")

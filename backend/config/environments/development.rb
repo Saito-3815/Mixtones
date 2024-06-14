@@ -64,5 +64,5 @@ Rails.application.configure do
 
   config.log_level = :debug
 
-  config.session_store :redis_store, { servers: ["redis://redis:6379/0/session"] }
+  Rails.application.config.session_store :action_dispatch_session_redis_store, servers: ENV['REDIS_URL']
 end
