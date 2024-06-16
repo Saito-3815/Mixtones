@@ -28,12 +28,6 @@ function App() {
     time: "00:00",
   };
 
-  // useEffect(() => {
-  //   if (error) {
-  //     return <div>Error</div>;
-  //   }
-  // }, [error]);
-
   return (
     <QueryClientProvider client={queryClient}>
       <Router>

@@ -1,6 +1,3 @@
-import axios from "axios";
-import qs from "qs";
-
 const authEndpoint = "https://accounts.spotify.com/authorize";
 const clientId = "5b2ac842f6c044f984dbb35520a349fd";
 export const redirectUri = "http://localhost:3000/";
@@ -59,22 +56,10 @@ export const getCodeFromUrl = () => {
   return urlParams.get("code");
 };
 
-// アクセストークンのリクエストと取得
-export const getAccessToken = async (code, codeVerifier) => {
-  console.log("codeVerifier:", codeVerifier);
-
-  const body = {
-    client_id: clientId,
-    grant_type: "authorization_code",
-    code,
-    redirect_uri: redirectUri,
-    code_verifier: codeVerifier,
-    client_secret: "6da90d9caf9d442b8ae62fe18ec2354d",
-  };
-  const response = await axios.post(tokenEndpoint, qs.stringify(body), {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  });
-  return response.data.access_token;
+// codeVerifierと認証コードを削除
+export const removeCodeVerifierAndRedirect = () => {
+  sessionStorage.removeItem("codeVerifier");
+  const urlWithoutCode = new URL(window.location.href);
+  urlWithoutCode.searchParams.delete("code");
+  window.history.replaceState(null, "", urlWithoutCode.href);
 };

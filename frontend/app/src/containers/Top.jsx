@@ -3,10 +3,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { CommunityItem } from "@/components/ui/CommunityItem/CommunityItem";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
 import { Link } from "react-router-dom";
-import { fetchCommunities } from "@/api/communities";
-import { getCodeFromUrl } from "@/SpotifyAuth";
+import { fetchCommunities } from "@/api/communitiesIndex";
+import { getCodeFromUrl, removeCodeVerifierAndRedirect } from "@/SpotifyAuth";
 import axios from "axios";
-import { usersCreate } from "@/urls/index";
+import { createUser } from "@/api/usersCreate";
 
 const Top = () => {
   // コミュニティー一覧を取得
@@ -23,18 +23,11 @@ const Top = () => {
     return <div>Error</div>;
   }
 
-  //  ユーザー作成リクエスト関数
+  //  ユーザー作成リクエスト
   const userCreate = useMutation({
-    mutationFn: ({ code, codeVerifier, cancelToken }) => {
-      const encodedCode = btoa(code);
-      return axios.post(
-        usersCreate,
-        { user: { code: encodedCode, code_verifier: codeVerifier } },
-        { cancelToken },
-      );
-    },
-    onSuccess: (data) => {
-      console.log("User data:", data);
+    mutationFn: createUser,
+    onSuccess: () => {
+      removeCodeVerifierAndRedirect();
     },
     onError: (error) => {
       if (axios.isCancel(error)) {
@@ -51,21 +44,14 @@ const Top = () => {
     const source = axios.CancelToken.source();
 
     const code = getCodeFromUrl();
-    console.log(`Got code from URL: ${code}`);
+    // console.log(`Got code from URL: ${code}`);
 
     // セッションストレージからcodeVerifierを取得
     const codeVerifier = sessionStorage.getItem("codeVerifier");
-    console.log("codeVerifier:", codeVerifier);
+    // console.log("codeVerifier:", codeVerifier);
 
-    // getAccessToken(code, codeVerifier)
-    // .then(token => {
-    //   console.log(`Got token from URL: ${token}`);
-    // })
-    // .catch(error => {
-    //   console.error('Failed to get access token:', error);
-    // });
-
-    if (code && codeVerifier) {
+    // URLにcodeが含まれている（認証ページからのリダイレクト時）かつcodeVerifierがセッションストレージに存在する場合のみリクエストを送信
+    if (window.location.search.includes("code=") && code && codeVerifier) {
       userCreate.mutate({ code, codeVerifier, cancelToken: source.token });
     }
 

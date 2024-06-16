@@ -34,36 +34,45 @@ module Api
         SpotifyAuth.fetch_saved_tracks(spotify_id, access_token, user_create_params)
         Rails.logger.info "User Create Params: #{user_create_params}"
 
-        User.transaction do
-          @user = User.create!(
-            name: user_create_params[:name],
-            avatar: user_create_params[:avatar],
-            spotify_id: user_create_params[:spotify_id],
-            refresh_token: refresh_token
-          )
+        existing_user = User.find_by(spotify_id: spotify_id)
 
-          user_create_params[:like_tunes].each do |like_tune|
-            existing_record = Tune.find_by(spotify_uri: like_tune[:spotify_uri])
+        if existing_user
+          # Update the existing user's refresh token
+          existing_user.update(refresh_token: refresh_token)
+          log_in(existing_user)
+          render json: { user: existing_user.as_json(except: :refresh_token), session_id: session[:session_id] }, status: :ok
+        else
+          User.transaction do
+            @user = User.create!(
+              name: user_create_params[:name],
+              avatar: user_create_params[:avatar],
+              spotify_id: user_create_params[:spotify_id],
+              refresh_token: refresh_token
+            )
 
-            if existing_record.nil?
-              @user.like_tunes.create!(
-                name: like_tune[:name],
-                artist: like_tune[:artist],
-                album: like_tune[:album],
-                images: like_tune[:images],
-                spotify_uri: like_tune[:spotify_uri],
-                preview_url: like_tune[:preview_url],
-                added_at: like_tune[:added_at]
-              )
-            else
-              @user.like_tunes << existing_record
+            user_create_params[:like_tunes].each do |like_tune|
+              existing_record = Tune.find_by(spotify_uri: like_tune[:spotify_uri])
+
+              if existing_record.nil?
+                @user.like_tunes.create!(
+                  name: like_tune[:name],
+                  artist: like_tune[:artist],
+                  album: like_tune[:album],
+                  images: like_tune[:images],
+                  spotify_uri: like_tune[:spotify_uri],
+                  preview_url: like_tune[:preview_url],
+                  added_at: like_tune[:added_at]
+                )
+              else
+                @user.like_tunes << existing_record
+              end
             end
+
+            log_in(@user)
           end
 
-          log_in(@user)
+          render json: { user: @user.as_json(except: :refresh_token), session_id: session[:session_id] }, status: :created
         end
-
-        render json: { user: @user.as_json(except: :refresh_token), session_id: session[:session_id] }, status: :created
       rescue StandardError => e
         Rails.logger.error "An error occurred: #{e.message}"
         Rails.logger.error e.backtrace.join("\n")
