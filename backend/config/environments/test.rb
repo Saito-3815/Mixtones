@@ -57,4 +57,12 @@ Rails.application.configure do
 
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
+
+  begin
+    Rails.application.config.session_store :action_dispatch_session_redis_store, servers: ENV['REDIS_URL']
+  rescue => e
+    Rails.logger.error "Failed to connect to Redis: #{e.message}, #{e.backtrace.join("\n")}"
+  end
+
+  config.log_level = :debug
 end

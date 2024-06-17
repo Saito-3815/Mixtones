@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_12_132710) do
+ActiveRecord::Schema[7.0].define(version: 2024_06_12_013008) do
   create_table "checks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "tune_id", null: false
@@ -78,7 +78,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_12_132710) do
     t.string "name", null: false
     t.string "artist", null: false
     t.string "album", null: false
-    t.string "images", null: false
+    t.text "images", null: false
     t.string "spotify_uri", null: false
     t.string "preview_url"
     t.string "added_at", null: false
@@ -90,10 +90,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_12_132710) do
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", limit: 40, null: false
     t.text "introduction", size: :tiny
-    t.string "avatar"
+    t.text "avatar"
     t.string "spotify_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "refresh_token"
     t.index ["spotify_id"], name: "index_users_on_spotify_id", unique: true
   end
 

@@ -1,4 +1,8 @@
 // サーバーサイドで定義したURL文字列を返す定数
 const DEFAULT_API_LOCALHOST = "http://localhost:3001/api/v1";
 
+// コミュニティ一覧
 export const communitiesIndex = `${DEFAULT_API_LOCALHOST}/communities`;
+
+// spotifyユーザーをデータベースへ登録
+export const usersCreate = `${DEFAULT_API_LOCALHOST}/users`;

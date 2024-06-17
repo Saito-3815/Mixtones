@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Header } from "@/components/ui/Header/Header";
 import { WordFooter } from "@/components/ui/WordFooter/WordFooter";
 import { TuneFooter } from "@/components/ui/TuneFooter/TuneFooter";
@@ -10,7 +11,6 @@ import CommunityEdit from "./containers/CommunityEdit";
 import Login from "./containers/Login";
 import User from "./containers/User";
 import UserEdit from "./containers/UserEdit";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 function App() {
   const queryClient = new QueryClient();
@@ -25,10 +25,6 @@ function App() {
     },
     time: "00:00",
   };
-
-  // const user = {
-  //   name: "User Name",
-  // };
 
   return (
     <QueryClientProvider client={queryClient}>

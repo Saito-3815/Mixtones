@@ -2,6 +2,8 @@ require_relative "boot"
 
 require "rails/all"
 
+require 'dotenv/load'
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -23,5 +25,11 @@ module Api
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # config.autoload_paths += %W(#{config.root}/lib)
+    config.eager_load_paths << Rails.root.join('lib')
+
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::RedisStore
   end
 end

@@ -61,4 +61,8 @@ Rails.application.configure do
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
+
+  config.log_level = :debug
+
+  Rails.application.config.session_store :action_dispatch_session_redis_store, servers: ENV['REDIS_URL']
 end
