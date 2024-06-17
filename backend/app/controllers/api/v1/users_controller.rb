@@ -26,13 +26,13 @@ module Api
         refresh_token = tokens[:refresh_token]
 
         # Log the token values
-        Rails.logger.info "Access Token: #{access_token}"
-        Rails.logger.info "Refresh Token: #{refresh_token}"
+        # Rails.logger.info "Access Token: #{access_token}"
+        # Rails.logger.info "Refresh Token: #{refresh_token}"
 
         user_create_params = SpotifyAuth.fetch_authenticated_user_data(access_token)
         spotify_id = user_create_params[:spotify_id]
         SpotifyAuth.fetch_saved_tracks(spotify_id, access_token, user_create_params)
-        Rails.logger.info "User Create Params: #{user_create_params}"
+        # Rails.logger.info "User Create Params: #{user_create_params}"
 
         existing_user = User.find_by(spotify_id: spotify_id)
 
