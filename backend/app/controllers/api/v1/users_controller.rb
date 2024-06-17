@@ -40,7 +40,10 @@ module Api
           # Update the existing user's refresh token
           existing_user.update(refresh_token: refresh_token)
           log_in(existing_user)
-          render json: { user: existing_user.as_json(except: :refresh_token), session_id: session[:session_id] }, status: :ok
+          render json: {
+            user: existing_user.as_json(except: :refresh_token),
+            session_id: session[:session_id]
+          }, status: :ok
         else
           User.transaction do
             @user = User.create!(
@@ -71,7 +74,10 @@ module Api
             log_in(@user)
           end
 
-          render json: { user: @user.as_json(except: :refresh_token), session_id: session[:session_id] }, status: :created
+          render json: {
+            user: @user.as_json(except: :refresh_token),
+            session_id: session[:session_id]
+          }, status: :created
         end
       rescue StandardError => e
         Rails.logger.error "An error occurred: #{e.message}"

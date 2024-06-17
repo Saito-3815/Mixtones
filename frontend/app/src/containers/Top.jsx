@@ -7,6 +7,8 @@ import { fetchCommunities } from "@/api/communitiesIndex";
 import { getCodeFromUrl, removeCodeVerifierAndRedirect } from "@/SpotifyAuth";
 import axios from "axios";
 import { createUser } from "@/api/usersCreate";
+import { useAtom } from "jotai";
+import { loginUser, userAtom } from "@/atoms/userAtoms";
 
 const Top = () => {
   // コミュニティー一覧を取得
@@ -23,11 +25,16 @@ const Top = () => {
     return <div>Error</div>;
   }
 
+  const [user, setUser] = useAtom(userAtom);
+
   //  ユーザー作成リクエスト
   const userCreate = useMutation({
     mutationFn: createUser,
-    onSuccess: () => {
+    onSuccess: (data) => {
       removeCodeVerifierAndRedirect();
+      if (!user) {
+        loginUser(setUser, data.data.user);
+      }
     },
     onError: (error) => {
       if (axios.isCancel(error)) {
@@ -37,6 +44,11 @@ const Top = () => {
       }
     },
   });
+
+  // userAtom の変更を監視
+  useEffect(() => {
+    console.log("userAtom updated:", user);
+  }, [user]);
 
   // 認証ページからリダイレクトされた際にコードを取得し、ユーザー作成リクエストを送信
   useEffect(() => {

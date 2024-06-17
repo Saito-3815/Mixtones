@@ -11,8 +11,6 @@ import CommunityEdit from "./containers/CommunityEdit";
 import Login from "./containers/Login";
 import User from "./containers/User";
 import UserEdit from "./containers/UserEdit";
-// import { useEffect } from "react";
-// import { getTokenFromUrl } from "./urls/Spotify";
 
 function App() {
   const queryClient = new QueryClient();
