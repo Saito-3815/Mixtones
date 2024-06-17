@@ -8,9 +8,9 @@ const Signup = () => {
   // ログインボタンをクリックしたときにコードチャレンジを生成してSpotifyのログインページにリダイレクトする
   const handleLogin = async () => {
     try {
-      const { codeChallenge, codeVerifier } = await generateCodeChallenge();
-      console.log(`Generated code challenge: ${codeChallenge}`);
-      console.log(`Generated code verifier: ${codeVerifier}`);
+      const { codeVerifier } = await generateCodeChallenge();
+      // console.log(`Generated code challenge: ${codeChallenge}`);
+      // console.log(`Generated code verifier: ${codeVerifier}`);
 
       // codeVerifierをセッションストレージに保存
       sessionStorage.setItem("codeVerifier", codeVerifier);

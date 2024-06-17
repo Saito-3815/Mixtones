@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/Button/Button";
 import { AvatarMenu } from "../AvatarMenu/AvatarMenu";
 import { BarMenu } from "@/components/ui/BarMenu/BarMenu";
 import { AlertDialogSet } from "../AlertDialog/AlertDialog";
-import { userAtom } from "@/atoms/userAtoms";
+import { isLoggedInAtom } from "@/atoms/userAtoms";
 import { useAtom } from "jotai";
 
 export const Header = () => {
-  const [user] = useAtom(userAtom);
+  const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   return (
     <header className="mx-1 my-1">
@@ -23,7 +23,7 @@ export const Header = () => {
           </div>
         </Link>
         <div className="hidden md:flex">
-          {user !== null ? (
+          {isLoggedIn ? (
             <>
               <div className="flex items-center space-x-20 ">
                 <AlertDialogSet

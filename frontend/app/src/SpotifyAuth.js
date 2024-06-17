@@ -47,7 +47,7 @@ export const generateCodeChallenge = async () => {
   codeVerifier = generateRandomString(64);
   const hashed = await sha256(codeVerifier);
   codeChallenge = base64encode(hashed);
-  return { codeChallenge, codeVerifier }; // 追加：生成したcodeChallengeとcodeVerifierを返す
+  return { codeChallenge, codeVerifier };
 };
 
 // URLから認証コードを取得
@@ -59,6 +59,7 @@ export const getCodeFromUrl = () => {
 // codeVerifierと認証コードを削除
 export const removeCodeVerifierAndRedirect = () => {
   sessionStorage.removeItem("codeVerifier");
+  localStorage.removeItem("codeVerifier");
   const urlWithoutCode = new URL(window.location.href);
   urlWithoutCode.searchParams.delete("code");
   window.history.replaceState(null, "", urlWithoutCode.href);
