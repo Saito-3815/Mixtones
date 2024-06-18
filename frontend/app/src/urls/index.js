@@ -9,3 +9,5 @@ export const usersCreate = `${DEFAULT_API_LOCALHOST}/users`;
 
 // ユーザーのログイン
 export const sessionsCreate = `${DEFAULT_API_LOCALHOST}/sessions`;
+// ユーザーのログアウト
+export const sessionsDestroy = `${DEFAULT_API_LOCALHOST}/sessions`;

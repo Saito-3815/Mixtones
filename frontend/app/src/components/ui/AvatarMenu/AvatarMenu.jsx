@@ -7,6 +7,11 @@ import { cn } from "@/lib/utils";
 
 import PropTypes from "prop-types";
 import { AvatarSet } from "@/components/ui/Avatar/Avatar";
+import { logoutUser, userAtom } from "@/atoms/userAtoms";
+import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { destroySessions } from "@/api/sessionsDestroy";
+import { useSetAtom } from "jotai";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -229,6 +234,26 @@ export {
 };
 
 export function AvatarMenu() {
+  const setUser = useSetAtom(userAtom);
+
+  // ユーザーログアウトリクエスト
+  const handleLogout = useMutation({
+    mutationFn: destroySessions,
+    onSuccess: (data) => {
+      if (data.status === 200) {
+        logoutUser(setUser);
+      }
+      console.log(data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
+    },
+  });
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -244,6 +269,7 @@ export function AvatarMenu() {
             dialogTitle="ログアウトします。よろしいですか？"
             dialogText="ログアウトするとあなたのお気に入りの更新がストップします。"
             actionText="ログアウトする"
+            onActionClick={handleLogout.mutate}
             cancelText="キャンセル"
           />
         </DropdownMenuItem>

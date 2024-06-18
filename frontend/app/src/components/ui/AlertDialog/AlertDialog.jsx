@@ -148,13 +148,16 @@ export const AlertDialogSet = ({
   dialogText,
   actionText,
   cancelText,
+  onActionClick, // アクションボタンのクリックイベントハンドラ
 }) => (
   <AlertDialog>
     <AlertDialogTrigger>{triggerComponent}</AlertDialogTrigger>
     <AlertDialogContent>
       <h2 className="text-center text-sm">{dialogTitle}</h2>
       <p className="text-theme-gray text-center text-xs">{dialogText}</p>
-      <AlertDialogAction>{actionText}</AlertDialogAction>
+      <AlertDialogAction onClick={onActionClick}>
+        {actionText}
+      </AlertDialogAction>
       <AlertDialogCancel>{cancelText}</AlertDialogCancel>
     </AlertDialogContent>
   </AlertDialog>
@@ -166,16 +169,9 @@ AlertDialogSet.propTypes = {
   dialogText: PropTypes.string.isRequired,
   actionText: PropTypes.string.isRequired,
   cancelText: PropTypes.string.isRequired,
+  onActionClick: PropTypes.func,
 };
 
-{
-  /* <AlertDialogSet
-                triggerComponent={
-                  <Button variant="secondary" label="コミュニティを作る" />
-                }
-                dialogTitle="新しいコミュニティが作成されます。\nよろしいですか？"
-                dialogText="コミュニティを作成するとあなたのお気に入りが共有されます。"
-                actionText="コミュニティを作る"
-                cancelText="キャンセル"
-              /> */
-}
+AlertDialogSet.defaultProps = {
+  onActionClick: () => {}, // デフォルトの onClick ハンドラを空の関数に設定
+};

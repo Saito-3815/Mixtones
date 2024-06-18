@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { getCodeFromUrl, removeCodeVerifierAndRedirect } from "@/SpotifyAuth";
 import axios from "axios";
 import { useAtom } from "jotai";
-import { loginUser, userAtom } from "@/atoms/userAtoms";
+import { isLoggedInAtom, loginUser, userAtom } from "@/atoms/userAtoms";
 
 // api
 import { fetchCommunities } from "@/api/communitiesIndex";
@@ -66,9 +66,12 @@ const Top = () => {
     },
   });
 
+  const [isLoggedIn] = useAtom(isLoggedInAtom);
+
   // userAtom の変更を監視
   useEffect(() => {
     console.log("userAtom updated:", user);
+    console.log("isLoggedIn?:", isLoggedIn);
   }, [user]);
 
   // 認証ページからリダイレクトされた際にコードを取得し、ユーザー作成もしくはログインリクエストを送信

@@ -5,8 +5,11 @@ import { atom } from "jotai";
 const userAtom = atom(null);
 
 // ユーザーがログインしているかどうかを判定するためのatom
-const isLoggedInAtom = atom((get) => get(userAtom) !== null);
-
+const isLoggedInAtom = atom((get) => {
+  const user = get(userAtom);
+  // userAtomの値がオブジェクトで、そのinitプロパティがnullの場合、またはuserAtom自体がnullの場合にfalseを返す
+  return !(user === null || (user && user.init === null));
+});
 // ログインユーザー情報をセットする関数
 const loginUser = (setUser, user) => {
   setUser(user); // ユーザー情報でuserAtomを更新
