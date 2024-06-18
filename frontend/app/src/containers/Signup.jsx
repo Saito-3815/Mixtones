@@ -6,14 +6,15 @@ import { accessUrl } from "@/SpotifyAuth.js";
 
 const Signup = () => {
   // ログインボタンをクリックしたときにコードチャレンジを生成してSpotifyのログインページにリダイレクトする
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     try {
       const { codeVerifier } = await generateCodeChallenge();
       // console.log(`Generated code challenge: ${codeChallenge}`);
       // console.log(`Generated code verifier: ${codeVerifier}`);
 
-      // codeVerifierをセッションストレージに保存
+      // codeVerifierとリダイレクト元のページ情報をセッションストレージに保存
       sessionStorage.setItem("codeVerifier", codeVerifier);
+      sessionStorage.setItem("redirectFrom", "signupPage");
 
       window.location.href = accessUrl;
     } catch (error) {
@@ -40,7 +41,7 @@ const Signup = () => {
         <p className="text-white">ログイン状態を保持する。</p>
       </div>
       <div className="w-full max-w-[550px] flex flex-col items-center space-y-12 pt-12 pb-24">
-        <div onClick={handleLogin}>
+        <div onClick={handleSignup}>
           <Button
             label="Spotifyでログインする"
             className="bg-theme-green hover:bg-theme-green/90 w-[290px]"

@@ -1,7 +1,25 @@
+import { accessUrl, generateCodeChallenge } from "@/SpotifyAuth";
 import { Button } from "@/components/ui/Button/Button";
 import { Switch } from "@/components/ui/Switch/Switch";
 
 const Login = () => {
+  // ログインボタンをクリックしたときにコードチャレンジを生成してSpotifyのログインページにリダイレクトする
+  const handleLogin = async () => {
+    try {
+      const { codeVerifier } = await generateCodeChallenge();
+      // console.log(`Generated code challenge: ${codeChallenge}`);
+      // console.log(`Generated code verifier: ${codeVerifier}`);
+
+      // codeVerifierとリダイレクト元のページ情報をセッションストレージに保存
+      sessionStorage.setItem("codeVerifier", codeVerifier);
+      sessionStorage.setItem("redirectFrom", "loginPage");
+
+      window.location.href = accessUrl;
+    } catch (error) {
+      console.error("Failed to generate code challenge:", error);
+    }
+  };
+
   return (
     <div className="container flex flex-col bg-theme-black max-w-[890px] max-h-[840px] h-full mx-auto my-8 rounded-sm justify-center items-center overflow-hidden">
       <div className="w-full max-w-[550px] mx-auto items-center text-center">
@@ -19,10 +37,12 @@ const Login = () => {
         <p className="text-white">ログイン状態を保持する。</p>
       </div>
       <div className="w-full max-w-[550px] flex flex-col items-center space-y-12 pt-12 pb-24">
-        <Button
-          label="Spotifyでログインする"
-          className="bg-theme-green hover:bg-theme-green/90 w-[290px]"
-        />
+        <div onClick={handleLogin}>
+          <Button
+            label="Spotifyでログインする"
+            className="bg-theme-green hover:bg-theme-green/90 w-[290px]"
+          />
+        </div>
         <Button
           label="ゲストログインする"
           className="bg-theme-orange w-[290px]"

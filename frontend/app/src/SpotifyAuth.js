@@ -56,10 +56,11 @@ export const getCodeFromUrl = () => {
   return urlParams.get("code");
 };
 
-// codeVerifierと認証コードを削除
+// codeVerifierと認証コードとリダイレクト元情報を削除
 export const removeCodeVerifierAndRedirect = () => {
   sessionStorage.removeItem("codeVerifier");
   localStorage.removeItem("codeVerifier");
+  sessionStorage.removeItem("redirectFrom");
   const urlWithoutCode = new URL(window.location.href);
   urlWithoutCode.searchParams.delete("code");
   window.history.replaceState(null, "", urlWithoutCode.href);

@@ -3,12 +3,15 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { CommunityItem } from "@/components/ui/CommunityItem/CommunityItem";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
 import { Link } from "react-router-dom";
-import { fetchCommunities } from "@/api/communitiesIndex";
 import { getCodeFromUrl, removeCodeVerifierAndRedirect } from "@/SpotifyAuth";
 import axios from "axios";
-import { createUser } from "@/api/usersCreate";
 import { useAtom } from "jotai";
 import { loginUser, userAtom } from "@/atoms/userAtoms";
+
+// api
+import { fetchCommunities } from "@/api/communitiesIndex";
+import { createUser } from "@/api/usersCreate";
+import { createSessions } from "@/api/sessionsCreate";
 
 const Top = () => {
   // コミュニティー一覧を取得
@@ -45,12 +48,30 @@ const Top = () => {
     },
   });
 
+  // ユーザーログインリクエスト
+  const userLogin = useMutation({
+    mutationFn: createSessions,
+    onSuccess: (data) => {
+      removeCodeVerifierAndRedirect();
+      if (!user) {
+        loginUser(setUser, data.data.user);
+      }
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
+    },
+  });
+
   // userAtom の変更を監視
   useEffect(() => {
     console.log("userAtom updated:", user);
   }, [user]);
 
-  // 認証ページからリダイレクトされた際にコードを取得し、ユーザー作成リクエストを送信
+  // 認証ページからリダイレクトされた際にコードを取得し、ユーザー作成もしくはログインリクエストを送信
   useEffect(() => {
     // axiosのCancelTokenを生成
     const source = axios.CancelToken.source();
@@ -64,7 +85,14 @@ const Top = () => {
 
     // URLにcodeが含まれている（認証ページからのリダイレクト時）かつcodeVerifierがセッションストレージに存在する場合のみリクエストを送信
     if (window.location.search.includes("code=") && code && codeVerifier) {
-      userCreate.mutate({ code, codeVerifier, cancelToken: source.token });
+      // リダイレクト元の情報をセッションストレージから取得
+      const redirectFrom = sessionStorage.getItem("redirectFrom");
+
+      if (redirectFrom === "signupPage") {
+        userCreate.mutate({ code, codeVerifier, cancelToken: source.token });
+      } else if (redirectFrom === "loginPage") {
+        userLogin.mutate({ code, codeVerifier, cancelToken: source.token });
+      }
     }
 
     // クリーンアップ関数でリクエストをキャンセル
