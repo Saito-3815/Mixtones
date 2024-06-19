@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CommunityItem } from "@/components/ui/CommunityItem/CommunityItem";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getCodeFromUrl, removeCodeVerifierAndRedirect } from "@/SpotifyAuth";
 import axios from "axios";
 import { useAtom } from "jotai";
@@ -48,6 +48,8 @@ const Top = () => {
     },
   });
 
+  const navigate = useNavigate();
+
   // ユーザーログインリクエスト
   const userLogin = useMutation({
     mutationFn: createSessions,
@@ -60,6 +62,9 @@ const Top = () => {
     onError: (error) => {
       if (axios.isCancel(error)) {
         console.log("Request was canceled by the user");
+      } else if (error.response && error.response.status === 404) {
+        // :not_foundに相当するステータスコード
+        navigate("/signup"); // サインアップページにリダイレクト
       } else {
         console.error(error);
       }

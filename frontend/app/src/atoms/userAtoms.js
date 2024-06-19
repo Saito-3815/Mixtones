@@ -5,19 +5,15 @@ import { atom } from "jotai";
 const userAtom = atom(null);
 
 // ユーザーがログインしているかどうかを判定するためのatom
-const isLoggedInAtom = atom((get) => {
-  const user = get(userAtom);
-  // userAtomの値がオブジェクトで、そのinitプロパティがnullの場合、またはuserAtom自体がnullの場合にfalseを返す
-  return !(user === null || (user && user.init === null));
-});
+const isLoggedInAtom = atom((get) => get(userAtom) !== null);
+
 // ログインユーザー情報をセットする関数
 const loginUser = (setUser, user) => {
   setUser(user); // ユーザー情報でuserAtomを更新
 };
-
 // ログアウト処理を行う関数
-const logoutUser = (set) => {
-  set(userAtom, null); // userAtomをnullに設定してログアウト状態にする
+const logoutUser = (setUser) => {
+  setUser(null); // userAtomをnullに設定してログアウト状態にする
 };
 
 // セッションチェックを行うカスタムフック

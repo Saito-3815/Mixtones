@@ -1,8 +1,21 @@
 import { accessUrl, generateCodeChallenge } from "@/SpotifyAuth";
 import { Button } from "@/components/ui/Button/Button";
 import { Switch } from "@/components/ui/Switch/Switch";
+import { useEffect, useState } from "react";
 
 const Login = () => {
+  // isPersistent状態を追加
+  const [isPersistent, setIsPersistent] = useState(false);
+
+  // Switchの状態を切り替える関数
+  const toggleIsPersistent = () => {
+    setIsPersistent(!isPersistent);
+  };
+  // isPersistentの状態を監視してログに表示
+  useEffect(() => {
+    console.log("isPersistent:", isPersistent);
+  }, [isPersistent]);
+
   // ログインボタンをクリックしたときにコードチャレンジを生成してSpotifyのログインページにリダイレクトする
   const handleLogin = async () => {
     try {
@@ -33,7 +46,7 @@ const Login = () => {
         </p>
       </div>
       <div className="w-full max-w-[550px] flex items-center justify-center space-x-10 pt-12">
-        <Switch />
+        <Switch checked={isPersistent} onChange={toggleIsPersistent} />
         <p className="text-white">ログイン状態を保持する。</p>
       </div>
       <div className="w-full max-w-[550px] flex flex-col items-center space-y-12 pt-12 pb-24">

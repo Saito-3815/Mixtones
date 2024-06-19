@@ -58,6 +58,7 @@ module Api
 
       def destroy
         log_out
+        response.set_cookie('_session_id', value: '', path: '/', domain: 'localhost',expires: Time.now - 1.year, httponly: true)
         render json: { message: 'Logged out' }, status: :ok
       end
 
