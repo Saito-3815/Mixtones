@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       end
       resources :sessions, only: [:create]
       delete 'sessions', to: 'sessions#destroy'
+      get 'sessions', to: 'sessions#current_user_show'
     end
   end
 end

@@ -1,6 +1,7 @@
 RSpec.shared_context 'when session is setup' do
   let(:spotify_code) { Base64.encode64('dummy_code') }
   let(:code_verifier) { 'dummy_code_verifier' }
+  let(:is_persistent) { false }
   let(:access_token) { 'dummy_access_token' }
   let(:refresh_token) { 'dummy_refresh_token' }
   let(:user_create_params) do

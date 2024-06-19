@@ -26,6 +26,7 @@ const Login = () => {
       // codeVerifierとリダイレクト元のページ情報をセッションストレージに保存
       sessionStorage.setItem("codeVerifier", codeVerifier);
       sessionStorage.setItem("redirectFrom", "loginPage");
+      sessionStorage.setItem("isPersistent", isPersistent);
 
       window.location.href = accessUrl;
     } catch (error) {

@@ -11,3 +11,5 @@ export const usersCreate = `${DEFAULT_API_LOCALHOST}/users`;
 export const sessionsCreate = `${DEFAULT_API_LOCALHOST}/sessions`;
 // ユーザーのログアウト
 export const sessionsDestroy = `${DEFAULT_API_LOCALHOST}/sessions`;
+// セッションに対応したユーザー情報の取得
+export const currentUser = `${DEFAULT_API_LOCALHOST}/sessions`;

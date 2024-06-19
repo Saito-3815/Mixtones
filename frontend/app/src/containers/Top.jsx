@@ -95,11 +95,22 @@ const Top = () => {
     if (window.location.search.includes("code=") && code && codeVerifier) {
       // リダイレクト元の情報をセッションストレージから取得
       const redirectFrom = sessionStorage.getItem("redirectFrom");
+      const isPersistent = sessionStorage.getItem("isPersistent");
 
       if (redirectFrom === "signupPage") {
-        userCreate.mutate({ code, codeVerifier, cancelToken: source.token });
+        userCreate.mutate({
+          code,
+          codeVerifier,
+          isPersistent,
+          cancelToken: source.token,
+        });
       } else if (redirectFrom === "loginPage") {
-        userLogin.mutate({ code, codeVerifier, cancelToken: source.token });
+        userLogin.mutate({
+          code,
+          codeVerifier,
+          isPersistent,
+          cancelToken: source.token,
+        });
       }
     }
 
