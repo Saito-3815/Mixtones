@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       resources :sessions, only: [:create]
       delete 'sessions', to: 'sessions#destroy'
       get 'sessions', to: 'sessions#current_user_show'
+      post 'sessions/guest', to: 'sessions#guest_login'
     end
   end
 end

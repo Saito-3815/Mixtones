@@ -36,6 +36,7 @@ module Api
       end
 
       def destroy
+        restore_guest_data
         log_out
         response.set_cookie('_session_id', value: '', path: '/', domain: 'localhost',expires: Time.now - 1.year, httponly: true)
         render json: { message: 'Logged out' }, status: :ok
@@ -46,6 +47,32 @@ module Api
           render json: { error: 'User not found' }, status: :not_found
         else
           render json: @current_user.as_json(except: :refresh_token), status: :ok
+        end
+      end
+
+      def guest_login
+        user = User.find_by(spotify_id: 'guest_user') # ゲストユーザーを特定
+        if user
+          log_in(user)
+          current_user
+          save_original_guest_data
+          request.session_options[:expire_after] = 1.hour
+          render json: { user: user.as_json(except: :refresh_token), message: 'Guest login successful' }, status: :ok
+        else
+          render json: {message: 'Guest user not found' }, status: :not_found
+        end
+      end
+
+      # ゲストユーザーのオリジナルデータを保存する
+      def save_original_guest_data
+        session[:original_guest_data] = @current_user.attributes
+      end
+
+      # セッション終了時にゲストユーザーのデータを復元する
+      def restore_guest_data
+        if current_user&.is_guest?
+          original_data = session[:original_guest_data]
+          @current_user.update(original_data)
         end
       end
 

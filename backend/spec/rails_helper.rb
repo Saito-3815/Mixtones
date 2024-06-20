@@ -70,4 +70,7 @@ RSpec.configure do |config|
 
   # ヘルパーメソッドをリクエストスペックで使用するために追加
   config.include SessionsHelper, type: :request
+
+  # ActiveSupportの時間旅行機能を有効にする
+  config.include ActiveSupport::Testing::TimeHelpers
 end
