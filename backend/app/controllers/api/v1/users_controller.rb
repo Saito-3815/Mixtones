@@ -34,7 +34,7 @@ module Api
 
         if existing_user
           update_result = update_user_and_like_tunes(existing_user, refresh_token, user_create_params)
-          set_session_expiration_from_params(spotify_login_params[:is_persistent])
+          update_session_expiration(spotify_login_params[:is_persistent])
 
           render json: {
             user: update_result[:user].as_json(except: :refresh_token),
@@ -68,7 +68,7 @@ module Api
             end
 
             log_in(@user)
-            set_session_expiration_from_params(spotify_login_params[:is_persistent])
+            update_session_expiration(spotify_login_params[:is_persistent])
           end
 
           render json: {
@@ -93,6 +93,7 @@ module Api
 
       def destroy
         @user = User.find(params[:id])
+        reset_session if current_user == @user
         @user.destroy
         render json: { message: 'User deleted' }, status: :ok
       end

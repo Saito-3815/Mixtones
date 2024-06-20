@@ -13,3 +13,5 @@ export const sessionsCreate = `${DEFAULT_API_LOCALHOST}/sessions`;
 export const sessionsDestroy = `${DEFAULT_API_LOCALHOST}/sessions`;
 // セッションに対応したユーザー情報の取得
 export const currentUser = `${DEFAULT_API_LOCALHOST}/sessions`;
+// ゲストログイン
+export const sessionsGuestLogin = `${DEFAULT_API_LOCALHOST}/sessions/guest`;

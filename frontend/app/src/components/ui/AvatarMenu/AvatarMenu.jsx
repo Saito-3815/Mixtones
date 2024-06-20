@@ -233,7 +233,7 @@ export {
   DropdownMenuRadioGroup,
 };
 
-export function AvatarMenu() {
+export function AvatarMenu({ userAvatar }) {
   const setUser = useSetAtom(userAtom);
 
   // ユーザーログアウトリクエスト
@@ -257,7 +257,7 @@ export function AvatarMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <AvatarSet size="12" />
+        <AvatarSet size="12" src={userAvatar} />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -286,3 +286,7 @@ export function AvatarMenu() {
     </DropdownMenu>
   );
 }
+
+AvatarMenu.propTypes = {
+  userAvatar: PropTypes.string.isRequired, // userAvatarは文字列で、必須であることを指定
+};

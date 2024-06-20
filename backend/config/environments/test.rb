@@ -59,7 +59,8 @@ Rails.application.configure do
   # config.action_view.annotate_rendered_view_with_filenames = true
 
   begin
-    Rails.application.config.session_store :action_dispatch_session_redis_store, servers: ENV['REDIS_URL']
+    # テスト環境専用のRedisサーバーURLを指定
+    Rails.application.config.session_store :action_dispatch_session_redis_store, servers: ENV['REDIS_TEST_URL']
   rescue => e
     Rails.logger.error "Failed to connect to Redis: #{e.message}, #{e.backtrace.join("\n")}"
   end

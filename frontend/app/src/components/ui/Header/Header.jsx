@@ -9,15 +9,9 @@ import { BarMenu } from "@/components/ui/BarMenu/BarMenu";
 import { AlertDialogSet } from "../AlertDialog/AlertDialog";
 import { isLoggedInAtom } from "@/atoms/userAtoms";
 import { useAtom } from "jotai";
-// import { useEffect } from "react";
 
 export const Header = () => {
   const [isLoggedIn] = useAtom(isLoggedInAtom);
-
-  // // userAtom の変更を監視
-  // useEffect(() => {
-  //   console.log("LoggedIn:", isLoggedIn);
-  // }, [isLoggedIn]);
 
   return (
     <header className="mx-1 my-1">
@@ -41,7 +35,7 @@ export const Header = () => {
                   actionText="コミュニティを作る"
                   cancelText="キャンセル"
                 />
-                <AvatarMenu />
+                <AvatarMenu src="" />
               </div>
             </>
           ) : (

@@ -20,7 +20,7 @@ module Api
 
         if existing_user
           update_result = update_user_and_like_tunes(existing_user, refresh_token, user_create_params)
-          set_session_expiration_from_params(spotify_login_params[:is_persistent])
+          update_session_expiration(spotify_login_params[:is_persistent])
 
           render json: {
             user: update_result[:user].as_json(except: :refresh_token),
@@ -38,7 +38,8 @@ module Api
       def destroy
         restore_guest_data
         log_out
-        response.set_cookie('_session_id', value: '', path: '/', domain: 'localhost',expires: Time.now - 1.year, httponly: true)
+        response.set_cookie('_session_id', value: '', path: '/', domain: 'localhost', expires: 1.year.ago,
+                                           httponly: true)
         render json: { message: 'Logged out' }, status: :ok
       end
 
@@ -50,29 +51,36 @@ module Api
         end
       end
 
+      # ゲストログイン
+      # オリジナルゲストユーザーデータをゲストユーザーにコピー
       def guest_login
-        user = User.find_by(spotify_id: 'guest_user') # ゲストユーザーを特定
+        user = User.find_by(spotify_id: 'guest_user')
         if user
+          copy_original_guest_data_to(user)
           log_in(user)
-          current_user
-          save_original_guest_data
           request.session_options[:expire_after] = 1.hour
           render json: { user: user.as_json(except: :refresh_token), message: 'Guest login successful' }, status: :ok
         else
-          render json: {message: 'Guest user not found' }, status: :not_found
+          render json: { message: 'Guest user not found' }, status: :not_found
         end
       end
 
-      # ゲストユーザーのオリジナルデータを保存する
-      def save_original_guest_data
-        session[:original_guest_data] = @current_user.attributes
+      # オリジナルゲストユーザーデータの取得
+      def fetch_original_guest_data
+        @fetch_original_guest_data ||= User.find_by(spotify_id: 'original_guest_user')
+      end
+
+      # オリジナルデータを現在のゲストユーザーにコピー
+      def copy_original_guest_data_to(user)
+        original_data = fetch_original_guest_data.attributes.except('id', 'created_at', 'updated_at', 'spotify_id')
+        user.update(original_data)
       end
 
       # セッション終了時にゲストユーザーのデータを復元する
       def restore_guest_data
-        if current_user&.is_guest?
+        if current_user&.guest? && session[:original_guest_data].present?
           original_data = session[:original_guest_data]
-          @current_user.update(original_data)
+          current_user.update(original_data)
         end
       end
 
