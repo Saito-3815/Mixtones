@@ -12,6 +12,7 @@ import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { destroySessions } from "@/api/sessionsDestroy";
 import { useSetAtom } from "jotai";
+import { useDestroyUser } from "@/api/usersDestroy";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -254,6 +255,29 @@ export function AvatarMenu({ userAvatar }) {
     },
   });
 
+  // ユーザー削除
+  const destroyUser = useDestroyUser();
+
+  const handleDestroy = useMutation({
+    mutationFn: () => {
+      const source = axios.CancelToken.source();
+      return destroyUser({ cancelToken: source.token });
+    },
+    onSuccess: (data) => {
+      if (data.status === 200) {
+        logoutUser(setUser);
+      }
+      console.log("this user is delete:", data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
+    },
+  });
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -279,6 +303,7 @@ export function AvatarMenu({ userAvatar }) {
             dialogTitle="あなたのユーザー情報を削除します。よろしいですか？"
             dialogText="アカウントを削除するとSpotifyアカウントとの連携も解除されます。"
             actionText="アカウントを削除する"
+            onActionClick={handleDestroy.mutate}
             cancelText="キャンセル"
           />
         </DropdownMenuItem>

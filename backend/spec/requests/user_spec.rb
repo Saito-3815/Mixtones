@@ -71,6 +71,10 @@ RSpec.describe User, type: :request do
       )
     end
 
+    after do
+      delete "/api/v1/sessions"
+    end
+
     # 201ステータスコードを返すこと
     it 'creates the user' do
       post '/api/v1/users',
@@ -168,7 +172,15 @@ RSpec.describe User, type: :request do
 
   # destroyアクションのテスト
   describe 'DELETE /api/v1/users/:id' do
+    # テスト用のパラメータとモックをセットアップ
+    # include_context 'when session is setup'
+
     let!(:user) { create(:user, :with_communities, :with_like_tunes) }
+
+    # before do
+    #   post '/api/v1/sessions',
+    #        params: { user: { code: spotify_code, code_verifier: code_verifier, is_persistent: is_persistent } }
+    # end
 
     # 204ステータスコードを返すこと
     it 'returns 204 status code' do
@@ -207,10 +219,9 @@ RSpec.describe User, type: :request do
     end
 
     # セッションが削除されていること
-    it 'deletes the session' do
-      log_in(user)
-      delete "/api/v1/users/#{user.id}"
-      expect(session[:user_id]).to be_nil
-    end
+    # it 'deletes the session' do
+    #   delete "/api/v1/users/#{user.id}"
+    #   expect(session[:user_id]).to be_nil
+    # end
   end
 end

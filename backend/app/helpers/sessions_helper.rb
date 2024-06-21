@@ -4,6 +4,8 @@ module SessionsHelper
   end
 
   def log_out
+    session_key = "session:#{session[:session_id]}"
+    RedisClient.current.del(session_key)
     reset_session
   end
 

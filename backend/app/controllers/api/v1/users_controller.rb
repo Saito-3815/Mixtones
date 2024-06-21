@@ -93,7 +93,11 @@ module Api
 
       def destroy
         @user = User.find(params[:id])
-        reset_session if current_user == @user
+        if current_user == @user
+          reset_session
+          session_key = "session:#{request.session_options[:id]}"
+          RedisClient.current.del(session_key)
+        end
         @user.destroy
         render json: { message: 'User deleted' }, status: :ok
       end
