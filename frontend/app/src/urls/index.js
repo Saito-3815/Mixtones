@@ -3,6 +3,9 @@ const DEFAULT_API_LOCALHOST = "http://localhost:3001/api/v1";
 
 // コミュニティ一覧
 export const communitiesIndex = `${DEFAULT_API_LOCALHOST}/communities`;
+// コミュニティ詳細
+export const communitiesShow = (communityId) =>
+  `${DEFAULT_API_LOCALHOST}/communities/${communityId}`;
 
 // spotifyユーザーをデータベースへ登録
 export const usersCreate = `${DEFAULT_API_LOCALHOST}/users`;

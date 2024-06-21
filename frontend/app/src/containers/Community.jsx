@@ -5,9 +5,27 @@ import PropTypes from "prop-types";
 import { TuneTable } from "@/components/ui/TuneTable/TuneTable";
 import { AlertDialogSet } from "@/components/ui/AlertDialog/AlertDialog";
 import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCommunity } from "@/api/communitiesShow";
+import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
 
 const Community = ({ user }) => {
   const { communitiesId } = useParams();
+  console.log(communitiesId);
+
+  // コミュニティ情報を取得
+  const {
+    data: communityData,
+    status: communityStatus,
+    error: communityError,
+  } = useQuery({
+    queryKey: ["community", communitiesId],
+    queryFn: () => fetchCommunity({ communitiesId: communitiesId }),
+  });
+
+  //データをそれぞれコンソールへ出力
+  console.log(communityData);
+  console.log(communityError);
 
   // プレイリスト情報
   const tunes = Array.from({ length: 100 }, (_, i) => ({
@@ -26,11 +44,15 @@ const Community = ({ user }) => {
       <div className="container mt-10 flex flex-wrap items-start justify-between mx-auto py-10 bg-theme-black max-w-[1200px] rounded-md">
         {/* 画像 */}
         <div className="flex justify-center max-w-[240px] items-start pl-5 sm:pl-3">
-          <img
-            src="https://picsum.photos/500"
-            alt="community"
-            className="w-40 h-40 rounded-sm object-cover"
-          />
+          {communityStatus === "pending" || !communityData ? (
+            <Skeleton className="w-60 h-60 sm:w-40 sm:h-40 rounded-xl" />
+          ) : (
+            <img
+              src={communityData.avatar}
+              alt="community"
+              className="w-40 h-40 rounded-sm object-cover"
+            />
+          )}
         </div>
         {/* テキスト情報 */}
         <div className="max-w-[480px] h-full flex flex-col items-start pr-40 overflow-hidden sm:p-0 p-5">
@@ -38,10 +60,10 @@ const Community = ({ user }) => {
             コミュニティプレイリスト
           </h2>
           <h1 className="text-white font-bold text-5xl mt-3 whitespace-nowrap">
-            {`コミュニティ${communitiesId}のプレイリスト`}
+            {communityData.playlist_name}
           </h1>
           <h2 className="text-white mt-3 text-lg whitespace-nowrap">
-            {`コミュニティ${communitiesId}・曲数`}
+            {`${communityData.name}・曲数`}
           </h2>
           <div className="flex space-x-3 mt-1">
             <AvatarSet src="https://picsum.photos/500" size="6" />
@@ -50,7 +72,7 @@ const Community = ({ user }) => {
             <AvatarSet src="https://picsum.photos/500" size="6" />
           </div>
           <p className="text-theme-gray text-md mt-5 whitespace-nowrap">
-            紹介文
+            {communityData.introduction}
           </p>
         </div>
         {/* ボタン類 */}
