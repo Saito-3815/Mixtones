@@ -35,7 +35,7 @@ export const Header = () => {
                   actionText="コミュニティを作る"
                   cancelText="キャンセル"
                 />
-                <AvatarMenu />
+                <AvatarMenu src="" />
               </div>
             </>
           ) : (
@@ -55,8 +55,4 @@ export const Header = () => {
       </div>
     </header>
   );
-};
-
-Header.defaultProps = {
-  user: null,
 };

@@ -1,7 +1,7 @@
 import axios from "axios";
-import { usersCreate } from "@/urls/index";
+import { sessionsCreate } from "@/urls/index";
 
-export const createUser = ({
+export const createSessions = ({
   code,
   codeVerifier,
   cancelToken,
@@ -9,7 +9,7 @@ export const createUser = ({
 }) => {
   const encodedCode = btoa(code);
   return axios.post(
-    usersCreate,
+    sessionsCreate,
     {
       user: {
         code: encodedCode,

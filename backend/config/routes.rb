@@ -17,6 +17,10 @@ Rails.application.routes.draw do
         get 'likes/latest', to: 'likes#latest' # 最新のlike_tunesを取得
         resources :checks, only: [:index, :create, :destroy]
       end
+      resources :sessions, only: [:create]
+      delete 'sessions', to: 'sessions#destroy'
+      get 'sessions', to: 'sessions#current_user_show'
+      post 'sessions/guest', to: 'sessions#guest_login'
     end
   end
 end

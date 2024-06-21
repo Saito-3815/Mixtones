@@ -24,7 +24,7 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-12 px-8 py-2 text-lg",
-        sm: "h-9 rounded-ful px-3 text-xs",
+        sm: "h-9 rounded-full px-3 text-xs",
         lg: "h-11 rounded-full px-8 text-lg",
         icon: "h-10 w-10",
       },
@@ -38,7 +38,15 @@ const buttonVariants = cva(
 
 const Button = React.forwardRef(
   (
-    { className, variant, size, asChild = false, label, backgroundColor },
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      label,
+      backgroundColor,
+      onClick,
+    },
     ref,
   ) => {
     const Comp = asChild ? Slot : "button";
@@ -47,6 +55,7 @@ const Button = React.forwardRef(
         className={cn(buttonVariants({ variant, size, className }))}
         style={backgroundColor && { backgroundColor }}
         ref={ref}
+        onClick={onClick}
       >
         {label}
       </Comp>
@@ -62,6 +71,7 @@ Button.propTypes = {
   asChild: PropTypes.bool,
   label: PropTypes.string,
   backgroundColor: PropTypes.string,
+  onClick: PropTypes.func,
 };
 
 export { Button, buttonVariants };

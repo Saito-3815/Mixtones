@@ -6,3 +6,15 @@ export const communitiesIndex = `${DEFAULT_API_LOCALHOST}/communities`;
 
 // spotifyユーザーをデータベースへ登録
 export const usersCreate = `${DEFAULT_API_LOCALHOST}/users`;
+// ユーザーを削除
+export const usersDestroy = (userId) =>
+  `${DEFAULT_API_LOCALHOST}/users/${userId}`;
+
+// ユーザーのログイン
+export const sessionsCreate = `${DEFAULT_API_LOCALHOST}/sessions`;
+// ユーザーのログアウト
+export const sessionsDestroy = `${DEFAULT_API_LOCALHOST}/sessions`;
+// セッションに対応したユーザー情報の取得
+export const currentUser = `${DEFAULT_API_LOCALHOST}/sessions`;
+// ゲストログイン
+export const sessionsGuestLogin = `${DEFAULT_API_LOCALHOST}/sessions/guest`;

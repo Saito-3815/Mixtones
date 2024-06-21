@@ -9,6 +9,13 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
 import PropTypes from "prop-types";
+import { isLoggedInAtom, logoutUser, userAtom } from "@/atoms/userAtoms";
+import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { destroySessions } from "@/api/sessionsDestroy";
+import { useAtom, useSetAtom } from "jotai";
+import { useDestroyUser } from "@/api/usersDestroy";
+import { Link } from "react-router-dom";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -230,34 +237,69 @@ export {
   DropdownMenuRadioGroup,
 };
 
-BarMenu.propTypes = {
-  user: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-  }),
-  onLogin: PropTypes.func.isRequired,
-  onLogout: PropTypes.func.isRequired,
-  onCreateAccount: PropTypes.func.isRequired,
-};
+export const BarMenu = () => {
+  const setUser = useSetAtom(userAtom);
+  const [isLoggedIn] = useAtom(isLoggedInAtom);
 
-export function BarMenu({ user, onLogin, onCreateAccount }) {
+  // ユーザーログアウトリクエスト
+  const handleLogout = useMutation({
+    mutationFn: destroySessions,
+    onSuccess: (data) => {
+      if (data.status === 200) {
+        logoutUser(setUser);
+      }
+      console.log(data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
+    },
+  });
+
+  // ユーザー削除
+  const destroyUser = useDestroyUser();
+
+  const handleDestroy = useMutation({
+    mutationFn: () => {
+      const source = axios.CancelToken.source();
+      return destroyUser({ cancelToken: source.token });
+    },
+    onSuccess: (data) => {
+      if (data.status === 200) {
+        logoutUser(setUser);
+      }
+      console.log("this user is delete:", data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
+    },
+  });
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <FontAwesomeIcon icon={faBars} className="text-white text-4xl" />
       </DropdownMenuTrigger>
-      {user ? (
+      {isLoggedIn ? (
         <>
           <DropdownMenuContent>
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>プロフィール</DropdownMenuItem>
-            {/* <DropdownMenuItem onClick={onLogout}>ログアウト</DropdownMenuItem> */}
             <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
               <AlertDialogSet
                 triggerComponent={<span>ログアウト</span>}
                 dialogTitle="ログアウトします。よろしいですか？"
                 dialogText="ログアウトするとあなたのお気に入りの更新がストップします。"
                 actionText="ログアウトする"
+                onActionClick={handleLogout.mutate}
                 cancelText="キャンセル"
               />
             </DropdownMenuItem>
@@ -268,6 +310,7 @@ export function BarMenu({ user, onLogin, onCreateAccount }) {
                 dialogTitle="あなたのユーザー情報を削除します。よろしいですか？"
                 dialogText="アカウントを削除するとSpotifyアカウントとの連携も解除されます。"
                 actionText="アカウントを削除する"
+                onActionClick={handleDestroy.mutate}
                 cancelText="キャンセル"
               />
             </DropdownMenuItem>
@@ -276,13 +319,15 @@ export function BarMenu({ user, onLogin, onCreateAccount }) {
       ) : (
         <>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={onCreateAccount}>
-              サインアップ
+            <DropdownMenuItem>
+              <Link to="/signup">サインアップ</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onLogin}>ログイン</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to="/login">ログイン</Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </>
       )}
     </DropdownMenu>
   );
-}
+};

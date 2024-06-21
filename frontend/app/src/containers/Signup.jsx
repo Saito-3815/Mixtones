@@ -1,24 +1,42 @@
 import { Button } from "@/components/ui/Button/Button";
 import { Switch } from "@/components/ui/Switch/Switch";
+import { useGuestLogin } from "@/hooks/useGuestLogin";
 import { generateCodeChallenge } from "@/SpotifyAuth.js";
 
 import { accessUrl } from "@/SpotifyAuth.js";
+import { useEffect, useState } from "react";
 
 const Signup = () => {
+  // isPersistent状態を追加
+  const [isPersistent, setIsPersistent] = useState(false);
+
+  // Switchの状態を切り替える関数
+  const toggleIsPersistent = () => {
+    setIsPersistent(!isPersistent);
+  };
+  // isPersistentの状態を監視してログに表示
+  useEffect(() => {
+    console.log("isPersistent:", isPersistent);
+  }, [isPersistent]);
+
   // ログインボタンをクリックしたときにコードチャレンジを生成してSpotifyのログインページにリダイレクトする
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     try {
       const { codeVerifier } = await generateCodeChallenge();
-      // console.log(`Generated code challenge: ${codeChallenge}`);
-      // console.log(`Generated code verifier: ${codeVerifier}`);
-
-      // codeVerifierをセッションストレージに保存
       sessionStorage.setItem("codeVerifier", codeVerifier);
+      sessionStorage.setItem("redirectFrom", "signupPage");
+      sessionStorage.setItem("isPersistent", isPersistent);
 
       window.location.href = accessUrl;
     } catch (error) {
       console.error("Failed to generate code challenge:", error);
     }
+  };
+
+  // ゲストログイン
+  const guestLogin = useGuestLogin();
+  const handleGuestLogin = () => {
+    guestLogin.mutate();
   };
 
   return (
@@ -36,11 +54,11 @@ const Signup = () => {
         </p>
       </div>
       <div className="w-full max-w-[550px] flex items-center justify-center space-x-10 pt-12">
-        <Switch />
+        <Switch checked={isPersistent} onChange={toggleIsPersistent} />
         <p className="text-white">ログイン状態を保持する。</p>
       </div>
       <div className="w-full max-w-[550px] flex flex-col items-center space-y-12 pt-12 pb-24">
-        <div onClick={handleLogin}>
+        <div onClick={handleSignup}>
           <Button
             label="Spotifyでログインする"
             className="bg-theme-green hover:bg-theme-green/90 w-[290px]"
@@ -49,6 +67,7 @@ const Signup = () => {
         <Button
           label="ゲストログインする"
           className="bg-theme-orange w-[290px]"
+          onClick={handleGuestLogin}
         />
       </div>
     </div>

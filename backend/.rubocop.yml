@@ -87,3 +87,7 @@ Style/HashSyntax:
 # mapメソッドの代わりにpluckメソッドを使用することを推奨
 Rails/Pluck:
   Enabled: false
+
+# メモ化されたヘルパーメソッドが複数ある場合の警告
+RSpec/MultipleMemoizedHelpers:
+  Max: 6 

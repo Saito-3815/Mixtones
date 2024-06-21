@@ -5,6 +5,7 @@ module Api
     class UsersController < ApplicationController
       extend SpotifyAuth
       include SessionsHelper
+      include UserLogin
 
       def show
         @user = User.find(params[:id])
@@ -19,30 +20,25 @@ module Api
       # ユーザー作成
       # ユーザー作成時には、like_tunesも一緒に登録する
       def create
-        decoded_code = Base64.decode64(params[:user][:code])
-        code_verifier = params[:user][:code_verifier]
+        decoded_code = Base64.decode64(spotify_login_params[:code])
+        code_verifier = spotify_login_params[:code_verifier]
         tokens = SpotifyAuth.fetch_spotify_tokens(decoded_code, code_verifier)
         access_token = tokens[:access_token]
         refresh_token = tokens[:refresh_token]
 
-        # Log the token values
-        Rails.logger.info "Access Token: #{access_token}"
-        Rails.logger.info "Refresh Token: #{refresh_token}"
-
         user_create_params = SpotifyAuth.fetch_authenticated_user_data(access_token)
         spotify_id = user_create_params[:spotify_id]
         SpotifyAuth.fetch_saved_tracks(spotify_id, access_token, user_create_params)
-        Rails.logger.info "User Create Params: #{user_create_params}"
 
         existing_user = User.find_by(spotify_id: spotify_id)
 
         if existing_user
-          # Update the existing user's refresh token
-          existing_user.update(refresh_token: refresh_token)
-          log_in(existing_user)
+          update_result = update_user_and_like_tunes(existing_user, refresh_token, user_create_params)
+          update_session_expiration(spotify_login_params[:is_persistent])
+
           render json: {
-            user: existing_user.as_json(except: :refresh_token),
-            session_id: session[:session_id]
+            user: update_result[:user].as_json(except: :refresh_token),
+            session_id: update_result[:session_id]
           }, status: :ok
         else
           User.transaction do
@@ -72,6 +68,7 @@ module Api
             end
 
             log_in(@user)
+            update_session_expiration(spotify_login_params[:is_persistent])
           end
 
           render json: {
@@ -95,12 +92,31 @@ module Api
       end
 
       def destroy
-        @user = User.find(params[:id])
-        @user.destroy
-        render json: { message: 'User deleted' }, status: :ok
+        @user = User.find_by(id: params[:id])
+        return render json: { error: 'User not found' }, status: :not_found unless @user
+
+        if @user.guest?
+          return render json: { error: 'ゲストユーザーは削除できません。' }, status: :forbidden
+        end
+
+        if current_user && current_user.id == @user.id
+          session_id = session[:user_id]
+          redis = Redis.new(url: ENV['REDIS_URL'])
+          session_key = "session:#{session_id}"
+          redis.del(session_key)
+          reset_session
+          @user.destroy
+          render json: { message: 'User deleted' }, status: :ok
+        else
+          render json: { error: 'Unauthorized' }, status: :unauthorized
+        end
       end
 
       private
+
+      def spotify_login_params
+        params.require(:user).permit(:code, :code_verifier, :is_persistent)
+      end
 
       def user_update_params
         params.require(:user).permit(:name, :introduction, :avatar)

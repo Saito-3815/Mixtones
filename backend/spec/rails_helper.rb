@@ -24,6 +24,10 @@ require "rspec/rails"
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
+
+# spec/support配下のファイルを読み込む
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+
 begin
   ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
@@ -60,7 +64,26 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
-  RSpec.configure do |config|
-    config.include FactoryBot::Syntax::Methods
+
+  # FactoryBotを使用するために追加
+  config.include FactoryBot::Syntax::Methods
+
+  # ヘルパーメソッドをリクエストスペックで使用するために追加
+  config.include SessionsHelper, type: :request
+
+  # ActiveSupportの時間旅行機能を有効にする
+  config.include ActiveSupport::Testing::TimeHelpers
+
+  # SpotifyAuthHelperを使用するために追加
+  config.include SpotifyAuthHelper
+
+  config.before(:suite) do
+    # テストスイートの実行前にテスト用のRedisデータベースをクリーンアップ
+    Redis.new(url: ENV.fetch('REDIS_TEST_URL', nil)).flushdb
+  end
+
+  config.after(:suite) do
+    # テストスイートの実行後にテスト用のRedisデータベースをクリーンアップ
+    Redis.new(url: ENV.fetch('REDIS_TEST_URL', nil)).flushdb
   end
 end

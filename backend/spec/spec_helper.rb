@@ -91,4 +91,16 @@ RSpec.configure do |config|
   #   # test failures related to randomization by passing the same `--seed` value
   #   # as the one that triggered the failure.
   #   Kernel.srand config.seed
+
+  # config.before(:suite) do
+  #   # テスト開始前にテストデータをクリア
+  #   keys = RedisClient.current.keys("#{TEST_REDIS_PREFIX}*")
+  #   RedisClient.current.del(keys) unless keys.empty?
+  # end
+
+  # config.after(:suite) do
+  #   # テスト終了後にテストデータをクリア
+  #   keys = RedisClient.current.keys("#{TEST_REDIS_PREFIX}*")
+  #   RedisClient.current.del(keys) unless keys.empty?
+  # end
 end
