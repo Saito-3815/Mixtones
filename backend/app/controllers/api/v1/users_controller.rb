@@ -92,14 +92,24 @@ module Api
       end
 
       def destroy
-        @user = User.find(params[:id])
-        if current_user == @user
-          reset_session
-          session_key = "session:#{request.session_options[:id]}"
-          RedisClient.current.del(session_key)
+        @user = User.find_by(id: params[:id])
+        return render json: { error: 'User not found' }, status: :not_found unless @user
+
+        if @user.guest?
+          return render json: { error: 'ゲストユーザーは削除できません。' }, status: :forbidden
         end
-        @user.destroy
-        render json: { message: 'User deleted' }, status: :ok
+
+        if current_user && current_user.id == @user.id
+          session_id = session[:user_id]
+          redis = Redis.new(url: ENV['REDIS_URL'])
+          session_key = "session:#{session_id}"
+          redis.del(session_key)
+          reset_session
+          @user.destroy
+          render json: { message: 'User deleted' }, status: :ok
+        else
+          render json: { error: 'Unauthorized' }, status: :unauthorized
+        end
       end
 
       private

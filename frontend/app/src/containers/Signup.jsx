@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button/Button";
 import { Switch } from "@/components/ui/Switch/Switch";
+import { useGuestLogin } from "@/hooks/useGuestLogin";
 import { generateCodeChallenge } from "@/SpotifyAuth.js";
 
 import { accessUrl } from "@/SpotifyAuth.js";
@@ -22,10 +23,6 @@ const Signup = () => {
   const handleSignup = async () => {
     try {
       const { codeVerifier } = await generateCodeChallenge();
-      // console.log(`Generated code challenge: ${codeChallenge}`);
-      // console.log(`Generated code verifier: ${codeVerifier}`);
-
-      // codeVerifierとリダイレクト元のページ情報をセッションストレージに保存
       sessionStorage.setItem("codeVerifier", codeVerifier);
       sessionStorage.setItem("redirectFrom", "signupPage");
       sessionStorage.setItem("isPersistent", isPersistent);
@@ -34,6 +31,12 @@ const Signup = () => {
     } catch (error) {
       console.error("Failed to generate code challenge:", error);
     }
+  };
+
+  // ゲストログイン
+  const guestLogin = useGuestLogin();
+  const handleGuestLogin = () => {
+    guestLogin.mutate();
   };
 
   return (
@@ -64,6 +67,7 @@ const Signup = () => {
         <Button
           label="ゲストログインする"
           className="bg-theme-orange w-[290px]"
+          onClick={handleGuestLogin}
         />
       </div>
     </div>

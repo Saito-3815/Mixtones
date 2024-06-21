@@ -74,6 +74,9 @@ RSpec.configure do |config|
   # ActiveSupportの時間旅行機能を有効にする
   config.include ActiveSupport::Testing::TimeHelpers
 
+  # SpotifyAuthHelperを使用するために追加
+  config.include SpotifyAuthHelper
+
   config.before(:suite) do
     # テストスイートの実行前にテスト用のRedisデータベースをクリーンアップ
     Redis.new(url: ENV.fetch('REDIS_TEST_URL', nil)).flushdb
