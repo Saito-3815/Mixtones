@@ -2,12 +2,11 @@ require 'rails_helper'
 
 RSpec.describe Membership, type: :request do
   # createアクションのテスト
-  describe 'POST /api/v1/communities/:community_id/memberships' do
+  describe 'POST /api/v1/communities/:id/memberships' do
     let(:user) { create(:user, :with_like_tunes) }
     let(:community) { create(:community) }
     let(:membership_params) do
       {
-        community_id: community.id,
         user_id: user.id
       }
     end

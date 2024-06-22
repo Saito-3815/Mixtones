@@ -1,17 +1,32 @@
 import { AvatarSet } from "@/components/ui/Avatar/Avatar";
 import { Button } from "@/components/ui/Button/Button";
 import React from "react";
-import PropTypes from "prop-types";
 import { TuneTable } from "@/components/ui/TuneTable/TuneTable";
 import { AlertDialogSet } from "@/components/ui/AlertDialog/AlertDialog";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchCommunity } from "@/api/communitiesShow";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
+import { useAtom } from "jotai";
+import { loginUser, userAtom } from "@/atoms/userAtoms";
+import axios from "axios";
+import { createMemberships } from "@/api/membershipsCreate";
 
-const Community = ({ user }) => {
+const Community = () => {
   const { communitiesId } = useParams();
   console.log(communitiesId);
+
+  const [user, setUser] = useAtom(userAtom);
+
+  // user が null または undefined でない、かつ communities プロパティを持っていることを確認
+  // さらに、community が null または undefined でないことも確認
+  const isMember =
+    user &&
+    user.communities &&
+    communitiesId &&
+    user.communities.some(
+      (community) => community && community.id === communitiesId,
+    );
 
   // コミュニティ情報を取得
   const {
@@ -27,16 +42,24 @@ const Community = ({ user }) => {
   console.log(communityData);
   console.log(communityError);
 
-  // プレイリスト情報
-  const tunes = Array.from({ length: 100 }, (_, i) => ({
-    id: i + 1,
-    name: `Tune ${i + 1}`,
-    artist: `Artist ${i + 1}`,
-    album: `Album ${i + 1}`,
-    images: "https://picsum.photos/500",
-    added_at: "2022-01-01T00:00:00Z",
-    time: "00:00",
-  }));
+  // コミュニティに参加する
+  const handleJoinCommunity = useMutation({
+    mutationFn: () =>
+      createMemberships({ communitiesId: communitiesId, user_id: user.id }),
+    onSuccess: (data) => {
+      if (data.status === 200) {
+        loginUser(setUser, data.data.user);
+      }
+      console.log(data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
+    },
+  });
 
   return (
     <div className="flex-col justify-center">
@@ -55,30 +78,44 @@ const Community = ({ user }) => {
           )}
         </div>
         {/* テキスト情報 */}
-        <div className="max-w-[480px] h-full flex flex-col items-start pr-40 overflow-hidden sm:p-0 p-5">
-          <h2 className="text-white text-lg whitespace-nowrap">
-            コミュニティプレイリスト
-          </h2>
-          <h1 className="text-white font-bold text-5xl mt-3 whitespace-nowrap">
-            {communityData.playlist_name}
-          </h1>
-          <h2 className="text-white mt-3 text-lg whitespace-nowrap">
-            {`${communityData.name}・曲数`}
-          </h2>
-          <div className="flex space-x-3 mt-1">
-            <AvatarSet src="https://picsum.photos/500" size="6" />
-            <AvatarSet src="" size="6" />
-            <AvatarSet src="" size="6" />
-            <AvatarSet src="https://picsum.photos/500" size="6" />
+        {communityStatus === "pending" || !communityData ? (
+          <div className="max-w-[480px] h-full flex flex-col items-start pr-40 overflow-hidden sm:p-0 p-5">
+            <Skeleton className="h-6 w-[160px]" />
+            <Skeleton className="h-20 w-[360px] mt-3" />
+            <Skeleton className="h-6 w-[160px] mt-3" />
+            <div className="flex space-x-3 mt-1">
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-6 w-6 rounded-full" />
+            </div>
+            <Skeleton className="h-5 w-[160px] mt-5" />
           </div>
-          <p className="text-theme-gray text-md mt-5 whitespace-nowrap">
-            {communityData.introduction}
-          </p>
-        </div>
+        ) : (
+          <div className="max-w-[480px] h-full flex flex-col items-start pr-40 overflow-hidden sm:p-0 p-5">
+            <h2 className="text-white text-lg whitespace-nowrap">
+              コミュニティプレイリスト
+            </h2>
+            <h1 className="text-white font-bold text-5xl mt-3 whitespace-nowrap">
+              {communityData.playlist_name}
+            </h1>
+            <h2 className="text-white mt-3 text-lg whitespace-nowrap">
+              {`${communityData.name}・曲数`}
+            </h2>
+            <div className="flex space-x-3 mt-1">
+              {communityData.members.map((member, index) => (
+                <AvatarSet key={index} src={member.avatar} size="6" />
+              ))}
+            </div>
+            <p className="text-theme-gray text-md mt-5 whitespace-nowrap">
+              {communityData.introduction}
+            </p>
+          </div>
+        )}
         {/* ボタン類 */}
         <div className="max-w-[480px] pr-10 flex flex-col h-full py-10 space-y-5">
-          {/* ユーザーがログインしていれば編集、脱退ボタン */}
-          {user ? (
+          {/* ユーザー情報にコミュニティIDが含まれていれば編集、脱退ボタン */}
+          {isMember ? (
             <>
               <Button
                 label="コミュニティを編集する"
@@ -110,6 +147,7 @@ const Community = ({ user }) => {
               dialogTitle="このコミュニティに参加します。よろしいですか？"
               dialogText="参加すると、コミュニティプレイリスト内にあなたの「お気に入りの曲」が更新が共有されます。"
               actionText="コミュニティに参加する"
+              onActionClick={handleJoinCommunity.mutate}
               cancelText="キャンセル"
             />
           )}
@@ -118,16 +156,10 @@ const Community = ({ user }) => {
 
       {/* プレイリストセクション */}
       <div className="flex justify-center my-16">
-        <TuneTable tunes={tunes} />
+        <TuneTable />
       </div>
     </div>
   );
-};
-
-Community.propTypes = {
-  user: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-  }),
 };
 
 export default Community;

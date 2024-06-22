@@ -173,12 +173,13 @@ RSpec.describe User, type: :request do
   # destroyアクションのテスト
   describe 'DELETE /api/v1/users/:id' do
     let(:user) { create(:user, :with_communities, :with_like_tunes) }
-    let(:guest) { User.create(
-      name: 'ゲストユーザー',
-      introduction: 'ゲストログインしています',
-      spotify_id: 'guest_user'
+    let(:guest) do
+      User.create(
+        name: 'ゲストユーザー',
+        introduction: 'ゲストログインしています',
+        spotify_id: 'guest_user'
       )
-    }
+    end
 
     before do
       login_with_spotify(user)

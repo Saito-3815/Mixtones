@@ -5,7 +5,7 @@ module SessionsHelper
 
   def log_out
     session_id = session[:user_id]
-    redis = Redis.new(url: ENV['REDIS_URL'])
+    redis = Redis.new(url: ENV.fetch('REDIS_URL', nil))
     session_key = "session:#{session_id}"
     redis.del(session_key)
     reset_session

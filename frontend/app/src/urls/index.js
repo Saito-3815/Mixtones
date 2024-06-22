@@ -7,6 +7,14 @@ export const communitiesIndex = `${DEFAULT_API_LOCALHOST}/communities`;
 export const communitiesShow = (communityId) =>
   `${DEFAULT_API_LOCALHOST}/communities/${communityId}`;
 
+// プレイリスト一覧
+export const playlistsIndex = (communityId) =>
+  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/playlists`;
+
+// コミュニティへ参加
+export const membershipsCreate = (communityId) =>
+  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/memberships`;
+
 // spotifyユーザーをデータベースへ登録
 export const usersCreate = `${DEFAULT_API_LOCALHOST}/users`;
 // ユーザーを削除

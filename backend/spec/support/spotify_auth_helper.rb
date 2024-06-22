@@ -20,15 +20,16 @@ module SpotifyAuthHelper
     allow(SpotifyAuth).to receive(:fetch_saved_tracks).with(user.spotify_id, access_token, user_create_params) do
       user_create_params[:like_tunes] = [
         { name: "test_tune1", artist: "test_artist1", album: "test_album1", images: "test_images1",
-            spotify_uri: "test_spotify_uri1", preview_url: "test_preview_url1", added_at: "test_added_at1" },
-          { name: "test_tune2", artist: "test_artist2", album: "test_album2", images: "test_images2",
-            spotify_uri: "test_spotify_uri2", preview_url: "test_preview_url2", added_at: "test_added_at2" },
-          { name: "test_tune3", artist: "test_artist3", album: "test_album3", images: "test_images3",
-            spotify_uri: "test_spotify_uri3", preview_url: "test_preview_url3", added_at: "test_added_at3" }
+          spotify_uri: "test_spotify_uri1", preview_url: "test_preview_url1", added_at: "test_added_at1" },
+        { name: "test_tune2", artist: "test_artist2", album: "test_album2", images: "test_images2",
+          spotify_uri: "test_spotify_uri2", preview_url: "test_preview_url2", added_at: "test_added_at2" },
+        { name: "test_tune3", artist: "test_artist3", album: "test_album3", images: "test_images3",
+          spotify_uri: "test_spotify_uri3", preview_url: "test_preview_url3", added_at: "test_added_at3" }
       ]
       user_create_params
     end
 
-    post '/api/v1/sessions', params: { user: { code: spotify_code, code_verifier: code_verifier, is_persistent: is_persistent } }
+    post '/api/v1/sessions',
+         params: { user: { code: spotify_code, code_verifier: code_verifier, is_persistent: is_persistent } }
   end
 end

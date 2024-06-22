@@ -13,8 +13,10 @@ import { Slider } from "@/components/ui/Slider/Slider";
 import { Progress } from "@/components/ui/Progress/Progress";
 import { ColorIcon } from "@/components/ui/ColorIcon/ColorIcon";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
+import { useAtom } from "jotai";
+import { tuneAtom } from "@/atoms/tuneAtom";
 
-export const TuneFooter = ({ tune }) => {
+export const TuneFooter = () => {
   const tuneNameRef = useRef(null);
   const tuneArtistRef = useRef(null);
 
@@ -29,13 +31,15 @@ export const TuneFooter = ({ tune }) => {
     checkScroll(tuneArtistRef.current);
   }, []);
 
+  const [tune] = useAtom(tuneAtom);
+
   return (
     <footer className="mx-1 my-1">
       <div className="grid grid-cols-1 md:grid-cols-3 items-center bg-theme-black rounded-sm md:h-[72px]">
         {/* 楽曲データ */}
         <div className="flex flex-grow flex-shrink justify-start items-center space-x-3 pr-5 col-span-3 md:col-span-1 py-3 lg:py-0">
           <img
-            src={`${tune.images.large}`}
+            src={`${tune.images}`}
             alt="images"
             className="object-cover h-12 w-12 bg-theme-gray rounded-sm ml-3"
           />

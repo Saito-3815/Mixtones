@@ -18,12 +18,23 @@ module Api
 
         existing_user = User.find_by(spotify_id: spotify_id)
 
+        # ユーザーが存在する場合、ユーザー情報を更新し有効期限を設定
         if existing_user
           update_result = update_user_and_like_tunes(existing_user, refresh_token, user_create_params)
           update_session_expiration(spotify_login_params[:is_persistent])
 
           render json: {
-            user: update_result[:user].as_json(except: :refresh_token),
+            user: update_result[:user].as_json(
+              except: :refresh_token,
+              include: {
+                communities: {
+                  only: [:id]
+                },
+                like_tunes: {
+                  only: [:id]
+                }
+              }
+            ),
             session_id: update_result[:session_id]
           }, status: :ok
         else
@@ -47,7 +58,17 @@ module Api
         if current_user.nil?
           render json: { error: 'User not found' }, status: :not_found
         else
-          render json: @current_user.as_json(except: :refresh_token), status: :ok
+          render json: @current_user.as_json(
+            except: :refresh_token,
+            include: {
+              communities: {
+                only: [:id]
+              },
+              like_tunes: {
+                only: [:id]
+              }
+            }
+          ), status: :ok
         end
       end
 

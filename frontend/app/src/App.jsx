@@ -10,21 +10,14 @@ import Login from "./containers/Login";
 import User from "./containers/User";
 import UserEdit from "./containers/UserEdit";
 import { useCheckSession } from "./hooks/useCheckSession";
+import { useAtom } from "jotai";
+import { tuneAtom } from "./atoms/tuneAtom";
 
 function App() {
   // セッションをチェックしてユーザー情報を取得
   useCheckSession();
 
-  const tune = {
-    name: "Song Name",
-    artist: "Artist Name",
-    album: "Album Name",
-    images: {
-      small: "https://picsum.photos/200",
-      large: "https://picsum.photos/500",
-    },
-    time: "00:00",
-  };
+  const [tune] = useAtom(tuneAtom);
 
   return (
     <Router>
@@ -60,7 +53,7 @@ function App() {
           </div>
         </main>
         <div className="fixed bottom-0 z-10 w-full">
-          {tune && <TuneFooter tune={tune} />}
+          {tune && <TuneFooter />}
         </div>
       </div>
     </Router>

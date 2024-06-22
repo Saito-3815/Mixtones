@@ -4,22 +4,18 @@ module Api
       # コミュニティにメンバーを追加
       # Userのlike_tunesをCommunityのplaylist_tunesに追加
       def create
-        @membership = Membership.new(
-          community_id: params[:community_id],
-          user_id: params[:user_id]
-        )
+        @membership = Membership.new(community_id: params[:community_id], user_id: params[:user_id])
         if @membership.save
-          # Userのlike_tunesをCommunityのplaylist_tunesに追加
           community = Community.find_by(id: params[:community_id])
           user = User.find_by(id: params[:user_id])
-          if user&.like_tunes.present?
-            user.like_tunes.each do |like_tune|
-              existing_record = community.playlist_tunes.find_by(spotify_uri: like_tune.spotify_uri)
+          return render json: { error: 'Community or User not found' }, status: :not_found if community.nil? || user.nil?
 
-              Playlist.create(community_id: community.id, tune_id: like_tune.id) if existing_record.nil?
-            end
-          end
-          render json: @membership, status: :created
+          added_tunes = add_like_tunes_to_community_playlist(community, user)
+          render json: {
+            community: community.as_json(include: ['members']),
+            user: user.as_json(include: { communities: { only: [:id] } }),
+            added_tunes: added_tunes
+          }, status: :created
         else
           render json: @membership.errors, status: :unprocessable_entity
         end
@@ -37,6 +33,22 @@ module Api
           add_missing_like_tunes_to_playlist(community)
           head :no_content
         end
+      end
+
+      private
+
+      def add_like_tunes_to_community_playlist(community, user)
+        added_tunes = []
+        spotify_uris = user.like_tunes.pluck(:spotify_uri)
+        existing_uris = community.playlist_tunes.where(spotify_uri: spotify_uris).pluck(:spotify_uri)
+
+        (spotify_uris - existing_uris).each do |uri|
+          like_tune = user.like_tunes.find_by(spotify_uri: uri)
+          added_tune = Playlist.create(community_id: community.id, tune_id: like_tune.id)
+          added_tunes << added_tune
+        end
+
+        added_tunes
       end
 
       # Userのlike_tunesをCommunityのplaylist_tunesから削除
