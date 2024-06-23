@@ -1,32 +1,40 @@
 import { AvatarSet } from "@/components/ui/Avatar/Avatar";
 import { Button } from "@/components/ui/Button/Button";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { TuneTable } from "@/components/ui/TuneTable/TuneTable";
 import { AlertDialogSet } from "@/components/ui/AlertDialog/AlertDialog";
 import { useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchCommunity } from "@/api/communitiesShow";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
 import { useAtom } from "jotai";
 import { loginUser, userAtom } from "@/atoms/userAtoms";
 import axios from "axios";
 import { createMemberships } from "@/api/membershipsCreate";
+import { destroyMemberships } from "@/api/membershipsDestroy";
 
 const Community = () => {
-  const { communitiesId } = useParams();
-  console.log(communitiesId);
+  const { communityId } = useParams();
+  // console.log("communityId:", communityId);
 
   const [user, setUser] = useAtom(userAtom);
 
+  const queryClient = useQueryClient();
+
   // user が null または undefined でない、かつ communities プロパティを持っていることを確認
   // さらに、community が null または undefined でないことも確認
-  const isMember =
-    user &&
-    user.communities &&
-    communitiesId &&
-    user.communities.some(
-      (community) => community && community.id === communitiesId,
-    );
+  const [isMember, setIsMember] = useState(false);
+
+  useEffect(() => {
+    const checkIsMember =
+      user &&
+      user.communities &&
+      communityId &&
+      user.communities.some(
+        (community) => community && community.id.toString() === communityId,
+      );
+    setIsMember(checkIsMember);
+  }, [user, communityId]);
 
   // コミュニティ情報を取得
   const {
@@ -34,21 +42,60 @@ const Community = () => {
     status: communityStatus,
     error: communityError,
   } = useQuery({
-    queryKey: ["community", communitiesId],
-    queryFn: () => fetchCommunity({ communitiesId: communitiesId }),
+    queryKey: ["community", communityId],
+    queryFn: () => fetchCommunity({ communityId: communityId }),
   });
 
   //データをそれぞれコンソールへ出力
-  console.log(communityData);
+  // console.log(communityData);
   console.log(communityError);
 
   // コミュニティに参加する
   const handleJoinCommunity = useMutation({
     mutationFn: () =>
-      createMemberships({ communitiesId: communitiesId, user_id: user.id }),
+      createMemberships({ communityId: communityId, userId: user.id }),
+    onSuccess: (data) => {
+      if (data.status === 201) {
+        loginUser(setUser, data.data.user);
+        // communityDataを最新のデータで更新
+        queryClient.setQueryData(
+          ["community", communityId],
+          data.data.community,
+        );
+        // playlistデータを最新のデータで更新
+        queryClient.setQueryData(
+          ["playlist", communityId],
+          data.data.community.playlist_tunes,
+        );
+      }
+      console.log(data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
+    },
+  });
+
+  // コミュニティから脱退する
+  // コミュニティから脱退する
+  const handleLeaveCommunity = useMutation({
+    mutationFn: () => destroyMemberships(user.id, communityId),
     onSuccess: (data) => {
       if (data.status === 200) {
         loginUser(setUser, data.data.user);
+        // communityDataを最新のデータで更新
+        queryClient.setQueryData(
+          ["community", communityId],
+          data.data.community,
+        );
+        // playlistデータを最新のデータで更新
+        queryClient.setQueryData(
+          ["playlist", communityId],
+          data.data.community.playlist_tunes,
+        );
       }
       console.log(data);
     },
@@ -132,6 +179,7 @@ const Community = () => {
                 dialogTitle="このコミュニティから脱退します。よろしいですか？"
                 dialogText="脱退すると、コミュニティプレイリスト内であなたの「お気に入りの曲」が更新がされなくなります。"
                 actionText="コミュニティから脱退する"
+                onActionClick={handleLeaveCommunity.mutate}
                 cancelText="キャンセル"
               />
             </>

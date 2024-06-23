@@ -12,7 +12,7 @@ import { fetchPlaylist } from "@/api/playlistsIndex";
 import { Skeleton } from "../Skeleton/Skeleton";
 
 export const TuneTable = () => {
-  const { communitiesId } = useParams();
+  const { communityId } = useParams();
 
   // プレイリスト楽曲を取得
   const {
@@ -20,12 +20,12 @@ export const TuneTable = () => {
     status: playlistStatus,
     error: playlistError,
   } = useQuery({
-    queryKey: ["playlist", communitiesId],
-    queryFn: () => fetchPlaylist({ communitiesId: communitiesId }),
+    queryKey: ["playlist", communityId],
+    queryFn: () => fetchPlaylist({ communityId: communityId }),
   });
 
   // データをそれぞれコンソールへ出力
-  console.log(playlistData);
+  // console.log(playlistData);
   console.log(playlistError);
 
   // 検索機能

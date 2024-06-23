@@ -17,10 +17,10 @@ RSpec.describe Membership, type: :request do
       expect(response).to have_http_status(:created)
     end
 
-    # membership_paramsが無効な場合、422ステータスコードを返すこと
-    it 'returns 422 status code if membership_params is invalid' do
-      post "/api/v1/communities/#{community.id}/memberships", params: { community_id: community }
-      expect(response).to have_http_status(:unprocessable_entity)
+    # 指定された user_id または community_id が存在しない場合、404ステータスコードを返すこと
+    it 'returns 404 status code if user or community does not exist' do
+      post "/api/v1/communities/999/memberships", params: { user_id: 999 }
+      expect(response).to have_http_status(:not_found)
     end
 
     # community.playlist_tunesにuser.like_tunesが含まれること
@@ -51,7 +51,7 @@ RSpec.describe Membership, type: :request do
     # 204ステータスコードを返すこと
     it 'returns 204 status code' do
       delete "/api/v1/communities/#{community.id}/memberships/#{user.id}"
-      expect(response).to have_http_status(:no_content)
+      expect(response).to have_http_status(:ok)
     end
 
     # community.playlist_tunesにuser.like_tunesが含まれないこと

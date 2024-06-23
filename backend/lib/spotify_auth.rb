@@ -1,14 +1,14 @@
 require 'rspotify'
 
 module SpotifyAuth
+  CLIENT_ID = ENV.fetch('SPOTIFY_CLIENT_ID', nil)
+  CLIENT_SECRET = ENV.fetch('SPOTIFY_CLIENT_SECRET', nil)
+  REDIRECT_URI = ENV.fetch('SPOTIFY_REDIRECT_URI', nil)
+
   # トークンの取得
   def self.fetch_spotify_tokens(code, code_verifier)
-    client_id = ENV.fetch('SPOTIFY_CLIENT_ID', nil)
-    client_secret = ENV.fetch('SPOTIFY_CLIENT_SECRET', nil)
-    redirect_uri = ENV.fetch('SPOTIFY_REDIRECT_URI', nil)
-
     # RSpotifyにクライアントIDとクライアントシークレットを設定
-    RSpotify.authenticate(client_id, client_secret)
+    RSpotify.authenticate(CLIENT_ID, CLIENT_SECRET)
 
     # フロントエンドから送信された認証コード
     auth_code = code
@@ -21,21 +21,21 @@ module SpotifyAuth
     request = Net::HTTP::Post.new(uri.path)
     request['Content-Type'] = 'application/x-www-form-urlencoded'
     request.body = URI.encode_www_form({
-                                         grant_type: 'authorization_code',
-                                         code: auth_code,
-                                         redirect_uri: redirect_uri,
-                                         client_id: client_id,
-                                         client_secret: client_secret,
-                                         code_verifier: code_verifier
-                                       })
+      grant_type: 'authorization_code',
+      code: auth_code,
+      redirect_uri: REDIRECT_URI,
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      code_verifier: code_verifier
+    })
 
     response = http.request(request)
 
-    Rails.logger.info "redirect_uri: #{redirect_uri}"
-    Rails.logger.info "client_id: #{client_id}"
-    Rails.logger.info "client_secret: #{client_secret}"
-    Rails.logger.info "code_verifier: #{code_verifier}"
-    Rails.logger.info "auth_code: #{auth_code}"
+    # Rails.logger.info "REDIRECT_URI: #{REDIRECT_URI}"
+    # Rails.logger.info "CLIENT_ID: #{CLIENT_ID}"
+    # Rails.logger.info "CLIENT_SECRET: #{CLIENT_SECRET}"
+    # Rails.logger.info "code_verifier: #{code_verifier}"
+    # Rails.logger.info "auth_code: #{auth_code}"
 
     token_info = JSON.parse(response.body)
 
@@ -102,7 +102,8 @@ module SpotifyAuth
         images: track['album']['images'],
         spotify_uri: track['uri'],
         preview_url: track['preview_url'],
-        added_at: item['added_at']
+        added_at: item['added_at'],
+        time: track['duration_ms']
       }
     end
 
@@ -110,5 +111,55 @@ module SpotifyAuth
   rescue StandardError => e
     Rails.logger.error "Error fetching saved_tracks: #{e.message}"
     raise
+  end
+
+  # リフレッシュトークンを使用してアクセストークンを更新
+  def self.refresh_access_token(refresh_token)
+    uri = URI('https://accounts.spotify.com/api/token')
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+
+    request = Net::HTTP::Post.new(uri.path)
+    request['Content-Type'] = 'application/x-www-form-urlencoded'
+    request.basic_auth(CLIENT_ID, CLIENT_SECRET)
+    request.body = URI.encode_www_form({
+                                         grant_type: 'refresh_token',
+                                         refresh_token: refresh_token
+                                       })
+    response = http.request(request)
+
+    if response.is_a?(Net::HTTPSuccess)
+      JSON.parse(response.body)['access_token']
+    else
+      Rails.logger.error "Failed to refresh access token: #{response.body}"
+      nil
+    end
+  end
+
+  # Spotifyのトラック情報を取得
+  def self.fetch_latest_saved_track(_spotify_uri, access_token)
+    uri = URI("https://api.spotify.com/v1/users/#{spotify_id}/tracks?limit=50")
+    req = Net::HTTP::Get.new(uri)
+    req['Authorization'] = "Bearer #{access_token}"
+
+    res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      http.request(req)
+    end
+
+    saved_tracks = JSON.parse(res.body)
+
+    saved_tracks['items'].map do |item|
+      track = item['track']
+      {
+        name: track['name'],
+        artist: track['artists'].map { |artist| artist['name'] }.join(', '),
+        album: track['album']['name'],
+        images: track['album']['images'],
+        spotify_uri: track['uri'],
+        preview_url: track['preview_url'],
+        added_at: item['added_at'],
+        time: track['duration_ms']
+      }
+    end
   end
 end

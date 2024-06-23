@@ -35,18 +35,18 @@ function App() {
             <Route path="/login" element={<Login />} />
             {/* コミュニティ情報 */}
             <Route
-              path="/communities/:communitiesId"
+              path="/communities/:communityId"
               element={<Community user={""} />}
             />
             {/* コミュニティ編集 */}
             <Route
-              path="/communities/:communitiesId/edit"
+              path="/communities/:communityId/edit"
               element={<CommunityEdit />}
             />
             {/* ユーザー情報 */}
-            <Route path="/users/:usersId" element={<User />} />
+            <Route path="/users/:userId" element={<User />} />
             {/* ユーザー編集 */}
-            <Route path="/users/:usersId/edit" element={<UserEdit />} />
+            <Route path="/users/:userId/edit" element={<UserEdit />} />
           </Routes>
           <div className="px-16">
             <WordFooter />

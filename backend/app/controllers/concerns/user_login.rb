@@ -8,6 +8,9 @@ module UserLogin
     reset_session
     log_in(existing_user)
 
+    # like_tunesのimagesデータを最初のURLのみに加工
+    extract_first_image_url(user_create_params[:like_tunes])
+
     user_create_params[:like_tunes].each do |like_tune|
       existing_record = Tune.find_by(spotify_uri: like_tune[:spotify_uri])
 
@@ -27,5 +30,14 @@ module UserLogin
     end
     # コントローラーでレスポンスを生成するために必要なデータを返す
     { user: existing_user, session_id: session[:session_id] }
+  end
+
+  private
+
+  def extract_first_image_url(like_tunes)
+    like_tunes.each do |like_tune|
+      first_image_url = like_tune[:images].first["url"]
+      like_tune[:images] = first_image_url # 配列ではなく単一の文字列として保存
+    end
   end
 end

@@ -59,6 +59,9 @@ module Api
               refresh_token: refresh_token
             )
 
+            # like_tunesのimagesデータを最初のURLのみに加工
+            extract_first_image_url(user_create_params[:like_tunes])
+
             user_create_params[:like_tunes].each do |like_tune|
               existing_record = Tune.find_by(spotify_uri: like_tune[:spotify_uri])
 
@@ -138,6 +141,14 @@ module Api
 
       def user_update_params
         params.require(:user).permit(:name, :introduction, :avatar)
+      end
+
+      # like_tune[:images]のデータを加工して、最初の要素のURLのみを保存するメソッド
+      def extract_first_image_url(like_tunes)
+        like_tunes.each do |like_tune|
+          first_image_url = like_tune[:images].first["url"]
+          like_tune[:images] = first_image_url # 配列ではなく単一の文字列として保存
+        end
       end
     end
   end

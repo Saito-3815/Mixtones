@@ -14,6 +14,9 @@ export const playlistsIndex = (communityId) =>
 // コミュニティへ参加
 export const membershipsCreate = (communityId) =>
   `${DEFAULT_API_LOCALHOST}/communities/${communityId}/memberships`;
+// コミュニティから脱退
+export const membershipsDestroy = (communityId, userId) =>
+  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/memberships/${userId}`;
 
 // spotifyユーザーをデータベースへ登録
 export const usersCreate = `${DEFAULT_API_LOCALHOST}/users`;

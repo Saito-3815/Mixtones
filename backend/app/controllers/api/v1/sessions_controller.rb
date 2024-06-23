@@ -62,7 +62,7 @@ module Api
             except: :refresh_token,
             include: {
               communities: {
-                only: [:id]
+                only: [:id, :name]
               },
               like_tunes: {
                 only: [:id]

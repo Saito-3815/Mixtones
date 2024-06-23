@@ -84,30 +84,6 @@ export const TuneColumn = ({ tune, index, onClick }) => {
     return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
-  // 画像データからURLを抽出する関数
-  const extractImageUrls = (imagesString) => {
-    try {
-      // 文字列をJSON形式に変換する前に、Rubyスタイルのハッシュ記法をJSON形式に修正
-      // ここでの変換処理を適宜修正する必要があるかもしれません
-      const correctedString = imagesString
-        .replace(/=>/g, ":")
-        .replace(/:(\w+)/g, ':"$1"')
-        .replace(/(\w+):/g, '"$1":');
-      // JSON形式の文字列をオブジェクトに変換
-      const imagesArray = JSON.parse(correctedString);
-      // URLのみを抽出して返す
-      return imagesArray.map((image) => image.url);
-    } catch (error) {
-      console.error("JSONのパースに失敗しました: ", error);
-      return []; // エラーが発生した場合は空の配列を返す
-    }
-  };
-
-  // imagesStringは、画像データの文字列
-  const imagesString = tune.images;
-  const imageUrls = extractImageUrls(imagesString);
-  console.log(imageUrls);
-
   return (
     <tr
       className={`cursor-pointer bg-black ${isSelected ? "bg-theme-black" : "hover:bg-theme-black"} text-theme-gray ${isSelected ? "text-white" : "hover:text-white"} h-[56px] w-full`}
@@ -161,7 +137,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
         >
           {/* 画像 */}
           <img
-            src={imageUrls[0]}
+            src={tune.images}
             alt="images"
             className="object-cover h-10 w-10 rounded-sm flex-shrink-0"
           />
