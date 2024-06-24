@@ -21,13 +21,13 @@ module SpotifyAuth
     request = Net::HTTP::Post.new(uri.path)
     request['Content-Type'] = 'application/x-www-form-urlencoded'
     request.body = URI.encode_www_form({
-      grant_type: 'authorization_code',
-      code: auth_code,
-      redirect_uri: REDIRECT_URI,
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      code_verifier: code_verifier
-    })
+                                         grant_type: 'authorization_code',
+                                         code: auth_code,
+                                         redirect_uri: REDIRECT_URI,
+                                         client_id: CLIENT_ID,
+                                         client_secret: CLIENT_SECRET,
+                                         code_verifier: code_verifier
+                                       })
 
     response = http.request(request)
 
@@ -137,8 +137,10 @@ module SpotifyAuth
   end
 
   # Spotifyのトラック情報を取得
-  def self.fetch_latest_saved_track(_spotify_uri, access_token)
-    uri = URI("https://api.spotify.com/v1/users/#{spotify_id}/tracks?limit=50")
+  def self.fetch_latest_saved_track(user, access_token)
+    latest_added_at = user.like_tunes.last.added_at
+
+    uri = URI("https://api.spotify.com/v1/users/#{user.spotify_id}/tracks?limit=50")
     req = Net::HTTP::Get.new(uri)
     req['Authorization'] = "Bearer #{access_token}"
 
@@ -148,7 +150,12 @@ module SpotifyAuth
 
     saved_tracks = JSON.parse(res.body)
 
-    saved_tracks['items'].map do |item|
+    # latest_added_atより新しい楽曲のみを選択
+    filtered_tracks = saved_tracks['items'].select do |item|
+      Time.zone.parse(item['added_at']) > latest_added_at
+    end
+
+    filtered_tracks.map do |item|
       track = item['track']
       {
         name: track['name'],

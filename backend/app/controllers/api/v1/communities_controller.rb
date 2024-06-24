@@ -1,6 +1,8 @@
 module Api
   module V1
     class CommunitiesController < ApplicationController
+      include SessionsHelper
+
       def index
         @communities = Community.all
         render json: @communities
@@ -21,6 +23,11 @@ module Api
         if @community.save
           create_membership
           add_like_tunes_to_playlist
+          # community_url = "#{ENV.fetch('FRONTEND_URL', nil)}communities/#{@community[:id]}"
+          # render json: {
+          #   community: @community,
+          #   redirect_url: community_url
+          #   }, status: :created
           render json: @community, status: :created
         else
           render json: @community.errors, status: :unprocessable_entity
@@ -50,15 +57,15 @@ module Api
 
       def build_community
         Community.new(
-          name: "#{params[:user_name]}のコミュニティ",
+          name: "#{current_user.name}のコミュニティ",
           introduction: "",
           avatar: "",
-          playlist_name: "#{params[:user_name]}のプレイリスト"
+          playlist_name: "#{current_user.name}のプレイリスト"
         )
       end
 
       def create_membership
-        @community.memberships.create(user_id: params[:user_id])
+        @community.memberships.create(user_id: current_user.id)
       end
 
       # コミュニティに参加したmemberのlike_tunesをplaylistに追加

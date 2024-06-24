@@ -177,10 +177,9 @@ export const TuneTable = () => {
             <>
               {filteredPlaylist.map((tune, index) => (
                 <TuneColumn
-                  tune={tune}
+                  tune={{ ...tune, id: tune.id.toString() }}
                   index={index}
-                  key={index}
-                  // clickedIndex={clickedIndex}
+                  key={index.toString()}
                   onClick={() => handleColumnClick(index, tune)}
                 />
               ))}

@@ -63,7 +63,6 @@ const Top = () => {
       if (axios.isCancel(error)) {
         console.log("Request was canceled by the user");
       } else if (error.response && error.response.status === 404) {
-        // :not_foundに相当するステータスコード
         navigate("/signup"); // サインアップページにリダイレクト
       } else {
         console.error(error);

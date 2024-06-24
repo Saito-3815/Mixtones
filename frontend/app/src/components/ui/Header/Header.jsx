@@ -9,9 +9,29 @@ import { BarMenu } from "@/components/ui/BarMenu/BarMenu";
 import { AlertDialogSet } from "../AlertDialog/AlertDialog";
 import { isLoggedInAtom } from "@/atoms/userAtoms";
 import { useAtom } from "jotai";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { createCommunity } from "@/api/communitiesCreate";
 
 export const Header = () => {
   const [isLoggedIn] = useAtom(isLoggedInAtom);
+
+  const handleCreateCommunity = useMutation({
+    mutationFn: createCommunity,
+    onSuccess: (data) => {
+      if (data.status === 200) {
+        console.log("Community created");
+      }
+      console.log(data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
+    },
+  });
 
   return (
     <header className="mx-1 my-1">
@@ -33,6 +53,7 @@ export const Header = () => {
                   dialogTitle="新しいコミュニティが作成されます。よろしいですか？"
                   dialogText="コミュニティを作成するとあなたのお気に入りが共有されます。"
                   actionText="コミュニティを作る"
+                  onActionClick={handleCreateCommunity.mutate}
                   cancelText="キャンセル"
                 />
                 <AvatarMenu src="" />

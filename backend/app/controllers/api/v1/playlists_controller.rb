@@ -3,16 +3,20 @@ module Api
     class PlaylistsController < ApplicationController
       extend SpotifyAuth
       include SessionsHelper
+      include UserLogin
 
       def index
         community = Community.find_by(id: params[:community_id])
-        # 全てのcommunity.memberに対して処理を行う
+        Rails.logger.info "Found community with ID: #{community.id}" if community
+
         community.members.each do |member|
-          # メンバーがログイン中であるか確認
           if logged_in?(member)
+            Rails.logger.info "Member #{member.id} is logged in."
             access_token = SpotifyAuth.refresh_access_token(member.refresh_token)
-            like_tunes = SpotifyAuth.fetch_latest_saved_track(member.spotify_id, access_token)
+            like_tunes = SpotifyAuth.fetch_latest_saved_track(member, access_token)
+            extract_first_image_url(like_tunes)
             like_tunes.each do |like_tune|
+              Rails.logger.info "Processing like_tune: #{like_tune[:name]}, URI: #{like_tune[:spotify_uri]}"
               existing_record = Tune.find_by(spotify_uri: like_tune[:spotify_uri])
 
               if existing_record.nil?
@@ -25,21 +29,31 @@ module Api
                   preview_url: like_tune[:preview_url],
                   added_at: like_tune[:added_at]
                 )
+                Rails.logger.info "Created new like_tune: #{like_tune[:name]}, URI: #{like_tune[:spotify_uri]}"
+              elsif member.like_tunes.exists?(existing_record.id)
+                Rails.logger.info "Existing like_tune found, not added: #{existing_record.name},
+                URI: #{existing_record.spotify_uri}"
               else
-                member.like_tunes << existing_record unless member.like_tunes.exists?(existing_record.id)
+                member.like_tunes << existing_record
+                Rails.logger.info "Added existing like_tune: #{existing_record.name},
+                URI: #{existing_record.spotify_uri}"
               end
             end
 
-            # memberのlike_tunesをcommunity.playlist_tunesに追加
             member.like_tunes.each do |like_tune|
-              unless community.playlist_tunes.exists?(spotify_uri: like_tune.spotify_uri)
-                community.playlist_tunes << like_tune
-              end
+              next if community.playlist_tunes.exists?(spotify_uri: like_tune.spotify_uri)
+
+              community.playlist_tunes << like_tune
+              Rails.logger.info "Added like_tune to community playlist: #{like_tune.name},
+              URI: #{like_tune.spotify_uri}"
             end
+          else
+            Rails.logger.info "Member #{member.id} is not logged in."
           end
         end
 
         @playlists = community.playlist_tunes.order(added_at: :desc)
+        Rails.logger.info "Rendering playlist with #{community.playlist_tunes.count} tunes."
         render json: @playlists
       end
     end

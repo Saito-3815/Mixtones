@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_06_22_075121) do
+ActiveRecord::Schema[7.0].define(version: 2024_06_24_020742) do
   create_table "checks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "tune_id", null: false
@@ -96,6 +96,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_22_075121) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "refresh_token"
+    t.datetime "last_active_at"
     t.index ["spotify_id"], name: "index_users_on_spotify_id", unique: true
   end
 
