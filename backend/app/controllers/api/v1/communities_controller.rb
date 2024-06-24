@@ -31,7 +31,7 @@ module Api
           render json: {
             community: @community,
             user: current_user.as_json(include: { communities: { only: [:id] } })
-            }, status: :created
+          }, status: :created
         else
           render json: @community.errors, status: :unprocessable_entity
         end

@@ -43,7 +43,7 @@ module Api
             render json: {
               message: 'Community and membership successfully deleted.',
               user: current_user.as_json(include: { communities: { only: [:id] } })
-              }, status: :accepted
+            }, status: :accepted
           else
             render json: {
               community: community.as_json(include: ['members']).merge(

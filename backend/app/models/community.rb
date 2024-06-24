@@ -10,7 +10,5 @@ class Community < ApplicationRecord
   validates :playlist_name, presence: true, length: { maximum: 40 }
 
   # プレイリストの曲数を返す
-  def playlist_tunes_count
-    playlist_tunes.count
-  end
+  delegate :count, to: :playlist_tunes, prefix: true
 end
