@@ -53,14 +53,14 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   };
 
   // tuneが現在選択されているかどうかを判断
-  const isSelected = currentTune && currentTune.id === tune.id;
+  const isSelected = currentTune ? currentTune.id === Number(tune.id) : false;
 
   const handleClick = () => {
     setCurrentTune(tune); // 現在のtuneを設定
     if (onClick) onClick(); // TuneTableから渡されたonClick(tuneAtomを更新する関数)
 
     // isSelectedの計算をhandleClick内で直接行う
-    const isTuneSelected = currentTune && currentTune.id === tune.id;
+    const isTuneSelected = currentTune && currentTune.id === Number(tune.id);
     if (isTuneSelected) {
       setIsPlaying(!isPlaying); // ここでのisSelectedは古い状態を参照しているため、直接計算した値を使用
     } else {
@@ -71,14 +71,16 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   // useEffect(() => {
   //   console.log("isPlaying:", isPlaying);
   //   console.log("isSelected:", isSelected);
+  //   console.log("Tune:", tune.id);
   // }, [isPlaying, isSelected]);
 
   // 追加日をフォーマット
   const date = new Date(tune.added_at);
   const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 
-  // 再生時間をフォーマット
-  const formatTime = (seconds) => {
+  // 再生時間をフォーマット（ミリ秒対応）
+  const formatTime = (milliseconds) => {
+    const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;

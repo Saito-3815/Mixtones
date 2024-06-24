@@ -1,9 +1,9 @@
 import { AvatarSet } from "@/components/ui/Avatar/Avatar";
 import { Button } from "@/components/ui/Button/Button";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TuneTable } from "@/components/ui/TuneTable/TuneTable";
 import { AlertDialogSet } from "@/components/ui/AlertDialog/AlertDialog";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchCommunity } from "@/api/communitiesShow";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
@@ -12,6 +12,8 @@ import { loginUser, userAtom } from "@/atoms/userAtoms";
 import axios from "axios";
 import { createMemberships } from "@/api/membershipsCreate";
 import { destroyMemberships } from "@/api/membershipsDestroy";
+import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Community = () => {
   const { communityId } = useParams();
@@ -46,9 +48,13 @@ const Community = () => {
     queryFn: () => fetchCommunity({ communityId: communityId }),
   });
 
+  if (communityError) {
+    console.error(communityError);
+  }
+
   //データをそれぞれコンソールへ出力
   // console.log(communityData);
-  console.log(communityError);
+  // console.log(communityError);
 
   // コミュニティに参加する
   const handleJoinCommunity = useMutation({
@@ -79,23 +85,33 @@ const Community = () => {
     },
   });
 
-  // コミュニティから脱退する
+  const navigate = useNavigate();
+
   // コミュニティから脱退する
   const handleLeaveCommunity = useMutation({
-    mutationFn: () => destroyMemberships(user.id, communityId),
+    mutationFn: () => destroyMemberships(communityId),
     onSuccess: (data) => {
-      if (data.status === 200) {
-        loginUser(setUser, data.data.user);
-        // communityDataを最新のデータで更新
-        queryClient.setQueryData(
-          ["community", communityId],
-          data.data.community,
-        );
-        // playlistデータを最新のデータで更新
-        queryClient.setQueryData(
-          ["playlist", communityId],
-          data.data.community.playlist_tunes,
-        );
+      switch (data.status) {
+        case 200:
+          loginUser(setUser, data.data.user);
+          // communityDataを最新のデータで更新
+          queryClient.setQueryData(
+            ["community", communityId],
+            data.data.community,
+          );
+          // playlistデータを最新のデータで更新
+          queryClient.setQueryData(
+            ["playlist", communityId],
+            data.data.community.playlist_tunes,
+          );
+          break;
+        case 202:
+          // コミュニティが削除された場合、ユーザー情報を更新
+          loginUser(setUser, data.data.user);
+          navigate("/");
+          break;
+        default:
+          console.log("Unexpected status code:", data.status);
       }
       console.log(data);
     },
@@ -108,21 +124,60 @@ const Community = () => {
     },
   });
 
+  // 文字列がスクロールする場合にアニメーションを適用
+  const communityNameRef = useRef(null);
+  const playlistNameRef = useRef(null);
+  const introductionRef = useRef(null);
+
+  useEffect(() => {
+    const checkScroll = (element) => {
+      if (element && element.scrollWidth > element.clientWidth) {
+        element.classList.add("scroll-slide");
+      } else if (element) {
+        element.classList.remove("scroll-slide");
+      }
+    };
+
+    // 各要素に対して checkScroll を初回とリサイズ時に呼び出す
+    checkScroll(communityNameRef.current);
+    checkScroll(playlistNameRef.current);
+    checkScroll(introductionRef.current);
+
+    // リサイズイベントに対するハンドラを設定
+    const handleResize = () => {
+      checkScroll(communityNameRef.current);
+      checkScroll(playlistNameRef.current);
+      checkScroll(introductionRef.current);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // コンポーネントのアンマウント時にイベントリスナーを削除
+    return () => window.removeEventListener("resize", handleResize);
+  }, [communityData]);
+
   return (
     <div className="flex-col justify-center">
       {/* コミュニティセクション */}
       <div className="container mt-10 flex flex-wrap items-start justify-between mx-auto py-10 bg-theme-black max-w-[1200px] rounded-md">
         {/* 画像 */}
         <div className="flex justify-center max-w-[240px] items-start pl-5 sm:pl-3">
-          {communityStatus === "pending" || !communityData ? (
-            <Skeleton className="w-60 h-60 sm:w-40 sm:h-40 rounded-xl" />
-          ) : (
-            <img
-              src={communityData.avatar}
-              alt="community"
-              className="w-40 h-40 rounded-sm object-cover"
-            />
-          )}
+          <div className="flex bg-gray-400 w-60 h-60 rounded-sm items-center justify-center">
+            {communityStatus === "pending" || !communityData ? (
+              <Skeleton className="w-60 h-60 rounded-xl" />
+            ) : communityData.avatar ? (
+              <img
+                src={communityData.avatar}
+                alt=""
+                className="object-cover object-center w-full h-full rounded-sm"
+              />
+            ) : (
+              <FontAwesomeIcon
+                icon={faUserGroup}
+                className="w-3/4 h-3/4 text-gray-500 self-center"
+              />
+            )}
+          </div>
         </div>
         {/* テキスト情報 */}
         {communityStatus === "pending" || !communityData ? (
@@ -139,22 +194,31 @@ const Community = () => {
             <Skeleton className="h-5 w-[160px] mt-5" />
           </div>
         ) : (
-          <div className="max-w-[480px] h-full flex flex-col items-start pr-40 overflow-hidden sm:p-0 p-5">
+          <div className="max-w-[480px] h-full flex flex-col items-start pr-40 sm:p-0 p-5">
             <h2 className="text-white text-lg whitespace-nowrap">
               コミュニティプレイリスト
             </h2>
-            <h1 className="text-white font-bold text-5xl mt-3 whitespace-nowrap">
+            <h1
+              className="text-white font-bold text-5xl mt-3 whitespace-nowrap"
+              ref={playlistNameRef}
+            >
               {communityData.playlist_name}
             </h1>
-            <h2 className="text-white mt-3 text-lg whitespace-nowrap">
-              {`${communityData.name}・曲数`}
+            <h2
+              className="text-white mt-3 text-lg whitespace-nowrap"
+              ref={communityNameRef}
+            >
+              {`${communityData.name}・${communityData.playlist_tunes_count}曲`}
             </h2>
             <div className="flex space-x-3 mt-1">
               {communityData.members.map((member, index) => (
                 <AvatarSet key={index} src={member.avatar} size="6" />
               ))}
             </div>
-            <p className="text-theme-gray text-md mt-5 whitespace-nowrap">
+            <p
+              className="text-theme-gray text-md mt-5 whitespace-nowrap"
+              ref={introductionRef}
+            >
               {communityData.introduction}
             </p>
           </div>
@@ -177,7 +241,7 @@ const Community = () => {
                   />
                 }
                 dialogTitle="このコミュニティから脱退します。よろしいですか？"
-                dialogText="脱退すると、コミュニティプレイリスト内であなたの「お気に入りの曲」が更新がされなくなります。"
+                dialogText="あなたがコミュニティメンバーの最後の一人だった場合、このコミュニティは削除されます。"
                 actionText="コミュニティから脱退する"
                 onActionClick={handleLeaveCommunity.mutate}
                 cancelText="キャンセル"

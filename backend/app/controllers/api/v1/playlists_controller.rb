@@ -27,7 +27,8 @@ module Api
                   images: like_tune[:images],
                   spotify_uri: like_tune[:spotify_uri],
                   preview_url: like_tune[:preview_url],
-                  added_at: like_tune[:added_at]
+                  added_at: like_tune[:added_at],
+                  time: like_tune[:time]
                 )
                 Rails.logger.info "Created new like_tune: #{like_tune[:name]}, URI: #{like_tune[:spotify_uri]}"
               elsif member.like_tunes.exists?(existing_record.id)

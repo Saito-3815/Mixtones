@@ -1,13 +1,12 @@
 import axios from "axios";
 import { communitiesCreate } from "@/urls/index";
 
-export const createCommunity = ({ userId, communityId, cancelToken }) => {
-  const url = communitiesCreate(communityId);
+export const createCommunity = () => {
   return axios.post(
-    url,
+    communitiesCreate,
+    {},
     {
-      user_id: userId,
+      withCredentials: true,
     },
-    { withCredentials: true, cancelToken },
   );
 };

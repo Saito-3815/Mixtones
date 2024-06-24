@@ -8,4 +8,9 @@ class Community < ApplicationRecord
   validates :name,    presence: true, length: { maximum: 40 }
   validates :introduction, length: { maximum: 160 }
   validates :playlist_name, presence: true, length: { maximum: 40 }
+
+  # プレイリストの曲数を返す
+  def playlist_tunes_count
+    playlist_tunes.count
+  end
 end

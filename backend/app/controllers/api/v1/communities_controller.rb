@@ -10,7 +10,7 @@ module Api
 
       def show
         @community = Community.find(params[:id])
-        render json: @community, include: ['members']
+        render json: @community.as_json(include: ['members'], methods: [:playlist_tunes_count])
       end
 
       def edit
@@ -28,7 +28,10 @@ module Api
           #   community: @community,
           #   redirect_url: community_url
           #   }, status: :created
-          render json: @community, status: :created
+          render json: {
+            community: @community,
+            user: current_user.as_json(include: { communities: { only: [:id] } })
+            }, status: :created
         else
           render json: @community.errors, status: :unprocessable_entity
         end
@@ -40,7 +43,7 @@ module Api
         if @community.update(community_params)
           render json: @community
         else
-          render json: @community.errors, status: :unprocessable_entity
+          render status: :unprocessable_entity
         end
       end
 
@@ -70,9 +73,8 @@ module Api
 
       # コミュニティに参加したmemberのlike_tunesをplaylistに追加
       def add_like_tunes_to_playlist
-        user = User.find_by(id: params[:user_id])
-        if user&.like_tunes.present?
-          user.like_tunes.each do |like_tune|
+        if current_user&.like_tunes.present?
+          current_user.like_tunes.each do |like_tune|
             Playlist.create(community_id: @community.id, tune_id: like_tune.id)
           end
         end

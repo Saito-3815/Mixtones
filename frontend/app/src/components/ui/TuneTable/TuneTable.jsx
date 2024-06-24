@@ -24,9 +24,12 @@ export const TuneTable = () => {
     queryFn: () => fetchPlaylist({ communityId: communityId }),
   });
 
+  if (playlistError) {
+    return <div>Error</div>;
+  }
+
   // データをそれぞれコンソールへ出力
   // console.log(playlistData);
-  console.log(playlistError);
 
   // 検索機能
   const [searchText, setSearchText] = useState("");
@@ -177,7 +180,11 @@ export const TuneTable = () => {
             <>
               {filteredPlaylist.map((tune, index) => (
                 <TuneColumn
-                  tune={{ ...tune, id: tune.id.toString() }}
+                  tune={{
+                    ...tune,
+                    id: tune.id.toString(),
+                    time: tune.time.toString(),
+                  }}
                   index={index}
                   key={index.toString()}
                   onClick={() => handleColumnClick(index, tune)}

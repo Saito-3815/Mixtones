@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
       resources :communities, only: [:index, :show, :create, :edit, :update, :destroy] do
         resources :memberships, only: [:create]
-        delete :'memberships/:user_id', to: 'memberships#destroy'
+        delete :'memberships', to: 'memberships#destroy'
         resources :playlists, only: [:index]
         get 'tunes/:tune_id/comments', to: 'comments#index'
         post 'tunes/:tune_id/users/:user_id/comments', to: 'comments#create'

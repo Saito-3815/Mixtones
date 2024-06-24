@@ -28,19 +28,32 @@ module Api
       # Userのlike_tunesをCommunityのplaylist_tunesから削除
       # Communityのplaylist_tunesに他のmembersの重複していたlike_tunesを追加
       def destroy
-        @membership = Membership.find_by(community_id: params[:community_id], user_id: params[:user_id])
-        if @membership.destroy
-          community = Community.find_by(id: params[:community_id])
-          user = User.find_by(id: params[:user_id])
-          remove_like_tunes_from_playlist(user, community) if user&.like_tunes.present?
+        @membership = Membership.find_by(community_id: params[:community_id], user_id: current_user.id)
+        community = Community.find_by(id: params[:community_id])
+        # current_userがコミュニティメンバーであるか確認
+        if community.members.include?(current_user)
+          @membership.destroy
+          remove_like_tunes_from_playlist(current_user, community) if current_user&.like_tunes.present?
           add_missing_like_tunes_to_playlist(community)
           sorted_playlist_tunes = community.playlist_tunes.order('added_at DESC')
-          render json: {
-            community: community.as_json(include: ['members']).merge(
-              playlist_tunes: sorted_playlist_tunes.as_json
-            ),
-            user: user.as_json(include: { communities: { only: [:id] } })
-          }, status: :ok
+
+          # コミュニティのメンバーがいなくなった場合、コミュニティを削除
+          if community.members.empty?
+            community.destroy
+            render json: {
+              message: 'Community and membership successfully deleted.',
+              user: current_user.as_json(include: { communities: { only: [:id] } })
+              }, status: :accepted
+          else
+            render json: {
+              community: community.as_json(include: ['members']).merge(
+                playlist_tunes: sorted_playlist_tunes.as_json
+              ),
+              user: current_user.as_json(include: { communities: { only: [:id] } })
+            }, status: :ok
+          end
+        else
+          render json: { error: 'User is not a member of this community.' }, status: :unprocessable_entity
         end
       end
 
