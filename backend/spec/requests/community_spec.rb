@@ -15,28 +15,32 @@ RSpec.describe Community, type: :request do
     let(:user) { create(:user, :with_like_tunes) }
 
     before do
-      post '/api/v1/communities', params: { user_id: user.id, user_name: user.name }
+      login_with_spotify(user)
     end
 
     # communityオブジェクトに紐づくmembershipを作成すること
     it 'creates a membership' do
+      post '/api/v1/communities'
       community = Community.last
       expect(community.members.count).to eq 1
     end
 
     # communityオブジェクトに紐づくplaylistにlike_tunesを追加すること
     it 'creates a playlist' do
+      post '/api/v1/communities'
       community = Community.last
       expect(community.playlist_tunes.count).to eq user.like_tunes.count
     end
 
     # 201ステータスコードを返すこと
     it 'creates a community' do
+      post '/api/v1/communities'
       expect(response).to have_http_status(:created)
     end
 
     # レスポンスがuser.nameのコミュニティの文字列が含まれること
     it 'returns test community' do
+      post '/api/v1/communities'
       expect(response.body).to include("#{user.name}のコミュニティ")
     end
   end

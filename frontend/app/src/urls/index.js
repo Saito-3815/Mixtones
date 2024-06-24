@@ -3,6 +3,22 @@ const DEFAULT_API_LOCALHOST = "http://localhost:3001/api/v1";
 
 // コミュニティ一覧
 export const communitiesIndex = `${DEFAULT_API_LOCALHOST}/communities`;
+// コミュニティ詳細
+export const communitiesShow = (communityId) =>
+  `${DEFAULT_API_LOCALHOST}/communities/${communityId}`;
+// コミュニティを作成
+export const communitiesCreate = `${DEFAULT_API_LOCALHOST}/communities`;
+
+// プレイリスト一覧
+export const playlistsIndex = (communityId) =>
+  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/playlists`;
+
+// コミュニティへ参加
+export const membershipsCreate = (communityId) =>
+  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/memberships`;
+// コミュニティから脱退
+export const membershipsDestroy = (communityId) =>
+  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/memberships`;
 
 // spotifyユーザーをデータベースへ登録
 export const usersCreate = `${DEFAULT_API_LOCALHOST}/users`;

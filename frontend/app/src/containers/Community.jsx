@@ -1,24 +1,160 @@
 import { AvatarSet } from "@/components/ui/Avatar/Avatar";
 import { Button } from "@/components/ui/Button/Button";
-import React from "react";
-import PropTypes from "prop-types";
+import React, { useEffect, useRef, useState } from "react";
 import { TuneTable } from "@/components/ui/TuneTable/TuneTable";
 import { AlertDialogSet } from "@/components/ui/AlertDialog/AlertDialog";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchCommunity } from "@/api/communitiesShow";
+import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
+import { useAtom } from "jotai";
+import { loginUser, userAtom } from "@/atoms/userAtoms";
+import axios from "axios";
+import { createMemberships } from "@/api/membershipsCreate";
+import { destroyMemberships } from "@/api/membershipsDestroy";
+import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const Community = ({ user }) => {
-  const { communitiesId } = useParams();
+const Community = () => {
+  const { communityId } = useParams();
+  // console.log("communityId:", communityId);
 
-  // プレイリスト情報
-  const tunes = Array.from({ length: 100 }, (_, i) => ({
-    id: i + 1,
-    name: `Tune ${i + 1}`,
-    artist: `Artist ${i + 1}`,
-    album: `Album ${i + 1}`,
-    images: "https://picsum.photos/500",
-    added_at: "2022-01-01T00:00:00Z",
-    time: "00:00",
-  }));
+  const [user, setUser] = useAtom(userAtom);
+
+  const queryClient = useQueryClient();
+
+  // user が null または undefined でない、かつ communities プロパティを持っていることを確認
+  // さらに、community が null または undefined でないことも確認
+  const [isMember, setIsMember] = useState(false);
+
+  useEffect(() => {
+    const checkIsMember =
+      user &&
+      user.communities &&
+      communityId &&
+      user.communities.some(
+        (community) => community && community.id.toString() === communityId,
+      );
+    setIsMember(checkIsMember);
+  }, [user, communityId]);
+
+  // コミュニティ情報を取得
+  const {
+    data: communityData,
+    status: communityStatus,
+    error: communityError,
+  } = useQuery({
+    queryKey: ["community", communityId],
+    queryFn: () => fetchCommunity({ communityId: communityId }),
+  });
+
+  if (communityError) {
+    console.error(communityError);
+  }
+
+  //データをそれぞれコンソールへ出力
+  // console.log(communityData);
+  // console.log(communityError);
+
+  // コミュニティに参加する
+  const handleJoinCommunity = useMutation({
+    mutationFn: () =>
+      createMemberships({ communityId: communityId, userId: user.id }),
+    onSuccess: (data) => {
+      if (data.status === 201) {
+        loginUser(setUser, data.data.user);
+        // communityDataを最新のデータで更新
+        queryClient.setQueryData(
+          ["community", communityId],
+          data.data.community,
+        );
+        // playlistデータを最新のデータで更新
+        queryClient.setQueryData(
+          ["playlist", communityId],
+          data.data.community.playlist_tunes,
+        );
+      }
+      console.log(data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
+    },
+  });
+
+  const navigate = useNavigate();
+
+  // コミュニティから脱退する
+  const handleLeaveCommunity = useMutation({
+    mutationFn: () => destroyMemberships(communityId),
+    onSuccess: (data) => {
+      switch (data.status) {
+        case 200:
+          loginUser(setUser, data.data.user);
+          // communityDataを最新のデータで更新
+          queryClient.setQueryData(
+            ["community", communityId],
+            data.data.community,
+          );
+          // playlistデータを最新のデータで更新
+          queryClient.setQueryData(
+            ["playlist", communityId],
+            data.data.community.playlist_tunes,
+          );
+          break;
+        case 202:
+          // コミュニティが削除された場合、ユーザー情報を更新
+          loginUser(setUser, data.data.user);
+          navigate("/");
+          break;
+        default:
+          console.log("Unexpected status code:", data.status);
+      }
+      console.log(data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        console.error(error);
+      }
+    },
+  });
+
+  // 文字列がスクロールする場合にアニメーションを適用
+  const communityNameRef = useRef(null);
+  const playlistNameRef = useRef(null);
+  const introductionRef = useRef(null);
+
+  useEffect(() => {
+    const checkScroll = (element) => {
+      if (element && element.scrollWidth > element.clientWidth) {
+        element.classList.add("scroll-slide");
+      } else if (element) {
+        element.classList.remove("scroll-slide");
+      }
+    };
+
+    // 各要素に対して checkScroll を初回とリサイズ時に呼び出す
+    checkScroll(communityNameRef.current);
+    checkScroll(playlistNameRef.current);
+    checkScroll(introductionRef.current);
+
+    // リサイズイベントに対するハンドラを設定
+    const handleResize = () => {
+      checkScroll(communityNameRef.current);
+      checkScroll(playlistNameRef.current);
+      checkScroll(introductionRef.current);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // コンポーネントのアンマウント時にイベントリスナーを削除
+    return () => window.removeEventListener("resize", handleResize);
+  }, [communityData]);
 
   return (
     <div className="flex-col justify-center">
@@ -26,37 +162,71 @@ const Community = ({ user }) => {
       <div className="container mt-10 flex flex-wrap items-start justify-between mx-auto py-10 bg-theme-black max-w-[1200px] rounded-md">
         {/* 画像 */}
         <div className="flex justify-center max-w-[240px] items-start pl-5 sm:pl-3">
-          <img
-            src="https://picsum.photos/500"
-            alt="community"
-            className="w-40 h-40 rounded-sm object-cover"
-          />
+          <div className="flex bg-gray-400 w-60 h-60 rounded-sm items-center justify-center">
+            {communityStatus === "pending" || !communityData ? (
+              <Skeleton className="w-60 h-60 rounded-xl" />
+            ) : communityData.avatar ? (
+              <img
+                src={communityData.avatar}
+                alt=""
+                className="object-cover object-center w-full h-full rounded-sm"
+              />
+            ) : (
+              <FontAwesomeIcon
+                icon={faUserGroup}
+                className="w-3/4 h-3/4 text-gray-500 self-center"
+              />
+            )}
+          </div>
         </div>
         {/* テキスト情報 */}
-        <div className="max-w-[480px] h-full flex flex-col items-start pr-40 overflow-hidden sm:p-0 p-5">
-          <h2 className="text-white text-lg whitespace-nowrap">
-            コミュニティプレイリスト
-          </h2>
-          <h1 className="text-white font-bold text-5xl mt-3 whitespace-nowrap">
-            {`コミュニティ${communitiesId}のプレイリスト`}
-          </h1>
-          <h2 className="text-white mt-3 text-lg whitespace-nowrap">
-            {`コミュニティ${communitiesId}・曲数`}
-          </h2>
-          <div className="flex space-x-3 mt-1">
-            <AvatarSet src="https://picsum.photos/500" size="6" />
-            <AvatarSet src="" size="6" />
-            <AvatarSet src="" size="6" />
-            <AvatarSet src="https://picsum.photos/500" size="6" />
+        {communityStatus === "pending" || !communityData ? (
+          <div className="max-w-[480px] h-full flex flex-col items-start pr-40 overflow-hidden sm:p-0 p-5">
+            <Skeleton className="h-6 w-[160px]" />
+            <Skeleton className="h-20 w-[360px] mt-3" />
+            <Skeleton className="h-6 w-[160px] mt-3" />
+            <div className="flex space-x-3 mt-1">
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-6 w-6 rounded-full" />
+            </div>
+            <Skeleton className="h-5 w-[160px] mt-5" />
           </div>
-          <p className="text-theme-gray text-md mt-5 whitespace-nowrap">
-            紹介文
-          </p>
-        </div>
+        ) : (
+          <div className="max-w-[480px] h-full flex flex-col items-start pr-40 sm:p-0 p-5">
+            <h2 className="text-white text-lg whitespace-nowrap">
+              コミュニティプレイリスト
+            </h2>
+            <h1
+              className="text-white font-bold text-5xl mt-3 whitespace-nowrap"
+              ref={playlistNameRef}
+            >
+              {communityData.playlist_name}
+            </h1>
+            <h2
+              className="text-white mt-3 text-lg whitespace-nowrap"
+              ref={communityNameRef}
+            >
+              {`${communityData.name}・${communityData.playlist_tunes_count}曲`}
+            </h2>
+            <div className="flex space-x-3 mt-1">
+              {communityData.members.map((member, index) => (
+                <AvatarSet key={index} src={member.avatar} size="6" />
+              ))}
+            </div>
+            <p
+              className="text-theme-gray text-md mt-5 whitespace-nowrap"
+              ref={introductionRef}
+            >
+              {communityData.introduction}
+            </p>
+          </div>
+        )}
         {/* ボタン類 */}
         <div className="max-w-[480px] pr-10 flex flex-col h-full py-10 space-y-5">
-          {/* ユーザーがログインしていれば編集、脱退ボタン */}
-          {user ? (
+          {/* ユーザー情報にコミュニティIDが含まれていれば編集、脱退ボタン */}
+          {isMember ? (
             <>
               <Button
                 label="コミュニティを編集する"
@@ -71,8 +241,9 @@ const Community = ({ user }) => {
                   />
                 }
                 dialogTitle="このコミュニティから脱退します。よろしいですか？"
-                dialogText="脱退すると、コミュニティプレイリスト内であなたの「お気に入りの曲」が更新がされなくなります。"
+                dialogText="あなたがコミュニティメンバーの最後の一人だった場合、このコミュニティは削除されます。"
                 actionText="コミュニティから脱退する"
+                onActionClick={handleLeaveCommunity.mutate}
                 cancelText="キャンセル"
               />
             </>
@@ -88,6 +259,7 @@ const Community = ({ user }) => {
               dialogTitle="このコミュニティに参加します。よろしいですか？"
               dialogText="参加すると、コミュニティプレイリスト内にあなたの「お気に入りの曲」が更新が共有されます。"
               actionText="コミュニティに参加する"
+              onActionClick={handleJoinCommunity.mutate}
               cancelText="キャンセル"
             />
           )}
@@ -96,16 +268,10 @@ const Community = ({ user }) => {
 
       {/* プレイリストセクション */}
       <div className="flex justify-center my-16">
-        <TuneTable tunes={tunes} />
+        <TuneTable />
       </div>
     </div>
   );
-};
-
-Community.propTypes = {
-  user: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-  }),
 };
 
 export default Community;

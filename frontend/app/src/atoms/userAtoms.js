@@ -1,6 +1,4 @@
 import { atom } from "jotai";
-// import { useEffect } from 'react';
-// import Cookies from 'js-cookie';
 
 const userAtom = atom(null);
 

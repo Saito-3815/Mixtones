@@ -2,21 +2,48 @@ import { useState, useEffect, useRef } from "react";
 import { TuneColumn } from "@/components/ui/TuneColumn/TuneColumn";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import PropTypes from "prop-types";
 import { faList, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
+import { useAtom } from "jotai";
+import { tuneAtom } from "@/atoms/tuneAtom";
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { fetchPlaylist } from "@/api/playlistsIndex";
+import { Skeleton } from "../Skeleton/Skeleton";
 
-export const TuneTable = ({ tunes }) => {
+export const TuneTable = () => {
+  const { communityId } = useParams();
+
+  // プレイリスト楽曲を取得
+  const {
+    data: playlistData,
+    status: playlistStatus,
+    error: playlistError,
+  } = useQuery({
+    queryKey: ["playlist", communityId],
+    queryFn: () => fetchPlaylist({ communityId: communityId }),
+  });
+
+  if (playlistError) {
+    return <div>Error</div>;
+  }
+
+  // データをそれぞれコンソールへ出力
+  // console.log(playlistData);
+
   // 検索機能
   const [searchText, setSearchText] = useState("");
   const [isSearchVisible, setIsSearchVisible] = useState(false);
 
-  const filteredTunes = tunes.filter(
-    (tune) =>
-      tune.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      tune.artist.toLowerCase().includes(searchText.toLowerCase()) ||
-      tune.album.toLowerCase().includes(searchText.toLowerCase()),
-  );
+  const filteredPlaylist =
+    (playlistData &&
+      playlistData.filter(
+        (tune) =>
+          tune.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          tune.artist.toLowerCase().includes(searchText.toLowerCase()) ||
+          tune.album.toLowerCase().includes(searchText.toLowerCase()),
+      )) ||
+    [];
 
   // ドロップダウンメニューの外側をクリックした場合に非表示にする
   const node = useRef();
@@ -37,6 +64,16 @@ export const TuneTable = ({ tunes }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const [tune, setTune] = useAtom(tuneAtom);
+
+  useEffect(() => {
+    console.log("tuneAtom updated:", tune);
+  }, [tune]);
+
+  const handleColumnClick = (index, tune) => {
+    setTune(tune);
+  };
 
   return (
     <div className="flex flex-col items-end max-w-[1200px]">
@@ -99,24 +136,64 @@ export const TuneTable = ({ tunes }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredTunes.map((tune, index) => (
-            <TuneColumn tune={tune} index={index} key={index} />
-          ))}
+          {playlistStatus === "pending" || !playlistData ? (
+            <>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <tr
+                  key={index}
+                  className="cursor-pointer bg-black hover:bg-theme-black text-theme-gray hover:text-white h-[56px] w-full"
+                >
+                  {/* 番号スケルトン */}
+                  <td className="h-[56px] w-[50px] hidden sm:table-cell">
+                    <Skeleton className="h-[18px] w-[18px] ml-5 hidden sm:flex" />
+                  </td>
+                  {/* 曲名セクションスケルトン */}
+                  <td className="h-[56px] w-[300px] max-w-[300px] items-center overflow-hidden">
+                    <div className="flex items-center w-full h-full ml-5 sm:ml-0">
+                      <Skeleton className="h-10 w-10 rounded-sm flex-shrink-0" />
+                      <div className="overflow-hidden ml-5 w-full flex-shrink">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-4 w-1/2 mt-2" />
+                      </div>
+                    </div>
+                  </td>
+                  {/* アルバムセクションスケルトン */}
+                  <td className="h-[56px] w-[300px] overflow-hidden hidden lg:table-cell">
+                    <Skeleton className="h-4 w-3/4 pl-5" />
+                  </td>
+                  {/* 追加日セクションスケルトン */}
+                  <td className="hidden h-[56px] w-[300px] sm:table-cell justify-between mx-5 overflow-hidden">
+                    <Skeleton className="h-4 w-1/4 pl-5" />
+                  </td>
+                  {/* 再生時間スケルトン */}
+                  <td className="mx-5 h-[56px] w-[150px] overflow-hidden hidden lg:table-cell">
+                    <Skeleton className="h-4 w-1/4" />
+                  </td>
+                  {/* ドットメニュースケルトン */}
+                  <td className="sm:hidden">
+                    <Skeleton className="h-4 w-4 justify-center px-4" />
+                  </td>
+                </tr>
+              ))}
+            </>
+          ) : (
+            <>
+              {filteredPlaylist.map((tune, index) => (
+                <TuneColumn
+                  tune={{
+                    ...tune,
+                    id: tune.id.toString(),
+                    time: tune.time.toString(),
+                  }}
+                  index={index}
+                  key={index.toString()}
+                  onClick={() => handleColumnClick(index, tune)}
+                />
+              ))}
+            </>
+          )}
         </tbody>
       </table>
     </div>
   );
-};
-
-TuneTable.propTypes = {
-  tunes: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string,
-      artist: PropTypes.string,
-      album: PropTypes.string,
-      images: PropTypes.string,
-      added_at: PropTypes.string,
-      time: PropTypes.string,
-    }),
-  ).isRequired,
 };

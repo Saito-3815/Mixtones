@@ -25,7 +25,8 @@
         spotify_uri: "spotify:track:#{SecureRandom.hex(10)}",
         preview_url: "https://test.com/preview_#{o + 1}.mp3",
         # added_atにランダムな日付をISO8601形式で設定
-        added_at: Time.at(rand * Time.now.to_i).iso8601
+        added_at: Time.at(rand * Time.now.to_i).iso8601,
+        time: rand(60..1200)
       )
 
       # like_tunesに対してcommentを作成
@@ -49,7 +50,8 @@
         images: "https://picsum.photos/500",
         spotify_uri: "spotify:track:#{SecureRandom.hex(10)}",
         preview_url: "https://test.com/preview_#{p + 1}.mp3",
-        added_at: Time.at(rand * Time.now.to_i).iso8601
+        added_at: Time.at(rand * Time.now.to_i).iso8601,
+        time: rand(60..1200)
       )
     end
   end

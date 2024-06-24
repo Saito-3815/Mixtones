@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpotify } from "@fortawesome/free-brands-svg-icons";
@@ -7,11 +7,48 @@ import { Button } from "@/components/ui/Button/Button";
 import { AvatarMenu } from "../AvatarMenu/AvatarMenu";
 import { BarMenu } from "@/components/ui/BarMenu/BarMenu";
 import { AlertDialogSet } from "../AlertDialog/AlertDialog";
-import { isLoggedInAtom } from "@/atoms/userAtoms";
+import { isLoggedInAtom, loginUser, userAtom } from "@/atoms/userAtoms";
 import { useAtom } from "jotai";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { createCommunity } from "@/api/communitiesCreate";
 
 export const Header = () => {
+  const [, setUser] = useAtom(userAtom);
   const [isLoggedIn] = useAtom(isLoggedInAtom);
+
+  const navigate = useNavigate();
+
+  const handleCreateCommunity = useMutation({
+    mutationFn: createCommunity,
+    onSuccess: (data) => {
+      if (data.status === 201) {
+        console.log("Community created:", data);
+        console.log("Community ID:", data.data.id);
+        console.log("User :", data.data.user);
+        loginUser(setUser, data.data.user);
+        navigate(`/communities/${data.data.community.id}`);
+      }
+      console.log(data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        const errorInfo = {
+          message: error.message || "Unknown error",
+          statusCode: error.response ? error.response.status : "No status code",
+        };
+        // 新しいオブジェクトをログに記録
+        console.error(`Error in createCommunity mutation:`, errorInfo);
+      }
+    },
+  });
+
+  // mutationFn: () => {
+  //   const source = axios.CancelToken.source();
+  //   return createCommunity({ cancelToken: source.token });
+  // },
 
   return (
     <header className="mx-1 my-1">
@@ -33,6 +70,7 @@ export const Header = () => {
                   dialogTitle="新しいコミュニティが作成されます。よろしいですか？"
                   dialogText="コミュニティを作成するとあなたのお気に入りが共有されます。"
                   actionText="コミュニティを作る"
+                  onActionClick={handleCreateCommunity.mutate}
                   cancelText="キャンセル"
                 />
                 <AvatarMenu src="" />

@@ -4,22 +4,21 @@ module Api
       # コミュニティにメンバーを追加
       # Userのlike_tunesをCommunityのplaylist_tunesに追加
       def create
-        @membership = Membership.new(
-          community_id: params[:community_id],
-          user_id: params[:user_id]
-        )
-        if @membership.save
-          # Userのlike_tunesをCommunityのplaylist_tunesに追加
-          community = Community.find_by(id: params[:community_id])
-          user = User.find_by(id: params[:user_id])
-          if user&.like_tunes.present?
-            user.like_tunes.each do |like_tune|
-              existing_record = community.playlist_tunes.find_by(spotify_uri: like_tune.spotify_uri)
+        community = Community.find_by(id: params[:community_id])
+        user = User.find_by(id: params[:user_id])
+        return render json: { error: 'Community or User not found' }, status: :not_found if community.nil? || user.nil?
 
-              Playlist.create(community_id: community.id, tune_id: like_tune.id) if existing_record.nil?
-            end
-          end
-          render json: @membership, status: :created
+        @membership = Membership.new(community_id: params[:community_id], user_id: params[:user_id])
+        if @membership.save
+
+          add_like_tunes_to_community_playlist(community, user)
+          sorted_playlist_tunes = community.playlist_tunes.order('added_at DESC')
+          render json: {
+            community: community.as_json(include: ['members']).merge(
+              playlist_tunes: sorted_playlist_tunes.as_json
+            ),
+            user: user.as_json(include: { communities: { only: [:id] } })
+          }, status: :created
         else
           render json: @membership.errors, status: :unprocessable_entity
         end
@@ -29,13 +28,44 @@ module Api
       # Userのlike_tunesをCommunityのplaylist_tunesから削除
       # Communityのplaylist_tunesに他のmembersの重複していたlike_tunesを追加
       def destroy
-        @membership = Membership.find_by(community_id: params[:community_id], user_id: params[:user_id])
-        if @membership.destroy
-          community = Community.find_by(id: params[:community_id])
-          user = User.find_by(id: params[:user_id])
-          remove_like_tunes_from_playlist(user, community) if user&.like_tunes.present?
+        @membership = Membership.find_by(community_id: params[:community_id], user_id: current_user.id)
+        community = Community.find_by(id: params[:community_id])
+        # current_userがコミュニティメンバーであるか確認
+        if community.members.include?(current_user)
+          @membership.destroy
+          remove_like_tunes_from_playlist(current_user, community) if current_user&.like_tunes.present?
           add_missing_like_tunes_to_playlist(community)
-          head :no_content
+          sorted_playlist_tunes = community.playlist_tunes.order('added_at DESC')
+
+          # コミュニティのメンバーがいなくなった場合、コミュニティを削除
+          if community.members.empty?
+            community.destroy
+            render json: {
+              message: 'Community and membership successfully deleted.',
+              user: current_user.as_json(include: { communities: { only: [:id] } })
+            }, status: :accepted
+          else
+            render json: {
+              community: community.as_json(include: ['members']).merge(
+                playlist_tunes: sorted_playlist_tunes.as_json
+              ),
+              user: current_user.as_json(include: { communities: { only: [:id] } })
+            }, status: :ok
+          end
+        else
+          render json: { error: 'User is not a member of this community.' }, status: :unprocessable_entity
+        end
+      end
+
+      private
+
+      def add_like_tunes_to_community_playlist(community, user)
+        spotify_uris = user.like_tunes.pluck(:spotify_uri)
+        existing_uris = community.playlist_tunes.where(spotify_uri: spotify_uris).pluck(:spotify_uri)
+
+        (spotify_uris - existing_uris).each do |uri|
+          like_tune = user.like_tunes.find_by(spotify_uri: uri)
+          Playlist.create(community_id: community.id, tune_id: like_tune.id)
         end
       end
 

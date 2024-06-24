@@ -37,7 +37,17 @@ module Api
           update_session_expiration(spotify_login_params[:is_persistent])
 
           render json: {
-            user: update_result[:user].as_json(except: :refresh_token),
+            user: update_result[:user].as_json(
+              except: :refresh_token,
+              include: {
+                communities: {
+                  only: [:id]
+                },
+                like_tunes: {
+                  only: [:id]
+                }
+              }
+            ),
             session_id: update_result[:session_id]
           }, status: :ok
         else
@@ -48,6 +58,9 @@ module Api
               spotify_id: user_create_params[:spotify_id],
               refresh_token: refresh_token
             )
+
+            # like_tunesのimagesデータを最初のURLのみに加工
+            extract_first_image_url(user_create_params[:like_tunes])
 
             user_create_params[:like_tunes].each do |like_tune|
               existing_record = Tune.find_by(spotify_uri: like_tune[:spotify_uri])
@@ -60,7 +73,8 @@ module Api
                   images: like_tune[:images],
                   spotify_uri: like_tune[:spotify_uri],
                   preview_url: like_tune[:preview_url],
-                  added_at: like_tune[:added_at]
+                  added_at: like_tune[:added_at],
+                  time: like_tune[:time]
                 )
               else
                 @user.like_tunes << existing_record
@@ -72,7 +86,17 @@ module Api
           end
 
           render json: {
-            user: @user.as_json(except: :refresh_token),
+            user: @user.as_json(
+              except: :refresh_token,
+              include: {
+                communities: {
+                  only: [:id]
+                },
+                like_tunes: {
+                  only: [:id]
+                }
+              }
+            ),
             session_id: session[:session_id]
           }, status: :created
         end
@@ -95,13 +119,11 @@ module Api
         @user = User.find_by(id: params[:id])
         return render json: { error: 'User not found' }, status: :not_found unless @user
 
-        if @user.guest?
-          return render json: { error: 'ゲストユーザーは削除できません。' }, status: :forbidden
-        end
+        return render json: { error: 'ゲストユーザーは削除できません。' }, status: :forbidden if @user.guest?
 
         if current_user && current_user.id == @user.id
           session_id = session[:user_id]
-          redis = Redis.new(url: ENV['REDIS_URL'])
+          redis = Redis.new(url: ENV.fetch('REDIS_URL', nil))
           session_key = "session:#{session_id}"
           redis.del(session_key)
           reset_session

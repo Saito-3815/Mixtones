@@ -1,6 +1,8 @@
 module Api
   module V1
     class CommunitiesController < ApplicationController
+      include SessionsHelper
+
       def index
         @communities = Community.all
         render json: @communities
@@ -8,7 +10,7 @@ module Api
 
       def show
         @community = Community.find(params[:id])
-        render json: @community, include: ['members']
+        render json: @community.as_json(include: ['members'], methods: [:playlist_tunes_count])
       end
 
       def edit
@@ -21,7 +23,15 @@ module Api
         if @community.save
           create_membership
           add_like_tunes_to_playlist
-          render json: @community, status: :created
+          # community_url = "#{ENV.fetch('FRONTEND_URL', nil)}communities/#{@community[:id]}"
+          # render json: {
+          #   community: @community,
+          #   redirect_url: community_url
+          #   }, status: :created
+          render json: {
+            community: @community,
+            user: current_user.as_json(include: { communities: { only: [:id] } })
+          }, status: :created
         else
           render json: @community.errors, status: :unprocessable_entity
         end
@@ -33,7 +43,7 @@ module Api
         if @community.update(community_params)
           render json: @community
         else
-          render json: @community.errors, status: :unprocessable_entity
+          render status: :unprocessable_entity
         end
       end
 
@@ -50,22 +60,21 @@ module Api
 
       def build_community
         Community.new(
-          name: "#{params[:user_name]}のコミュニティ",
+          name: "#{current_user.name}のコミュニティ",
           introduction: "",
           avatar: "",
-          playlist_name: "#{params[:user_name]}のプレイリスト"
+          playlist_name: "#{current_user.name}のプレイリスト"
         )
       end
 
       def create_membership
-        @community.memberships.create(user_id: params[:user_id])
+        @community.memberships.create(user_id: current_user.id)
       end
 
       # コミュニティに参加したmemberのlike_tunesをplaylistに追加
       def add_like_tunes_to_playlist
-        user = User.find_by(id: params[:user_id])
-        if user&.like_tunes.present?
-          user.like_tunes.each do |like_tune|
+        if current_user&.like_tunes.present?
+          current_user.like_tunes.each do |like_tune|
             Playlist.create(community_id: @community.id, tune_id: like_tune.id)
           end
         end
