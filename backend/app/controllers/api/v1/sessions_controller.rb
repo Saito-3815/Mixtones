@@ -35,7 +35,8 @@ module Api
                 }
               }
             ),
-            session_id: update_result[:session_id]
+            session_id: update_result[:session_id],
+            access_token: access_token
           }, status: :ok
         else
           signup_url = "#{ENV.fetch('SPOTIFY_REDIRECT_URI', nil)}signup"
@@ -58,17 +59,21 @@ module Api
         if current_user.nil?
           render json: { error: 'User not found' }, status: :not_found
         else
-          render json: @current_user.as_json(
-            except: :refresh_token,
-            include: {
-              communities: {
-                only: [:id, :name]
-              },
-              like_tunes: {
-                only: [:id]
+          access_token = SpotifyAuth.refresh_access_token(current_user.refresh_token)
+          render json: {
+            user: @current_user.as_json(
+              except: :refresh_token,
+              include: {
+                communities: {
+                  only: [:id, :name]
+                },
+                like_tunes: {
+                  only: [:id]
+                }
               }
-            }
-          ), status: :ok
+            ),
+            access_token: access_token
+          },status: :ok
         end
       end
 

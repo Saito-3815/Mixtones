@@ -15,8 +15,12 @@ import { ColorIcon } from "@/components/ui/ColorIcon/ColorIcon";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
 import { useAtom } from "jotai";
 import { tuneAtom } from "@/atoms/tuneAtom";
+import { tokenAtom } from "@/atoms/tokenAtoms";
 
 export const TuneFooter = () => {
+  const [tune] = useAtom(tuneAtom);
+  const [access_token] = useAtom(tokenAtom);
+
   const tuneNameRef = useRef(null);
   const tuneArtistRef = useRef(null);
 
@@ -31,7 +35,34 @@ export const TuneFooter = () => {
     checkScroll(tuneArtistRef.current);
   }, []);
 
-  const [tune] = useAtom(tuneAtom);
+  // Spotify Web Playback SDKを読み込む
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://sdk.scdn.co/spotify-player.js";
+    document.body.appendChild(script);
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      const token = access_token; // Spotifyのアクセストークン
+      const player = new window.Spotify.Player({
+        name: "Web Playback SDK Quick Start Player",
+        getOAuthToken: (cb) => {
+          cb(token);
+        },
+      });
+
+      // イベントリスナーの設定
+      player.addListener("ready", ({ device_id }) => {
+        console.log("Ready with Device ID", device_id);
+      });
+
+      player.connect();
+    };
+
+    return () => {
+      // コンポーネントのアンマウント時にSDKスクリプトを削除
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <footer className="mx-1 my-1">

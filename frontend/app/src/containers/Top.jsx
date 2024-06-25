@@ -12,8 +12,12 @@ import { isLoggedInAtom, loginUser, userAtom } from "@/atoms/userAtoms";
 import { fetchCommunities } from "@/api/communitiesIndex";
 import { createUser } from "@/api/usersCreate";
 import { createSessions } from "@/api/sessionsCreate";
+import { tokenAtom } from "@/atoms/tokenAtoms";
 
 const Top = () => {
+  const [user, setUser] = useAtom(userAtom);
+  const [token, setToken] = useAtom(tokenAtom);
+
   // コミュニティー一覧を取得
   const {
     data: communitiesData,
@@ -28,8 +32,6 @@ const Top = () => {
     return <div>Error</div>;
   }
 
-  const [user, setUser] = useAtom(userAtom);
-
   //  ユーザー作成リクエスト
   const userCreate = useMutation({
     mutationFn: createUser,
@@ -37,6 +39,7 @@ const Top = () => {
       removeCodeVerifierAndRedirect();
       if (!user) {
         loginUser(setUser, data.data.user);
+        setToken(data.data.access_token);
       }
     },
     onError: (error) => {
@@ -57,6 +60,7 @@ const Top = () => {
       removeCodeVerifierAndRedirect();
       if (!user) {
         loginUser(setUser, data.data.user);
+        setToken(data.data.access_token);
       }
     },
     onError: (error) => {
@@ -76,6 +80,7 @@ const Top = () => {
   useEffect(() => {
     console.log("userAtom updated:", user);
     console.log("isLoggedIn?:", isLoggedIn);
+    console.log("token:", token);
   }, [user]);
 
   // 認証ページからリダイレクトされた際にコードを取得し、ユーザー作成もしくはログインリクエストを送信

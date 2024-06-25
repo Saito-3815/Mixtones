@@ -4,9 +4,11 @@ import { useAtom } from "jotai";
 import { userAtom } from "@/atoms/userAtoms";
 import { fetchCurrentUser } from "@/api/sessionsCurrentUser";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { tokenAtom } from "@/atoms/tokenAtoms";
 
 const useCheckSession = () => {
   const [user, setUser] = useAtom(userAtom);
+  const [, setToken] = useAtom(tokenAtom);
   const [isInitialLoad, setIsInitialLoad] = useState(true); // 初回ロードを追跡するための状態を追加
   const queryClient = useQueryClient();
 
@@ -37,7 +39,8 @@ const useCheckSession = () => {
   useEffect(() => {
     if (currentUserData) {
       console.log("Current user data:", currentUserData);
-      setUser(currentUserData);
+      setUser(currentUserData.user);
+      setToken(currentUserData.access_token);
     }
     if (currentUserError) {
       console.error(currentUserError);
