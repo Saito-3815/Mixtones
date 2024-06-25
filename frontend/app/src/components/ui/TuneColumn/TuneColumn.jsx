@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { DotsMenu } from "../DotsMenu/DotsMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { tuneAtom } from "@/atoms/tuneAtom";
+import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
 import { useAtom } from "jotai";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
@@ -39,7 +39,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   const [currentTune, setCurrentTune] = useAtom(tuneAtom);
 
   // 再生中かどうかを判断
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
 
   // ホバー時にアイコンを変更
   const [isHovered, setIsHovered] = useState(false);

@@ -2,7 +2,12 @@ const authEndpoint = "https://accounts.spotify.com/authorize";
 const clientId = "5b2ac842f6c044f984dbb35520a349fd";
 export const redirectUri = "http://localhost:3000/";
 // 対応する範囲を決める
-export const scope = ["user-library-read", "user-read-private", "streaming"];
+export const scope = [
+  "user-library-read",
+  "user-read-private",
+  "streaming",
+  "user-read-email",
+];
 
 // コードチャレンジとコードバリデータの生成
 // コード検証子の作成

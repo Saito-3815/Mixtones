@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBackwardStep,
@@ -14,55 +14,107 @@ import { Progress } from "@/components/ui/Progress/Progress";
 import { ColorIcon } from "@/components/ui/ColorIcon/ColorIcon";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
 import { useAtom } from "jotai";
-import { tuneAtom } from "@/atoms/tuneAtom";
+import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
 import { tokenAtom } from "@/atoms/tokenAtoms";
+import { playerAtom } from "@/atoms/playerAtom";
 
 export const TuneFooter = () => {
   const [tune] = useAtom(tuneAtom);
+  const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
   const [access_token] = useAtom(tokenAtom);
+  const [player, setPlayer] = useAtom(playerAtom);
+  const [deviceId, setDeviceId] = useState(null);
 
   const tuneNameRef = useRef(null);
   const tuneArtistRef = useRef(null);
 
+  const play = (spotify_uri) => {
+    if (!player || !access_token || !deviceId) return; // deviceIdの存在も確認
+
+    // deviceIdステートを使用してAPIを呼び出す
+    fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+      method: "PUT",
+      body: JSON.stringify({ uris: [spotify_uri] }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Playback failed");
+        }
+        // レスポンスボディがある場合のみJSONとして解析
+        return response.text().then((text) => (text ? JSON.parse(text) : {}));
+      })
+      .then((data) => {
+        setIsPlaying(true);
+        if (Object.keys(data).length === 0) {
+          console.log("Playback started successfully");
+        } else {
+          console.log("Playback started", data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
   useEffect(() => {
-    const checkScroll = (element) => {
-      if (element.scrollWidth > element.clientWidth) {
-        element.classList.add("scroll-slide");
-      }
-    };
+    console.log("IsPlayingAtom is now", isPlaying);
+  }, [isPlaying]);
 
-    checkScroll(tuneNameRef.current);
-    checkScroll(tuneArtistRef.current);
-  }, []);
-
-  // Spotify Web Playback SDKを読み込む
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://sdk.scdn.co/spotify-player.js";
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
-      const token = access_token; // Spotifyのアクセストークン
       const player = new window.Spotify.Player({
         name: "Web Playback SDK Quick Start Player",
-        getOAuthToken: (cb) => {
-          cb(token);
-        },
+        getOAuthToken: (cb) => cb(access_token),
+        volume: 0.5,
       });
 
-      // イベントリスナーの設定
+      setPlayer(player);
+
       player.addListener("ready", ({ device_id }) => {
-        console.log("Ready with Device ID", device_id);
+        console.log(
+          "Ready with Device ID",
+          device_id,
+          "Type:",
+          typeof device_id,
+        );
+        setDeviceId(device_id);
       });
 
-      player.connect();
+      player.connect().then((success) => {
+        if (success) {
+          console.log(
+            "The Web Playback SDK successfully connected to Spotify!",
+          );
+        }
+      });
     };
+  }, [access_token]);
 
-    return () => {
-      // コンポーネントのアンマウント時にSDKスクリプトを削除
-      document.body.removeChild(script);
-    };
-  }, []);
+  // tuneが変更されたときに音楽を再生する
+  useEffect(() => {
+    if (tune && tune.spotify_uri && player && deviceId) {
+      console.log(`Attempting to play tune on device with ID: ${deviceId}`);
+      play(tune.spotify_uri, deviceId);
+    } else {
+      console.log(`Unable to play tune. Device ID: ${deviceId}`);
+    }
+  }, [tune, player, deviceId]);
+
+  // 再生時間をフォーマット（ミリ秒対応）
+  const formatTime = (milliseconds) => {
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
 
   return (
     <footer className="mx-1 my-1">
@@ -98,7 +150,13 @@ export const TuneFooter = () => {
                 icon={faBackwardStep}
                 className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
               />
-              <PlayIcon color="text-white" size="8" />
+              <PlayIcon
+                color="text-white"
+                size="8"
+                onClick={() => {
+                  player.togglePlay();
+                }}
+              />
               <FontAwesomeIcon
                 icon={faForwardStep}
                 className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
@@ -106,9 +164,13 @@ export const TuneFooter = () => {
               <ColorIcon icon={faRepeat} />
             </div>
             <div className="flex flex-grow flex-shrink items-center space-x-2 mt-1">
-              <span className="text-theme-gray text-xs font-extralight">{`${tune.time}`}</span>
+              <span className="text-theme-gray text-xs font-extralight">
+                {formatTime(tune.time)}
+              </span>
               <Progress value={33} className="" />
-              <span className="text-theme-gray text-xs font-extralight">{`${tune.time}`}</span>
+              <span className="text-theme-gray text-xs font-extralight">
+                {formatTime(tune.time)}
+              </span>
             </div>
           </div>
         </div>
