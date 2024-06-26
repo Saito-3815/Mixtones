@@ -1,6 +1,7 @@
 const authEndpoint = "https://accounts.spotify.com/authorize";
-const clientId = "5b2ac842f6c044f984dbb35520a349fd";
-export const redirectUri = "http://localhost:3000/";
+const clientId = import.meta.env.VITE_CLIENT_ID;
+export const redirectUri = import.meta.env.VITE_REDIRECT_URI;
+
 // 対応する範囲を決める
 export const scope = [
   "user-library-read",
@@ -27,10 +28,6 @@ const state = encodeURIComponent(generateRandomString(16));
 export const accessUrl = `${authEndpoint}?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope.join(
   "%20",
 )}&state=${state}&show_dialog=true`;
-// SpotifyのログインページのURL
-// export const accessUrl = `${authEndpoint}?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope.join(
-//   "%20",
-// )}&state=${state}&show_dialog=true`;
 
 export const tokenEndpoint = "https://accounts.spotify.com/api/token";
 

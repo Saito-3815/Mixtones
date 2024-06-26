@@ -7,29 +7,34 @@ import { PlayIcon } from "../PlayIcon/PlayIcon";
 import { useAtom } from "jotai";
 import { tuneAtom } from "@/atoms/tuneAtom";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { fetchPlaylist } from "@/api/playlistsIndex";
 import { Skeleton } from "../Skeleton/Skeleton";
+import { useCommunityPlaylist } from "@/hooks/useCommunityPlaylist";
+import { playlistAtom } from "@/atoms/playlistAtom";
 
 export const TuneTable = () => {
   const { communityId } = useParams();
+  const [, setCurrentPlaylist] = useAtom(playlistAtom);
 
   // プレイリスト楽曲を取得
   const {
     data: playlistData,
     status: playlistStatus,
     error: playlistError,
-  } = useQuery({
-    queryKey: ["playlist", communityId],
-    queryFn: () => fetchPlaylist({ communityId: communityId }),
-  });
+  } = useCommunityPlaylist(communityId);
 
   if (playlistError) {
     return <div>Error</div>;
   }
 
+  // プレイリストデータが取得できた場合、グローバルステートで管理する
+  useEffect(() => {
+    if (playlistData) {
+      setCurrentPlaylist(playlistData);
+    }
+  }, [playlistData]);
+
   // データをそれぞれコンソールへ出力
-  // console.log(playlistData);
+  // console.log("playlistData:",playlistData);
 
   // 検索機能
   const [searchText, setSearchText] = useState("");
@@ -72,7 +77,7 @@ export const TuneTable = () => {
   }, [tune]);
 
   const handleColumnClick = (index, tune) => {
-    setTune(tune);
+    setTune({ index, tune });
   };
 
   return (

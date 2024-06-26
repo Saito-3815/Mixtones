@@ -16,7 +16,6 @@ export const PlayIcon = ({ color, size, onClick }) => {
       // playerがnullでない場合のみ以下を実行
       setIsPlaying(!isPlaying);
       if (onClick) {
-        console.log("External onClick function is being called"); // 外部から渡されたonClick関数が呼び出されることをログに記録
         onClick();
       }
     }

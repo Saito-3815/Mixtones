@@ -27,3 +27,7 @@ dist-ssr
 *.sw?
 
 *storybook.log
+
+# 環境設定ファイル
+.env
+.env.local

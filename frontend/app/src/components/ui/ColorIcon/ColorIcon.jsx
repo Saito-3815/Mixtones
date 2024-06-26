@@ -3,11 +3,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import PropTypes from "prop-types";
 
-export const ColorIcon = ({ icon }) => {
+export const ColorIcon = ({ icon, onClick }) => {
   const [isClicked, setIsClicked] = useState(false);
 
   const handleClick = () => {
     setIsClicked(!isClicked);
+    if (onClick) {
+      onClick();
+    }
   };
 
   return (
@@ -21,6 +24,5 @@ export const ColorIcon = ({ icon }) => {
 
 ColorIcon.propTypes = {
   icon: PropTypes.object.isRequired,
+  onClick: PropTypes.func,
 };
-
-/* <ColorIcon icon={faCirclePlay} /> */

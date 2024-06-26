@@ -29,3 +29,33 @@
 /config/master.key
 .env
 
+# Ignore vendor/bundle for Ruby gems.
+/vendor/bundle
+
+# Ignore node modules.
+/node_modules
+
+# Ignore precompiled assets in public/assets.
+/public/assets
+
+# Ignore database files for SQLite.
+/db/*.sqlite3
+/db/*.sqlite3-journal
+
+# Ignore specific log files.
+/log/*.log
+
+# Ignore Mac system files.
+.DS_Store
+
+# Ignore files related to image uploads.
+/public/system
+
+# Ignore coverage data.
+/coverage
+
+# Ignore byebug history.
+.byebug_history
+
+# Ignore environment specific .env files.
+.env.*
