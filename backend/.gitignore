@@ -58,4 +58,4 @@
 .byebug_history
 
 # Ignore environment specific .env files.
-.env.*
+.env.*.env
