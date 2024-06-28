@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import PropTypes from "prop-types";
 
-export const ColorIcon = ({ icon, onClick }) => {
-  const [isClicked, setIsClicked] = useState(false);
-
+export const ColorIcon = ({ icon, mode, onClick }) => {
   const handleClick = () => {
-    setIsClicked(!isClicked);
     if (onClick) {
       onClick();
     }
@@ -16,7 +13,7 @@ export const ColorIcon = ({ icon, onClick }) => {
   return (
     <FontAwesomeIcon
       icon={icon}
-      className={`h-4 w-4 transform transition-transform duration-200 hover:scale-110 ${isClicked ? "text-theme-orange" : "text-theme-white"}`}
+      className={`h-4 w-4 transform transition-transform duration-200 hover:scale-110 ${mode ? "text-theme-orange" : "text-theme-white"}`}
       onClick={handleClick}
     />
   );
@@ -24,5 +21,6 @@ export const ColorIcon = ({ icon, onClick }) => {
 
 ColorIcon.propTypes = {
   icon: PropTypes.object.isRequired,
+  mode: PropTypes.bool,
   onClick: PropTypes.func,
 };

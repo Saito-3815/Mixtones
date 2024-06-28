@@ -1,23 +1,57 @@
-// import { useEffect } from 'react';
+import { playerAtom } from "@/atoms/playerAtom";
+import { tokenAtom } from "@/atoms/tokenAtoms";
+import { useAtom } from "jotai";
+import { useEffect } from "react";
 
-// export const useSpotifyPlayer = (token) => {
-//   useEffect(() => {
-//     window.onSpotifyWebPlaybackSDKReady = () => {
-//       const player = new Spotify.Player({
-//         name: 'Web Playback SDK Quick Start Player',
-//         getOAuthToken: cb => { cb(token); }
-//       });
+// カスタムフックの定義
+export function useSpotifyPlayer(setDeviceId) {
+  const [access_token] = useAtom(tokenAtom);
+  const [, setPlayer] = useAtom(playerAtom);
 
-//       // プレイヤーのセットアップ
-//       player.addListener('ready', ({ device_id }) => {
-//         console.log('Ready with Device ID', device_id);
-//       });
+  useEffect(() => {
+    let currentAccessToken = null;
 
-//       player.addListener('not_ready', ({ device_id }) => {
-//         console.log('Device ID has gone offline', device_id);
-//       });
+    const isScriptAdded = document.querySelector(
+      "script[src='https://sdk.scdn.co/spotify-player.js']",
+    );
+    if (!isScriptAdded) {
+      const script = document.createElement("script");
+      script.src = "https://sdk.scdn.co/spotify-player.js";
+      document.body.appendChild(script);
+    }
 
-//       player.connect();
-//     };
-//   }, [token]);
-// };
+    if (!window.onSpotifyWebPlaybackSDKReady) {
+      window.onSpotifyWebPlaybackSDKReady = () => {
+        if (access_token !== currentAccessToken) {
+          currentAccessToken = access_token;
+
+          const player = new window.Spotify.Player({
+            name: "Web Playback SDK Quick Start Player",
+            getOAuthToken: (cb) => cb(access_token),
+            volume: 0.5,
+          });
+
+          setPlayer(player);
+
+          player.addListener("ready", ({ device_id }) => {
+            console.log(
+              "Ready with Device ID",
+              device_id,
+              "Type:",
+              typeof device_id,
+            );
+            setDeviceId(device_id);
+          });
+
+          player.connect().then((success) => {
+            if (success) {
+              console.log(
+                "The Web Playback SDK successfully connected to Spotify!",
+              );
+            }
+          });
+        }
+      };
+    }
+  }, [access_token, setPlayer, setDeviceId]); // 依存配列に追加
+}

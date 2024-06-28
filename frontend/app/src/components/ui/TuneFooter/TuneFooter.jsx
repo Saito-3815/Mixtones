@@ -15,19 +15,20 @@ import { ColorIcon } from "@/components/ui/ColorIcon/ColorIcon";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
 import { useAtom } from "jotai";
 import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
-import { tokenAtom } from "@/atoms/tokenAtoms";
 import { playerAtom } from "@/atoms/playerAtom";
 import { playlistAtom } from "@/atoms/playlistAtom";
+import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
+import { usePlay } from "@/hooks/usePlay";
 
 export const TuneFooter = () => {
   const [tune, setTune] = useAtom(tuneAtom);
-  const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
-  const [access_token] = useAtom(tokenAtom);
-  const [player, setPlayer] = useAtom(playerAtom);
-  const [playlistData] = useAtom(playlistAtom);
+  const [isPlaying] = useAtom(isPlayingAtom);
+  const [player] = useAtom(playerAtom);
+  const [playlistData, setPlaylistData] = useAtom(playlistAtom);
 
   const [deviceId, setDeviceId] = useState(null);
   const [shuffleMode, setShuffleMode] = useState(false);
+  const [repeatMode, setRepeatMode] = useState(false);
 
   const tuneNameRef = useRef(null);
   const tuneArtistRef = useRef(null);
@@ -40,7 +41,7 @@ export const TuneFooter = () => {
       nextIndex = 0; // 範囲を超える場合は最初に戻る
     }
     tune.index = nextIndex; // tune.indexを更新
-    return { index: tune.index, tune: playlistData[nextIndex] }; // 更新されたインデックスでplaylistDataからトラックを返す
+    return { index: tune.index, tune: playlistData[nextIndex] };
   };
 
   // 前のトラックを取得
@@ -51,98 +52,59 @@ export const TuneFooter = () => {
       prevIndex = playlistData.length - 1; // 0未満になる場合は最後に戻る
     }
     tune.index = prevIndex; // tune.indexを更新
-    return { index: tune.index, tune: playlistData[prevIndex] }; // 更新されたインデックスでplaylistDataからトラックを返す
+    return { index: tune.index, tune: playlistData[prevIndex] };
   };
 
-  // シャッフルモードに切り替え
-  const setShuffle = async (state) => {
-    if (!access_token || !deviceId) return;
+  // プレイリストデータのコピーを保持
+  const [originalPlaylistData, setOriginalPlaylistData] = useState([]);
 
-    try {
-      const response = await fetch(
-        `https://api.spotify.com/v1/me/player/shuffle?state=${state}&device_id=${deviceId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${access_token}`,
-          },
-        },
-      );
+  const isInitialMount = useRef(true); // 初回マウント時にtrueに設定
 
-      if (!response.ok) {
-        throw new Error("Shuffle mode setting failed");
-      }
-      console.log("Shuffle mode set to", state);
-    } catch (error) {
-      console.error("Error:", error);
+  useEffect(() => {
+    if (playlistData.length > 0 && isInitialMount.current) {
+      setOriginalPlaylistData([...playlistData]);
+      isInitialMount.current = false; // 初回マウント後はフラグをfalseに設定
     }
-  };
+  }, [playlistData]);
 
-  // async function fetchShuffledPlaylist() {
-  //   if (!access_token) return;
+  useEffect(() => {
+    console.log("originalPlaylistData:", originalPlaylistData);
+  }, [originalPlaylistData]);
 
-  //   try {
-  //     const response = await fetch(
-  //       `https://api.spotify.com/v1/me/player/queue?uri=spotify:playlist:37i9dQZF1DXcBWIGoYBM5M`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${access_token}`,
-  //         },
-  //       }
-  //     );
+  // shuffleModeがtrueに切り替わったらplaylistDataをシャッフル
+  useEffect(() => {
+    if (shuffleMode) {
+      const shuffledPlaylistData = [...playlistData].sort(
+        () => Math.random() - 0.5,
+      );
+      setPlaylistData(shuffledPlaylistData);
+      console.log("shuffledPlaylistData", shuffledPlaylistData);
+    } else if (originalPlaylistData.length > 0) {
+      // シャッフルモードがfalseになったら、保存しておいた元のplaylistDataを復元
+      setPlaylistData(originalPlaylistData);
+    }
+  }, [shuffleMode]);
 
-  //     if (!response.ok) {
-  //       throw new Error("Shuffled playlist fetching failed");
-  //     }
-
-  //     const data = await response.json();
-  //     console.log("Shuffled playlist fetched", data);
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //   }
-  // }
+  // repeateModeがtrueに切り替わったらplaylistDataの全ての要素を現在のtuneデータのコピーで置き換え
+  useEffect(() => {
+    if (repeatMode) {
+      const repeatPlaylistData = Array(playlistData.length).fill(tune.tune);
+      setPlaylistData(repeatPlaylistData);
+      console.log("repeatPlaylistData", repeatPlaylistData);
+    } else if (originalPlaylistData.length > 0) {
+      // リピートモードがfalseになったら、保存しておいた元のplaylistDataを復元
+      setPlaylistData(originalPlaylistData);
+    }
+  }, [repeatMode]);
 
   // プレイリストデータからSpotify URIを取得
   const spotifyUris = playlistData.map((track) => track.spotify_uri);
 
-  // 指定されたSpotify URIの曲を再生
-  const play = (spotify_uris, startPosition = 0) => {
-    if (!player || !access_token || !deviceId) return; // deviceIdの存在も確認
+  // Spotifyプレイヤーの初期化
+  useSpotifyPlayer(setDeviceId);
 
-    // deviceIdステートを使用してAPIを呼び出す
-    fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        uris: spotify_uris,
-        offset: { position: startPosition },
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Playback failed");
-        }
-        // レスポンスボディがある場合のみJSONとして解析
-        return response.text().then((text) => (text ? JSON.parse(text) : {}));
-      })
-      .then((data) => {
-        setIsPlaying(true);
-        if (Object.keys(data).length === 0) {
-          console.log("Playback started successfully");
-        } else {
-          console.log("Playback started", data);
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  };
+  // playlistDataの曲を再生
+  const play = usePlay(deviceId);
 
   useEffect(() => {
     console.log("IsPlayingAtom is now", isPlaying);
@@ -152,80 +114,19 @@ export const TuneFooter = () => {
     console.log("shuffleMode", shuffleMode);
   }, [shuffleMode]);
 
-  // シャッフル再生を開始する
-  const playWithShuffle = (spotify_uris, startPosition = 0) => {
-    // まずシャッフルを有効にする
-    setShuffle(true).then(() => {
-      // シャッフルが有効になった後、曲を再生する
-      play(spotify_uris, startPosition);
-    });
-  };
-
-  // アクセストークンが変更されたときにSpotify Web Playback SDKを初期化
   useEffect(() => {
-    let currentAccessToken = null; // 現在のアクセストークンを保持する
-
-    // Spotify Web Playback SDK スクリプトが既に追加されているかチェック
-    const isScriptAdded = document.querySelector(
-      "script[src='https://sdk.scdn.co/spotify-player.js']",
-    );
-    if (!isScriptAdded) {
-      const script = document.createElement("script");
-      script.src = "https://sdk.scdn.co/spotify-player.js";
-      document.body.appendChild(script);
-    }
-
-    // onSpotifyWebPlaybackSDKReady が既に設定されているかチェック
-    if (!window.onSpotifyWebPlaybackSDKReady) {
-      window.onSpotifyWebPlaybackSDKReady = () => {
-        if (access_token !== currentAccessToken) {
-          // アクセストークンが更新されたかチェック
-          currentAccessToken = access_token; // 現在のアクセストークンを更新
-
-          const player = new window.Spotify.Player({
-            name: "Web Playback SDK Quick Start Player",
-            getOAuthToken: (cb) => cb(access_token),
-            volume: 0.5,
-          });
-
-          setPlayer(player);
-
-          player.addListener("ready", ({ device_id }) => {
-            console.log(
-              "Ready with Device ID",
-              device_id,
-              "Type:",
-              typeof device_id,
-            );
-            setDeviceId(device_id);
-          });
-
-          player.connect().then((success) => {
-            if (success) {
-              console.log(
-                "The Web Playback SDK successfully connected to Spotify!",
-              );
-            }
-          });
-        }
-      };
-    }
-  }, [access_token]); // 依存配列にaccess_tokenを追加
+    console.log("repeatMode", repeatMode);
+  }, [repeatMode]);
 
   // tuneが変更されたときに音楽を再生する
   useEffect(() => {
     if (tune && tune.tune.spotify_uri && player && deviceId) {
       console.log(`Attempting to play tune on device with ID: ${deviceId}`);
-      if (shuffleMode) {
-        // シャッフルモードが有効な場合
-        playWithShuffle(spotifyUris, tune.index);
-      } else {
-        play(spotifyUris, tune.index);
-      }
+      play(spotifyUris, tune.index);
     } else {
       console.log(`Unable to play tune. Device ID: ${deviceId}`);
     }
-  }, [tune, player, deviceId, shuffleMode]);
+  }, [tune, player, deviceId, shuffleMode, repeatMode]);
 
   // 再生時間をフォーマット（ミリ秒対応）
   const formatTime = (milliseconds) => {
@@ -266,7 +167,11 @@ export const TuneFooter = () => {
             <div className="flex justify-center items-center space-x-5 mt-2">
               <ColorIcon
                 icon={faShuffle}
+                mode={shuffleMode}
                 onClick={() => {
+                  if (repeatMode) {
+                    setRepeatMode(false);
+                  }
                   setShuffleMode(!shuffleMode);
                 }}
               />
@@ -293,7 +198,16 @@ export const TuneFooter = () => {
                   setTune(nextTrack());
                 }}
               />
-              <ColorIcon icon={faRepeat} />
+              <ColorIcon
+                icon={faRepeat}
+                mode={repeatMode}
+                onClick={() => {
+                  if (shuffleMode) {
+                    setShuffleMode(false);
+                  }
+                  setRepeatMode(!repeatMode);
+                }}
+              />
             </div>
             <div className="flex flex-grow flex-shrink items-center space-x-2 mt-1">
               <span className="text-theme-gray text-xs font-extralight">
