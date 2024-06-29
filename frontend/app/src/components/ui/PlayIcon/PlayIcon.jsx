@@ -18,6 +18,8 @@ export const PlayIcon = ({ color, size, onClick }) => {
       if (onClick) {
         onClick();
       }
+    } else {
+      onClick();
     }
   };
 

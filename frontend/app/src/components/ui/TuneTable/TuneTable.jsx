@@ -10,10 +10,12 @@ import { useParams } from "react-router-dom";
 import { Skeleton } from "../Skeleton/Skeleton";
 import { useCommunityPlaylist } from "@/hooks/useCommunityPlaylist";
 import { playlistAtom } from "@/atoms/playlistAtom";
+import { playerAtom } from "@/atoms/playerAtom";
 
 export const TuneTable = () => {
   const { communityId } = useParams();
-  const [, setCurrentPlaylist] = useAtom(playlistAtom);
+  const [currentPlaylist, setCurrentPlaylist] = useAtom(playlistAtom);
+  const [player] = useAtom(playerAtom);
 
   // プレイリスト楽曲を取得
   const {
@@ -70,6 +72,7 @@ export const TuneTable = () => {
     };
   }, []);
 
+  // 楽曲を選択してグローバルステートへ
   const [tune, setTune] = useAtom(tuneAtom);
 
   useEffect(() => {
@@ -80,6 +83,17 @@ export const TuneTable = () => {
     setTune({ index, tune });
   };
 
+  // プレイリストの再生コントロール
+  const handlePlay = () => {
+    if (!tune) {
+      setTune({ index: 0, tune: currentPlaylist[0] });
+    }
+    // playerが存在し、togglePlayメソッドがある場合にのみ実行
+    if (tune && player && typeof player.togglePlay === "function") {
+      player.togglePlay();
+    }
+  };
+
   return (
     <div className="flex flex-col items-end max-w-[1200px]">
       {/* テーブル操作セクション */}
@@ -88,7 +102,7 @@ export const TuneTable = () => {
         ref={node}
       >
         <div className="pl-5 sm:pl-11">
-          <PlayIcon color="text-theme-orange" size="10" />
+          <PlayIcon color="text-theme-orange" size="10" onClick={handlePlay} />
         </div>
         <div className="flex">
           {isSearchVisible ? (

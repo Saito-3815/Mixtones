@@ -7,11 +7,11 @@ import {
   faRepeat,
   faShuffle,
   faVolumeHigh,
+  faVolumeMute,
 } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
 import { Slider } from "@/components/ui/Slider/Slider";
 import { Progress } from "@/components/ui/Progress/Progress";
-import { ColorIcon } from "@/components/ui/ColorIcon/ColorIcon";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
 import { useAtom } from "jotai";
 import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
@@ -19,6 +19,7 @@ import { playerAtom } from "@/atoms/playerAtom";
 import { playlistAtom } from "@/atoms/playlistAtom";
 import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
 import { usePlay } from "@/hooks/usePlay";
+import { ModeColorIcon } from "../ColorIcon/ModeColoorIcon";
 
 export const TuneFooter = () => {
   const [tune, setTune] = useAtom(tuneAtom);
@@ -67,14 +68,16 @@ export const TuneFooter = () => {
     }
   }, [playlistData]);
 
-  useEffect(() => {
-    console.log("originalPlaylistData:", originalPlaylistData);
-  }, [originalPlaylistData]);
+  // useEffect(() => {
+  //   console.log("originalPlaylistData:", originalPlaylistData);
+  // }, [originalPlaylistData]);
 
   // shuffleModeがtrueに切り替わったらplaylistDataをシャッフル
   useEffect(() => {
+    // shuffleModeがtrueに切り替わったらplaylistDataをシャッフル
     if (shuffleMode) {
-      const shuffledPlaylistData = [...playlistData].sort(
+      // originalPlaylistDataを使用してシャッフルを行う
+      const shuffledPlaylistData = [...originalPlaylistData].sort(
         () => Math.random() - 0.5,
       );
       setPlaylistData(shuffledPlaylistData);
@@ -83,7 +86,7 @@ export const TuneFooter = () => {
       // シャッフルモードがfalseになったら、保存しておいた元のplaylistDataを復元
       setPlaylistData(originalPlaylistData);
     }
-  }, [shuffleMode]);
+  }, [shuffleMode, originalPlaylistData]); // originalPlaylistDataを依存配列に追加
 
   // repeateModeがtrueに切り替わったらplaylistDataの全ての要素を現在のtuneデータのコピーで置き換え
   useEffect(() => {
@@ -96,6 +99,11 @@ export const TuneFooter = () => {
       setPlaylistData(originalPlaylistData);
     }
   }, [repeatMode]);
+
+  // playlistDataの更新を確認
+  // useEffect(() => {
+  //   console.log("playlistData:", playlistData);
+  // }, [playlistData]);
 
   // プレイリストデータからSpotify URIを取得
   const spotifyUris = playlistData.map((track) => track.spotify_uri);
@@ -110,13 +118,13 @@ export const TuneFooter = () => {
     console.log("IsPlayingAtom is now", isPlaying);
   }, [isPlaying]);
 
-  useEffect(() => {
-    console.log("shuffleMode", shuffleMode);
-  }, [shuffleMode]);
+  // useEffect(() => {
+  //   console.log("shuffleMode", shuffleMode);
+  // }, [shuffleMode]);
 
-  useEffect(() => {
-    console.log("repeatMode", repeatMode);
-  }, [repeatMode]);
+  // useEffect(() => {
+  //   console.log("repeatMode", repeatMode);
+  // }, [repeatMode]);
 
   // tuneが変更されたときに音楽を再生する
   useEffect(() => {
@@ -135,6 +143,46 @@ export const TuneFooter = () => {
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
+
+  // 音量を操作する
+  const handleSliderChange = (value) => {
+    const volume = value / 100;
+    // setVolume(volume); // スライダーの値をvolumeに設定
+    player.setVolume(volume).then(() => {
+      console.log(`Volume is now set to ${volume}`);
+    });
+  };
+
+  // ミュートコントロール
+  const [lastVolume, setLastVolume] = useState(0.5); // lastVolumeの状態を追加
+  const [isMuted, setIsMuted] = useState(false);
+
+  const handleVolumeOff = () => {
+    player.getVolume().then((volume) => {
+      if (!isMuted) {
+        setIsMuted(true);
+        setLastVolume(volume); // lastVolumeを更新
+        player.setVolume(0).then(() => {
+          console.log("Volume is now muted");
+        });
+      } else {
+        setIsMuted(false);
+        player.setVolume(lastVolume).then(() => {
+          // lastVolumeを使用して音量を設定
+          console.log("Volume is now unmuted");
+        });
+      }
+    });
+  };
+
+  // 進行時間の操作
+  // const handleProgressChange = (value) => {
+  //   const progress = value / 100;
+  //   const newPosition = Math.floor(tune.tune.time * progress);
+  //   player.seek(newPosition).then(() => {
+  //     console.log(`Seeked to ${newPosition}ms`);
+  //   });
+  // }
 
   return (
     <footer className="mx-1 my-1">
@@ -165,12 +213,12 @@ export const TuneFooter = () => {
         <div className="flex-grow flex-shrink justify-center items-center col-span-3 md:col-span-1 md:flex px-3 md:px-0">
           <div className="items-center w-full">
             <div className="flex justify-center items-center space-x-5 mt-2">
-              <ColorIcon
+              <ModeColorIcon
                 icon={faShuffle}
                 mode={shuffleMode}
-                onClick={() => {
+                onClick={async () => {
                   if (repeatMode) {
-                    setRepeatMode(false);
+                    await setRepeatMode(false);
                   }
                   setShuffleMode(!shuffleMode);
                 }}
@@ -198,7 +246,7 @@ export const TuneFooter = () => {
                   setTune(nextTrack());
                 }}
               />
-              <ColorIcon
+              <ModeColorIcon
                 icon={faRepeat}
                 mode={repeatMode}
                 onClick={() => {
@@ -223,8 +271,17 @@ export const TuneFooter = () => {
         {/* 音量調整 */}
         <div className="flex-grow flex-shrink justify-end items-center hidden md:flex">
           <div className="flex flex-grow flex-shrink justify-end items-center space-x-3 mr-10">
-            <FontAwesomeIcon icon={faVolumeHigh} className="text-white" />
-            <Slider defaultValue={[33]} max={100} step={1} className="w-28" />
+            <FontAwesomeIcon
+              icon={isMuted ? faVolumeMute : faVolumeHigh}
+              className="text-white"
+              onClick={handleVolumeOff}
+            />
+            <Slider
+              defaultValue={[33]}
+              max={100}
+              className="w-28"
+              onChange={handleSliderChange}
+            />
           </div>
         </div>
       </div>

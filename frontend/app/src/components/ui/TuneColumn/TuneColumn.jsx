@@ -63,6 +63,18 @@ export const TuneColumn = ({ tune, index, onClick }) => {
       : false;
 
   const handleClick = () => {
+    // 現在のtuneが既に選択されているか確認し、選択されていれば再生状態のみを切り替える
+    if (
+      currentTune &&
+      currentTune.tune &&
+      currentTune.tune.id === Number(tune.id)
+    ) {
+      player.togglePlay();
+      setIsPlaying(!isPlaying);
+      return;
+    }
+
+    // 初めてこのtuneがクリックされた場合、onClickを呼び出してtuneAtomを更新し、再生状態を切り替える
     if (onClick) {
       onClick(); // TuneTableから渡されたonClick(tuneAtomを更新する関数)
       player.togglePlay();
@@ -85,7 +97,6 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   return (
     <tr
       className={`cursor-pointer bg-black ${isSelected ? "bg-theme-black" : "hover:bg-theme-black"} text-theme-gray ${isSelected ? "text-white" : "hover:text-white"} h-[56px] w-full`}
-      onClick={onClick}
     >
       {/* 番号 */}
       <td className="h-[56px] w-[50px] hidden sm:table-cell">
@@ -202,15 +213,18 @@ export const TuneColumn = ({ tune, index, onClick }) => {
 };
 
 TuneColumn.propTypes = {
-  tune: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    artist: PropTypes.string.isRequired,
-    album: PropTypes.string.isRequired,
-    images: PropTypes.string.isRequired,
-    added_at: PropTypes.string.isRequired,
-    time: PropTypes.string.isRequired,
-  }),
+  tune: {
+    tune: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      artist: PropTypes.string.isRequired,
+      album: PropTypes.string.isRequired,
+      images: PropTypes.string.isRequired,
+      added_at: PropTypes.string.isRequired,
+      time: PropTypes.string.isRequired,
+    }),
+    index: PropTypes.number.isRequired,
+  },
   index: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,
 };
