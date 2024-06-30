@@ -213,18 +213,15 @@ export const TuneColumn = ({ tune, index, onClick }) => {
 };
 
 TuneColumn.propTypes = {
-  tune: {
-    tune: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      artist: PropTypes.string.isRequired,
-      album: PropTypes.string.isRequired,
-      images: PropTypes.string.isRequired,
-      added_at: PropTypes.string.isRequired,
-      time: PropTypes.string.isRequired,
-    }),
-    index: PropTypes.number.isRequired,
-  },
+  tune: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    artist: PropTypes.string.isRequired,
+    album: PropTypes.string.isRequired,
+    images: PropTypes.string.isRequired,
+    added_at: PropTypes.string.isRequired,
+    time: PropTypes.string.isRequired,
+  }),
   index: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,
 };

@@ -10,7 +10,6 @@ const Slider = React.forwardRef(({ className, onChange, ...props }, ref) => {
 
   // 新しいスライダーの値を処理する関数
   const handleValueChange = (value) => {
-    console.log("新しいスライダーの値:", value);
     // 外部から渡されたonChange関数を呼び出す
     if (onChange) {
       onChange(value[0]); // スライダーは配列形式の値を使用するため、最初の要素を渡す

@@ -11,7 +11,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
 import { Slider } from "@/components/ui/Slider/Slider";
-import { Progress } from "@/components/ui/Progress/Progress";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
 import { useAtom } from "jotai";
 import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
@@ -20,12 +19,14 @@ import { playlistAtom } from "@/atoms/playlistAtom";
 import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
 import { usePlay } from "@/hooks/usePlay";
 import { ModeColorIcon } from "../ColorIcon/ModeColoorIcon";
+import { isLoggedInAtom } from "@/atoms/userAtoms";
 
 export const TuneFooter = () => {
   const [tune, setTune] = useAtom(tuneAtom);
   const [isPlaying] = useAtom(isPlayingAtom);
   const [player] = useAtom(playerAtom);
   const [playlistData, setPlaylistData] = useAtom(playlistAtom);
+  const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   const [deviceId, setDeviceId] = useState(null);
   const [shuffleMode, setShuffleMode] = useState(false);
@@ -72,7 +73,7 @@ export const TuneFooter = () => {
   //   console.log("originalPlaylistData:", originalPlaylistData);
   // }, [originalPlaylistData]);
 
-  // shuffleModeがtrueに切り替わったらplaylistDataをシャッフル
+  // シャッフルモードへ変更
   useEffect(() => {
     // shuffleModeがtrueに切り替わったらplaylistDataをシャッフル
     if (shuffleMode) {
@@ -88,7 +89,7 @@ export const TuneFooter = () => {
     }
   }, [shuffleMode, originalPlaylistData]); // originalPlaylistDataを依存配列に追加
 
-  // repeateModeがtrueに切り替わったらplaylistDataの全ての要素を現在のtuneデータのコピーで置き換え
+  // リピートモードへ変更
   useEffect(() => {
     if (repeatMode) {
       const repeatPlaylistData = Array(playlistData.length).fill(tune.tune);
@@ -108,8 +109,15 @@ export const TuneFooter = () => {
   // プレイリストデータからSpotify URIを取得
   const spotifyUris = playlistData.map((track) => track.spotify_uri);
 
+  // プレイリストのデータからpreviewUrlを取得
+  // const previewUrls = playlistData.map((track) => track.preview_url);
+
   // Spotifyプレイヤーの初期化
-  useSpotifyPlayer(setDeviceId);
+  useEffect(() => {
+    if (isLoggedIn) {
+      useSpotifyPlayer(setDeviceId);
+    }
+  }, [isLoggedIn]);
 
   // playlistDataの曲を再生
   const play = usePlay(deviceId);
@@ -136,21 +144,11 @@ export const TuneFooter = () => {
     }
   }, [tune, player, deviceId, shuffleMode, repeatMode]);
 
-  // 再生時間をフォーマット（ミリ秒対応）
-  const formatTime = (milliseconds) => {
-    const seconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
-
   // 音量を操作する
   const handleSliderChange = (value) => {
     const volume = value / 100;
     // setVolume(volume); // スライダーの値をvolumeに設定
-    player.setVolume(volume).then(() => {
-      console.log(`Volume is now set to ${volume}`);
-    });
+    player.setVolume(volume);
   };
 
   // ミュートコントロール
@@ -175,14 +173,65 @@ export const TuneFooter = () => {
     });
   };
 
+  // 再生時間をフォーマット（ミリ秒対応）
+  const formatTime = (milliseconds) => {
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  // 現在の再生時間を取得
+  const [currentTime, setCurrentTime] = useState(0);
+
+  useEffect(() => {
+    if (player) {
+      player.getCurrentState().then((state) => {
+        if (!state) {
+          console.error(
+            "User is not playing music through the Web Playback SDK",
+          );
+          return;
+        }
+        setCurrentTime(state.position);
+      });
+    }
+  }, [player, isPlaying]);
+
+  // console.log("currentTime", currentTime);
+
+  // 再生時間の更新
+  useEffect(() => {
+    let interval = null;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setCurrentTime((prevTime) => prevTime + 1000);
+      }, 1000);
+    } else if (!isPlaying && interval) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
+  useEffect(() => {
+    setCurrentTime(0);
+  }, [tune]);
+
+  // 再生時間が最後まで到達したら次の曲を再生
+  useEffect(() => {
+    if (currentTime >= tune.tune.time) {
+      setTune(nextTrack());
+    }
+  }, [currentTime, tune.tune.time]);
+
   // 進行時間の操作
-  // const handleProgressChange = (value) => {
-  //   const progress = value / 100;
-  //   const newPosition = Math.floor(tune.tune.time * progress);
-  //   player.seek(newPosition).then(() => {
-  //     console.log(`Seeked to ${newPosition}ms`);
-  //   });
-  // }
+  const handleProgressChange = (value) => {
+    const progress = value / 100;
+    const newPosition = Math.floor(tune.tune.time * progress);
+    player.seek(newPosition).then(() => {
+      setCurrentTime(newPosition); // 現在の再生時間を更新
+    });
+  };
 
   return (
     <footer className="mx-1 my-1">
@@ -259,9 +308,17 @@ export const TuneFooter = () => {
             </div>
             <div className="flex flex-grow flex-shrink items-center space-x-2 mt-1">
               <span className="text-theme-gray text-xs font-extralight">
-                {formatTime(tune.tune.time)}
+                {formatTime(currentTime)}
+                {/* {formatTime(0)} */}
               </span>
-              <Progress value={33} className="" />
+              <Slider
+                max={100}
+                className="w-[420px] transition-all"
+                value={[
+                  tune.tune.time ? (currentTime / tune.tune.time) * 100 : 0,
+                ]}
+                onChange={handleProgressChange}
+              />
               <span className="text-theme-gray text-xs font-extralight">
                 {formatTime(tune.tune.time)}
               </span>

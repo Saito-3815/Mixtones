@@ -11,11 +11,14 @@ import { Skeleton } from "../Skeleton/Skeleton";
 import { useCommunityPlaylist } from "@/hooks/useCommunityPlaylist";
 import { playlistAtom } from "@/atoms/playlistAtom";
 import { playerAtom } from "@/atoms/playerAtom";
+import { isLoggedInAtom } from "@/atoms/userAtoms";
+import usePreviewPlay from "@/hooks/usePreviewPlay";
 
 export const TuneTable = () => {
   const { communityId } = useParams();
   const [currentPlaylist, setCurrentPlaylist] = useAtom(playlistAtom);
   const [player] = useAtom(playerAtom);
+  const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   // プレイリスト楽曲を取得
   const {
@@ -74,13 +77,22 @@ export const TuneTable = () => {
 
   // 楽曲を選択してグローバルステートへ
   const [tune, setTune] = useAtom(tuneAtom);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  // previewUrlが変更されたときにusePreviewPlayを呼び出す
+  usePreviewPlay(previewUrl);
 
   useEffect(() => {
     console.log("tuneAtom updated:", tune);
   }, [tune]);
 
   const handleColumnClick = (index, tune) => {
-    setTune({ index, tune });
+    if (isLoggedIn) {
+      setTune({ index, tune });
+    } else {
+      setPreviewUrl(tune.preview_url);
+      setTune({ index, tune });
+    }
   };
 
   // プレイリストの再生コントロール
