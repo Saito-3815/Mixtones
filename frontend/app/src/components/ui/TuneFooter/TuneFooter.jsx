@@ -20,6 +20,8 @@ import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
 import { usePlay } from "@/hooks/usePlay";
 import { ModeColorIcon } from "../ColorIcon/ModeColoorIcon";
 import { isLoggedInAtom } from "@/atoms/userAtoms";
+import { useMobilePlayer } from "@/hooks/useMobilePlayer";
+import { useMobilePlay } from "@/hooks/useMobilePlay";
 
 export const TuneFooter = () => {
   const [tune, setTune] = useAtom(tuneAtom);
@@ -31,6 +33,8 @@ export const TuneFooter = () => {
   const [deviceId, setDeviceId] = useState(null);
   const [shuffleMode, setShuffleMode] = useState(false);
   const [repeatMode, setRepeatMode] = useState(false);
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   const tuneNameRef = useRef(null);
   const tuneArtistRef = useRef(null);
@@ -112,15 +116,21 @@ export const TuneFooter = () => {
   // プレイリストのデータからpreviewUrlを取得
   // const previewUrls = playlistData.map((track) => track.preview_url);
 
-  // Spotifyプレイヤーの初期化
+  // モバイルかどうかに基づいて適切なプレイヤーフックを選択
+  const playerHook = isMobile ? useMobilePlayer : useSpotifyPlayer;
+
+  // プレイヤーフックの結果を使用してデバイスIDを設定
+  const setDeviceIdFromPlayer = playerHook(setDeviceId);
+
   useEffect(() => {
-    if (isLoggedIn) {
-      useSpotifyPlayer(setDeviceId);
-    }
-  }, [isLoggedIn]);
+    if (!isLoggedIn) return;
+
+    // デバイスID設定ロジックはここには不要になる
+  }, [isLoggedIn, setDeviceIdFromPlayer]); // 依存配列を更新
 
   // playlistDataの曲を再生
   const play = usePlay(deviceId);
+  const playMobile = useMobilePlay(deviceId);
 
   useEffect(() => {
     console.log("IsPlayingAtom is now", isPlaying);
@@ -136,13 +146,20 @@ export const TuneFooter = () => {
 
   // tuneが変更されたときに音楽を再生する
   useEffect(() => {
-    if (tune && tune.tune.spotify_uri && player && deviceId) {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (tune && tune.tune.spotify_uri && deviceId) {
       console.log(`Attempting to play tune on device with ID: ${deviceId}`);
-      play(spotifyUris, tune.index);
+      if (isMobile) {
+        playMobile(spotifyUris);
+      } else {
+        if (player) {
+          play(spotifyUris, tune.index);
+        }
+      }
     } else {
       console.log(`Unable to play tune. Device ID: ${deviceId}`);
     }
-  }, [tune, player, deviceId, shuffleMode, repeatMode]);
+  }, [tune, player, deviceId, shuffleMode, repeatMode, isMobile]);
 
   // 音量を操作する
   const handleSliderChange = (value) => {
@@ -306,14 +323,14 @@ export const TuneFooter = () => {
                 }}
               />
             </div>
-            <div className="flex flex-grow flex-shrink items-center space-x-2 mt-1">
+            <div className="flex justify-center flex-grow flex-shrink items-center space-x-2 mt-1">
               <span className="text-theme-gray text-xs font-extralight">
                 {formatTime(currentTime)}
                 {/* {formatTime(0)} */}
               </span>
               <Slider
                 max={100}
-                className="w-[420px] transition-all"
+                className="w-[250px] lg:w-[420px] transition-all"
                 value={[
                   tune.tune.time ? (currentTime / tune.tune.time) * 100 : 0,
                 ]}

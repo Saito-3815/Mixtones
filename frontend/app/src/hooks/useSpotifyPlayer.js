@@ -1,13 +1,11 @@
 import { playerAtom } from "@/atoms/playerAtom";
 import { tokenAtom } from "@/atoms/tokenAtoms";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react"; // useStateをインポート
+import { useEffect } from "react"; // useStateをインポート
 
-// カスタムフックの定義、previewUrlを引数に追加
-export function useSpotifyPlayer(setDeviceId, previewUrl) {
+export function useSpotifyPlayer(setDeviceId) {
   const [access_token] = useAtom(tokenAtom);
   const [, setPlayer] = useAtom(playerAtom);
-  const [audio, setAudio] = useState(null);
 
   useEffect(() => {
     let currentAccessToken = null;
@@ -55,23 +53,6 @@ export function useSpotifyPlayer(setDeviceId, previewUrl) {
           }
         };
       }
-    } else if (previewUrl) {
-      // access_tokenがない場合はpreviewUrlを使用して再生
-      if (audio) {
-        audio.pause();
-      }
-      const newAudio = new Audio(previewUrl);
-      setAudio(newAudio);
-      newAudio.play();
     }
-  }, [access_token, previewUrl, audio]); // この行を修正した
-
-  // コンポーネントのアンマウント時に音楽の再生を停止
-  useEffect(() => {
-    return () => {
-      if (audio) {
-        audio.pause();
-      }
-    };
-  }, [audio]);
+  }, [access_token]);
 }

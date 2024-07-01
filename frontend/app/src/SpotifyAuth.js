@@ -8,6 +8,8 @@ export const scope = [
   "user-read-private",
   "streaming",
   "user-read-email",
+  "user-read-playback-state",
+  "user-modify-playback-state",
 ];
 
 // コードチャレンジとコードバリデータの生成
