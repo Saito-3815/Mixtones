@@ -150,7 +150,7 @@ export const TuneFooter = () => {
     if (tune && tune.tune.spotify_uri && deviceId) {
       console.log(`Attempting to play tune on device with ID: ${deviceId}`);
       if (isMobile) {
-        playMobile(spotifyUris);
+        playMobile(spotifyUris, tune.index);
       } else {
         if (player) {
           play(spotifyUris, tune.index);
@@ -275,73 +275,84 @@ export const TuneFooter = () => {
             className="text-white hidden md:flex"
           />
         </div>
-        {/* 再生コントロール */}
-        <div className="flex-grow flex-shrink justify-center items-center col-span-3 md:col-span-1 md:flex px-3 md:px-0">
-          <div className="items-center w-full">
-            <div className="flex justify-center items-center space-x-5 mt-2">
-              <ModeColorIcon
-                icon={faShuffle}
-                mode={shuffleMode}
-                onClick={async () => {
-                  if (repeatMode) {
-                    await setRepeatMode(false);
-                  }
-                  setShuffleMode(!shuffleMode);
-                }}
-              />
-              <FontAwesomeIcon
-                icon={faBackwardStep}
-                className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
-                onClick={() => {
-                  player.previousTrack();
-                  setTune(prevTrack());
-                }}
-              />
-              <PlayIcon
-                color="text-white"
-                size="8"
-                onClick={() => {
-                  player.togglePlay();
-                }}
-              />
-              <FontAwesomeIcon
-                icon={faForwardStep}
-                className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
-                onClick={() => {
-                  player.nextTrack();
-                  setTune(nextTrack());
-                }}
-              />
-              <ModeColorIcon
-                icon={faRepeat}
-                mode={repeatMode}
-                onClick={() => {
-                  if (shuffleMode) {
-                    setShuffleMode(false);
-                  }
-                  setRepeatMode(!repeatMode);
-                }}
-              />
-            </div>
-            <div className="flex justify-center flex-grow flex-shrink items-center space-x-2 mt-1">
-              <span className="text-theme-gray text-xs font-extralight">
-                {formatTime(currentTime)}
-                {/* {formatTime(0)} */}
-              </span>
-              <Slider
-                max={100}
-                className="w-[250px] lg:w-[420px] transition-all"
-                value={[
-                  tune.tune.time ? (currentTime / tune.tune.time) * 100 : 0,
-                ]}
-                onChange={handleProgressChange}
-              />
-              <span className="text-theme-gray text-xs font-extralight">
-                {formatTime(tune.tune.time)}
-              </span>
-            </div>
+        {isMobile ? (
+          <div className="flex-col space-y-2">
+            <h1 className="text-white text-center">Playing now in Spotify!</h1>
+            <p className="text-theme-gray text-center text-xs">
+              再生コントロールはSppotifyアプリ上で行えます。
+            </p>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* 再生コントロール */}
+            <div className="flex-grow flex-shrink justify-center items-center col-span-3 md:col-span-1 md:flex px-3 md:px-0">
+              <div className="items-center w-full">
+                <div className="flex justify-center items-center space-x-5 mt-2">
+                  <ModeColorIcon
+                    icon={faShuffle}
+                    mode={shuffleMode}
+                    onClick={async () => {
+                      if (repeatMode) {
+                        await setRepeatMode(false);
+                      }
+                      setShuffleMode(!shuffleMode);
+                    }}
+                  />
+                  <FontAwesomeIcon
+                    icon={faBackwardStep}
+                    className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
+                    onClick={() => {
+                      player.previousTrack();
+                      setTune(prevTrack());
+                    }}
+                  />
+                  <PlayIcon
+                    color="text-white"
+                    size="8"
+                    onClick={() => {
+                      player.togglePlay();
+                    }}
+                  />
+                  <FontAwesomeIcon
+                    icon={faForwardStep}
+                    className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
+                    onClick={() => {
+                      player.nextTrack();
+                      setTune(nextTrack());
+                    }}
+                  />
+                  <ModeColorIcon
+                    icon={faRepeat}
+                    mode={repeatMode}
+                    onClick={() => {
+                      if (shuffleMode) {
+                        setShuffleMode(false);
+                      }
+                      setRepeatMode(!repeatMode);
+                    }}
+                  />
+                </div>
+                <div className="flex justify-center flex-grow flex-shrink items-center space-x-2 mt-1">
+                  <span className="text-theme-gray text-xs font-extralight">
+                    {formatTime(currentTime)}
+                    {/* {formatTime(0)} */}
+                  </span>
+                  <Slider
+                    max={100}
+                    className="w-[250px] lg:w-[420px] transition-all"
+                    value={[
+                      tune.tune.time ? (currentTime / tune.tune.time) * 100 : 0,
+                    ]}
+                    onChange={handleProgressChange}
+                  />
+                  <span className="text-theme-gray text-xs font-extralight">
+                    {formatTime(tune.tune.time)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
         {/* 音量調整 */}
         <div className="flex-grow flex-shrink justify-end items-center hidden md:flex">
           <div className="flex flex-grow flex-shrink justify-end items-center space-x-3 mr-10">
