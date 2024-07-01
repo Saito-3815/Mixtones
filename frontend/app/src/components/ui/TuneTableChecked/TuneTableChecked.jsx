@@ -1,59 +1,91 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { TuneColumnChecked } from "@/components/ui/TuneColumnChecked/TuneColumnChecked";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import { faList, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
-// import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useCheckTunes } from "@/hooks/ useCheckTunes";
+import { useAtom } from "jotai";
+import { playlistAtom } from "@/atoms/playlistAtom";
+import useSearchPlaylist from "@/hooks/useSearchPlaylist";
+import { tuneAtom } from "@/atoms/tuneAtom";
+import usePreviewPlay from "@/hooks/usePreviewPlay";
+import { isLoggedInAtom } from "@/atoms/userAtoms";
+import { playerAtom } from "@/atoms/playerAtom";
 
-export const TuneTableChecked = ({ tunes }) => {
-  // const [userId] = useParams();
+export const TuneTableChecked = () => {
+  const { userId } = useParams();
+  const [currentPlaylist, setCurrentPlaylist] = useAtom(playlistAtom);
+  const [player] = useAtom(playerAtom);
+  const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   // チェックした楽曲を取得
-  // const {
-  //   data: checkTunesData,
-  //   status: checkTunesStatus,
-  //   error: checkTunesError,
-  // } = useCheckTunes(userId);
+  const {
+    data: checkTunesData,
+    status: checkTunesStatus,
+    error: checkTunesError,
+  } = useCheckTunes(userId);
 
-  // console.log("checkTunesData:", checkTunesData);
-  // console.log("checkTunesStatus:", checkTunesStatus);
+  console.log("checkTunesData:", checkTunesData);
+  console.log("checkTunesStatus:", checkTunesStatus);
 
-  // if (checkTunesError) {
-  //   return <div>Error</div>;
-  // }
+  if (checkTunesError) {
+    return <div>Error</div>;
+  }
+
+  // チェックした楽曲データが取得できた場合、グローバルステートで管理する
+  useEffect(() => {
+    if (checkTunesData) {
+      setCurrentPlaylist(checkTunesData);
+    }
+  }, [checkTunesData]);
 
   // 検索機能
-  const [searchText, setSearchText] = useState("");
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  // ドロップダウンメニュー以外ををクリックすると閉じる
+  const {
+    searchText,
+    setSearchText,
+    isSearchVisible,
+    setIsSearchVisible,
+    filteredPlaylist,
+    node,
+  } = useSearchPlaylist(checkTunesData || []); // playlistDataがundefinedの場合に空の配列を渡す
 
-  const filteredTunes = tunes.filter(
-    (tune) =>
-      tune.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      tune.artist.toLowerCase().includes(searchText.toLowerCase()) ||
-      tune.album.toLowerCase().includes(searchText.toLowerCase()),
-  );
+  // 楽曲を選択してグローバルステートへ
+  const [tune, setTune] = useAtom(tuneAtom);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
-  // ドロップダウンメニューの外側をクリックした場合に非表示にする
-  const node = useRef();
+  // previewUrlが変更されたときにusePreviewPlayを呼び出す
+  usePreviewPlay(previewUrl);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (node.current.contains(e.target)) {
-        // inside click
-        return;
+    console.log("tuneAtom updated:", tune);
+  }, [tune]);
+
+  const handleColumnClick = (index, tune) => {
+    if (isLoggedIn) {
+      setTune({ index, tune });
+    } else {
+      // tune.preview_url が存在するかチェック
+      if (tune.preview_url) {
+        setPreviewUrl(tune.preview_url);
       }
-      // outside click
-      setIsSearchVisible(false);
-    };
+      setTune({ index, tune });
+    }
+  };
 
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  // プレイリストの再生コントロール
+  const handlePlay = () => {
+    if (!tune) {
+      setTune({ index: 0, tune: currentPlaylist[0] });
+    }
+    // playerが存在し、togglePlayメソッドがある場合にのみ実行
+    if (tune && player && typeof player.togglePlay === "function") {
+      player.togglePlay();
+    }
+  };
 
   return (
     <div className="flex flex-col items-end max-w-[1200px]">
@@ -63,7 +95,7 @@ export const TuneTableChecked = ({ tunes }) => {
         ref={node}
       >
         <div className="pl-5 sm:pl-11">
-          <PlayIcon color="text-theme-orange" size="10" />
+          <PlayIcon color="text-theme-orange" size="10" onClick={handlePlay} />
         </div>
         <div className="flex">
           {isSearchVisible ? (
@@ -116,8 +148,17 @@ export const TuneTableChecked = ({ tunes }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredTunes.map((tune, index) => (
-            <TuneColumnChecked tune={tune} index={index} key={index} />
+          {filteredPlaylist.map((tune, index) => (
+            <TuneColumnChecked
+              tune={{
+                ...tune,
+                id: tune.id.toString(),
+                time: tune.time.toString(),
+              }}
+              index={index}
+              key={index.toString()}
+              onClick={() => handleColumnClick(index, tune)}
+            />
           ))}
         </tbody>
       </table>

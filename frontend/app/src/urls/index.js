@@ -36,3 +36,7 @@ export const sessionsDestroy = `${DEFAULT_API_LOCALHOST}/sessions`;
 export const currentUser = `${DEFAULT_API_LOCALHOST}/sessions`;
 // ゲストログイン
 export const sessionsGuestLogin = `${DEFAULT_API_LOCALHOST}/sessions/guest`;
+
+// ユーザーのチェック楽曲を取得
+export const checksIndex = (userId) =>
+  `${DEFAULT_API_LOCALHOST}/users/${userId}/checks`;

@@ -33,17 +33,6 @@ const User = () => {
     console.error(userError);
   }
 
-  // プレイリスト情報
-  const tunes = Array.from({ length: 100 }, (_, i) => ({
-    id: i + 1,
-    name: `Tune ${i + 1}`,
-    artist: `Artist ${i + 1}`,
-    album: `Album ${i + 1}`,
-    images: "https://picsum.photos/500",
-    added_at: "2022-01-01T00:00:00Z",
-    time: "00:00",
-  }));
-
   return (
     <div className="flex-col justify-center">
       {/* ユーザーセクション */}
@@ -51,12 +40,12 @@ const User = () => {
         {/* 画像 */}
         <div className="flex justify-center max-w-[240px] items-start pl-5 sm:pl-3">
           {userStatus === "pending" || !userData ? (
-            <Skeleton className="w-40 h-40 rounded-full" />
+            <Skeleton className="w-60 h-60 rounded-full" />
           ) : userData.avatar ? (
             <img
               src="https://picsum.photos/500"
               alt="User"
-              className="w-40 h-40 rounded-full object-cover"
+              className="w-60 h-60 rounded-full object-cover"
             />
           ) : (
             <FontAwesomeIcon
@@ -95,7 +84,7 @@ const User = () => {
 
       {/* プレイリストセクション */}
       <div className="flex justify-center my-16">
-        <TuneTableChecked tunes={tunes} />
+        <TuneTableChecked />
       </div>
     </div>
   );

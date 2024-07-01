@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
 import { useAtom } from "jotai";
 import { playerAtom } from "@/atoms/playerAtom";
+import { formatTime } from "@/utils/formatTime";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -85,14 +86,6 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   // 追加日をフォーマット
   const date = new Date(tune.added_at);
   const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
-
-  // 再生時間をフォーマット（ミリ秒対応）
-  const formatTime = (milliseconds) => {
-    const seconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
 
   return (
     <tr

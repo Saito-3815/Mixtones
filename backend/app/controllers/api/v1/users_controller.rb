@@ -6,6 +6,7 @@ module Api
       extend SpotifyAuth
       include SessionsHelper
       include UserLogin
+      include RenderUserJson
 
       def show
         @user = User.find(params[:id])
@@ -86,21 +87,7 @@ module Api
             update_session_expiration(spotify_login_params[:is_persistent])
           end
 
-          render json: {
-            user: @user.as_json(
-              except: :refresh_token,
-              include: {
-                communities: {
-                  only: [:id]
-                },
-                like_tunes: {
-                  only: [:id]
-                }
-              }
-            ),
-            session_id: session[:session_id],
-            access_token: access_token
-          }, status: :created
+          render_user_json(@user, session[:session_id], access_token)
         end
       rescue StandardError => e
         Rails.logger.error "An error occurred: #{e.message}"
