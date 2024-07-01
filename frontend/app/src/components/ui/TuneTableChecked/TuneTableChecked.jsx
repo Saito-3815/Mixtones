@@ -5,8 +5,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import { faList, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
+// import { useParams } from "react-router-dom";
 
 export const TuneTableChecked = ({ tunes }) => {
+  // const [userId] = useParams();
+
+  // チェックした楽曲を取得
+  // const {
+  //   data: checkTunesData,
+  //   status: checkTunesStatus,
+  //   error: checkTunesError,
+  // } = useCheckTunes(userId);
+
+  // console.log("checkTunesData:", checkTunesData);
+  // console.log("checkTunesStatus:", checkTunesStatus);
+
+  // if (checkTunesError) {
+  //   return <div>Error</div>;
+  // }
+
   // 検索機能
   const [searchText, setSearchText] = useState("");
   const [isSearchVisible, setIsSearchVisible] = useState(false);

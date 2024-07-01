@@ -10,8 +10,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { DotsMenu } from "../DotsMenu/DotsMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { tuneAtom } from "@/atoms/tuneAtom";
+import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
 import { useAtom } from "jotai";
+import { playerAtom } from "@/atoms/playerAtom";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -35,11 +36,14 @@ export const TuneColumn = ({ tune, index, onClick }) => {
     checkScroll(tuneAlbumRef.current);
   }, []);
 
+  // spotifyのプレイヤー情報を取得
+  const [player] = useAtom(playerAtom);
+
   // 現在選択されているtuneを取得
-  const [currentTune, setCurrentTune] = useAtom(tuneAtom);
+  const [currentTune] = useAtom(tuneAtom);
 
   // 再生中かどうかを判断
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
 
   // ホバー時にアイコンを変更
   const [isHovered, setIsHovered] = useState(false);
@@ -52,27 +56,31 @@ export const TuneColumn = ({ tune, index, onClick }) => {
     setIsHovered(false);
   };
 
-  // tuneが現在選択されているかどうかを判断
-  const isSelected = currentTune ? currentTune.id === Number(tune.id) : false;
+  // tuneが現在選択されているかどうかを判断する際に、currentTuneまたはcurrentTune.tuneがundefinedでないことを確認
+  const isSelected =
+    currentTune && currentTune.tune && currentTune.tune.id === Number(tune.id)
+      ? true
+      : false;
 
   const handleClick = () => {
-    setCurrentTune(tune); // 現在のtuneを設定
-    if (onClick) onClick(); // TuneTableから渡されたonClick(tuneAtomを更新する関数)
+    // 現在のtuneが既に選択されているか確認し、選択されていれば再生状態のみを切り替える
+    if (
+      currentTune &&
+      currentTune.tune &&
+      currentTune.tune.id === Number(tune.id)
+    ) {
+      player.togglePlay();
+      setIsPlaying(!isPlaying);
+      return;
+    }
 
-    // isSelectedの計算をhandleClick内で直接行う
-    const isTuneSelected = currentTune && currentTune.id === Number(tune.id);
-    if (isTuneSelected) {
-      setIsPlaying(!isPlaying); // ここでのisSelectedは古い状態を参照しているため、直接計算した値を使用
-    } else {
-      setIsPlaying(true); // 新しく選択された場合は再生を開始
+    // 初めてこのtuneがクリックされた場合、onClickを呼び出してtuneAtomを更新し、再生状態を切り替える
+    if (onClick) {
+      onClick(); // TuneTableから渡されたonClick(tuneAtomを更新する関数)
+      player.togglePlay();
+      setIsPlaying(!isPlaying);
     }
   };
-
-  // useEffect(() => {
-  //   console.log("isPlaying:", isPlaying);
-  //   console.log("isSelected:", isSelected);
-  //   console.log("Tune:", tune.id);
-  // }, [isPlaying, isSelected]);
 
   // 追加日をフォーマット
   const date = new Date(tune.added_at);
@@ -89,7 +97,6 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   return (
     <tr
       className={`cursor-pointer bg-black ${isSelected ? "bg-theme-black" : "hover:bg-theme-black"} text-theme-gray ${isSelected ? "text-white" : "hover:text-white"} h-[56px] w-full`}
-      onClick={onClick}
     >
       {/* 番号 */}
       <td className="h-[56px] w-[50px] hidden sm:table-cell">

@@ -1,8 +1,16 @@
 const authEndpoint = "https://accounts.spotify.com/authorize";
-const clientId = "5b2ac842f6c044f984dbb35520a349fd";
-export const redirectUri = "http://localhost:3000/";
+const clientId = import.meta.env.VITE_CLIENT_ID;
+export const redirectUri = import.meta.env.VITE_REDIRECT_URI;
+
 // 対応する範囲を決める
-export const scope = ["user-library-read", "user-read-private"];
+export const scope = [
+  "user-library-read",
+  "user-read-private",
+  "streaming",
+  "user-read-email",
+  "user-read-playback-state",
+  "user-modify-playback-state",
+];
 
 // コードチャレンジとコードバリデータの生成
 // コード検証子の作成

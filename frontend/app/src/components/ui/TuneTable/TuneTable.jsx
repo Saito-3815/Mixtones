@@ -7,29 +7,39 @@ import { PlayIcon } from "../PlayIcon/PlayIcon";
 import { useAtom } from "jotai";
 import { tuneAtom } from "@/atoms/tuneAtom";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { fetchPlaylist } from "@/api/playlistsIndex";
 import { Skeleton } from "../Skeleton/Skeleton";
+import { useCommunityPlaylist } from "@/hooks/useCommunityPlaylist";
+import { playlistAtom } from "@/atoms/playlistAtom";
+import { playerAtom } from "@/atoms/playerAtom";
+import { isLoggedInAtom } from "@/atoms/userAtoms";
+import usePreviewPlay from "@/hooks/usePreviewPlay";
 
 export const TuneTable = () => {
   const { communityId } = useParams();
+  const [currentPlaylist, setCurrentPlaylist] = useAtom(playlistAtom);
+  const [player] = useAtom(playerAtom);
+  const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   // プレイリスト楽曲を取得
   const {
     data: playlistData,
     status: playlistStatus,
     error: playlistError,
-  } = useQuery({
-    queryKey: ["playlist", communityId],
-    queryFn: () => fetchPlaylist({ communityId: communityId }),
-  });
+  } = useCommunityPlaylist(communityId);
 
   if (playlistError) {
     return <div>Error</div>;
   }
 
+  // プレイリストデータが取得できた場合、グローバルステートで管理する
+  useEffect(() => {
+    if (playlistData) {
+      setCurrentPlaylist(playlistData);
+    }
+  }, [playlistData]);
+
   // データをそれぞれコンソールへ出力
-  // console.log(playlistData);
+  // console.log("playlistData:",playlistData);
 
   // 検索機能
   const [searchText, setSearchText] = useState("");
@@ -65,14 +75,35 @@ export const TuneTable = () => {
     };
   }, []);
 
+  // 楽曲を選択してグローバルステートへ
   const [tune, setTune] = useAtom(tuneAtom);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  // previewUrlが変更されたときにusePreviewPlayを呼び出す
+  usePreviewPlay(previewUrl);
 
   useEffect(() => {
     console.log("tuneAtom updated:", tune);
   }, [tune]);
 
   const handleColumnClick = (index, tune) => {
-    setTune(tune);
+    if (isLoggedIn) {
+      setTune({ index, tune });
+    } else {
+      setPreviewUrl(tune.preview_url);
+      setTune({ index, tune });
+    }
+  };
+
+  // プレイリストの再生コントロール
+  const handlePlay = () => {
+    if (!tune) {
+      setTune({ index: 0, tune: currentPlaylist[0] });
+    }
+    // playerが存在し、togglePlayメソッドがある場合にのみ実行
+    if (tune && player && typeof player.togglePlay === "function") {
+      player.togglePlay();
+    }
   };
 
   return (
@@ -83,7 +114,7 @@ export const TuneTable = () => {
         ref={node}
       >
         <div className="pl-5 sm:pl-11">
-          <PlayIcon color="text-theme-orange" size="10" />
+          <PlayIcon color="text-theme-orange" size="10" onClick={handlePlay} />
         </div>
         <div className="flex">
           {isSearchVisible ? (

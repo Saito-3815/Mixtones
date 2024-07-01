@@ -48,7 +48,8 @@ module Api
                 }
               }
             ),
-            session_id: update_result[:session_id]
+            session_id: update_result[:session_id],
+            access_token: access_token
           }, status: :ok
         else
           User.transaction do
@@ -97,7 +98,8 @@ module Api
                 }
               }
             ),
-            session_id: session[:session_id]
+            session_id: session[:session_id],
+            access_token: access_token
           }, status: :created
         end
       rescue StandardError => e

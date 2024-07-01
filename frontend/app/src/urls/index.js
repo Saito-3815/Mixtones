@@ -25,6 +25,8 @@ export const usersCreate = `${DEFAULT_API_LOCALHOST}/users`;
 // ユーザーを削除
 export const usersDestroy = (userId) =>
   `${DEFAULT_API_LOCALHOST}/users/${userId}`;
+// ユーザー情報の取得
+export const usersShow = (userId) => `${DEFAULT_API_LOCALHOST}/users/${userId}`;
 
 // ユーザーのログイン
 export const sessionsCreate = `${DEFAULT_API_LOCALHOST}/sessions`;

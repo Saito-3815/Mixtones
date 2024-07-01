@@ -21,22 +21,15 @@ module SpotifyAuth
     request = Net::HTTP::Post.new(uri.path)
     request['Content-Type'] = 'application/x-www-form-urlencoded'
     request.body = URI.encode_www_form({
-                                         grant_type: 'authorization_code',
-                                         code: auth_code,
-                                         redirect_uri: REDIRECT_URI,
-                                         client_id: CLIENT_ID,
-                                         client_secret: CLIENT_SECRET,
-                                         code_verifier: code_verifier
-                                       })
+      grant_type: 'authorization_code',
+      code: auth_code,
+      redirect_uri: REDIRECT_URI,
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      code_verifier: code_verifier
+    })
 
     response = http.request(request)
-
-    # Rails.logger.info "REDIRECT_URI: #{REDIRECT_URI}"
-    # Rails.logger.info "CLIENT_ID: #{CLIENT_ID}"
-    # Rails.logger.info "CLIENT_SECRET: #{CLIENT_SECRET}"
-    # Rails.logger.info "code_verifier: #{code_verifier}"
-    # Rails.logger.info "auth_code: #{auth_code}"
-
     token_info = JSON.parse(response.body)
 
     # アクセストークンとリフレッシュトークンを返す
@@ -123,9 +116,9 @@ module SpotifyAuth
     request['Content-Type'] = 'application/x-www-form-urlencoded'
     request.basic_auth(CLIENT_ID, CLIENT_SECRET)
     request.body = URI.encode_www_form({
-                                         grant_type: 'refresh_token',
-                                         refresh_token: refresh_token
-                                       })
+      grant_type: 'refresh_token',
+      refresh_token: refresh_token
+    })
     response = http.request(request)
 
     if response.is_a?(Net::HTTPSuccess)
@@ -136,7 +129,7 @@ module SpotifyAuth
     end
   end
 
-  # Spotifyのトラック情報を取得
+  # Spotifyの最新のお気に入り情報を取得
   def self.fetch_latest_saved_track(user, access_token)
     latest_added_at = user.like_tunes.last.added_at
 

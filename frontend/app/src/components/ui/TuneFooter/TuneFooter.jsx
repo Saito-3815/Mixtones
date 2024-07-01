@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBackwardStep,
@@ -7,31 +7,248 @@ import {
   faRepeat,
   faShuffle,
   faVolumeHigh,
+  faVolumeMute,
 } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
 import { Slider } from "@/components/ui/Slider/Slider";
-import { Progress } from "@/components/ui/Progress/Progress";
-import { ColorIcon } from "@/components/ui/ColorIcon/ColorIcon";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
 import { useAtom } from "jotai";
-import { tuneAtom } from "@/atoms/tuneAtom";
+import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
+import { playerAtom } from "@/atoms/playerAtom";
+import { playlistAtom } from "@/atoms/playlistAtom";
+import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
+import { usePlay } from "@/hooks/usePlay";
+import { ModeColorIcon } from "../ColorIcon/ModeColoorIcon";
+import { isLoggedInAtom } from "@/atoms/userAtoms";
+import { useMobilePlayer } from "@/hooks/useMobilePlayer";
+import { useMobilePlay } from "@/hooks/useMobilePlay";
 
 export const TuneFooter = () => {
+  const [tune, setTune] = useAtom(tuneAtom);
+  const [isPlaying] = useAtom(isPlayingAtom);
+  const [player] = useAtom(playerAtom);
+  const [playlistData, setPlaylistData] = useAtom(playlistAtom);
+  const [isLoggedIn] = useAtom(isLoggedInAtom);
+
+  const [deviceId, setDeviceId] = useState(null);
+  const [shuffleMode, setShuffleMode] = useState(false);
+  const [repeatMode, setRepeatMode] = useState(false);
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
   const tuneNameRef = useRef(null);
   const tuneArtistRef = useRef(null);
 
+  // 次のトラックを取得
+  const nextTrack = () => {
+    let nextIndex = tune.index + 1; // tune.indexを増やす前に次のインデックスを計算
+    if (nextIndex >= playlistData.length) {
+      // playlistDataの範囲を超えるかチェック
+      nextIndex = 0; // 範囲を超える場合は最初に戻る
+    }
+    tune.index = nextIndex; // tune.indexを更新
+    return { index: tune.index, tune: playlistData[nextIndex] };
+  };
+
+  // 前のトラックを取得
+  const prevTrack = () => {
+    let prevIndex = tune.index - 1; // tune.indexを減らす前に前のインデックスを計算
+    if (prevIndex < 0) {
+      // 0未満になるかチェック
+      prevIndex = playlistData.length - 1; // 0未満になる場合は最後に戻る
+    }
+    tune.index = prevIndex; // tune.indexを更新
+    return { index: tune.index, tune: playlistData[prevIndex] };
+  };
+
+  // プレイリストデータのコピーを保持
+  const [originalPlaylistData, setOriginalPlaylistData] = useState([]);
+
+  const isInitialMount = useRef(true); // 初回マウント時にtrueに設定
+
   useEffect(() => {
-    const checkScroll = (element) => {
-      if (element.scrollWidth > element.clientWidth) {
-        element.classList.add("scroll-slide");
+    if (playlistData.length > 0 && isInitialMount.current) {
+      setOriginalPlaylistData([...playlistData]);
+      isInitialMount.current = false; // 初回マウント後はフラグをfalseに設定
+    }
+  }, [playlistData]);
+
+  // useEffect(() => {
+  //   console.log("originalPlaylistData:", originalPlaylistData);
+  // }, [originalPlaylistData]);
+
+  // シャッフルモードへ変更
+  useEffect(() => {
+    // shuffleModeがtrueに切り替わったらplaylistDataをシャッフル
+    if (shuffleMode) {
+      // originalPlaylistDataを使用してシャッフルを行う
+      const shuffledPlaylistData = [...originalPlaylistData].sort(
+        () => Math.random() - 0.5,
+      );
+      setPlaylistData(shuffledPlaylistData);
+      console.log("shuffledPlaylistData", shuffledPlaylistData);
+    } else if (originalPlaylistData.length > 0) {
+      // シャッフルモードがfalseになったら、保存しておいた元のplaylistDataを復元
+      setPlaylistData(originalPlaylistData);
+    }
+  }, [shuffleMode, originalPlaylistData]); // originalPlaylistDataを依存配列に追加
+
+  // リピートモードへ変更
+  useEffect(() => {
+    if (repeatMode) {
+      const repeatPlaylistData = Array(playlistData.length).fill(tune.tune);
+      setPlaylistData(repeatPlaylistData);
+      console.log("repeatPlaylistData", repeatPlaylistData);
+    } else if (originalPlaylistData.length > 0) {
+      // リピートモードがfalseになったら、保存しておいた元のplaylistDataを復元
+      setPlaylistData(originalPlaylistData);
+    }
+  }, [repeatMode]);
+
+  // playlistDataの更新を確認
+  // useEffect(() => {
+  //   console.log("playlistData:", playlistData);
+  // }, [playlistData]);
+
+  // プレイリストデータからSpotify URIを取得
+  const spotifyUris = playlistData.map((track) => track.spotify_uri);
+
+  // プレイリストのデータからpreviewUrlを取得
+  // const previewUrls = playlistData.map((track) => track.preview_url);
+
+  // モバイルかどうかに基づいて適切なプレイヤーフックを選択
+  const playerHook = isMobile ? useMobilePlayer : useSpotifyPlayer;
+
+  // プレイヤーフックの結果を使用してデバイスIDを設定
+  const setDeviceIdFromPlayer = playerHook(setDeviceId);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    // デバイスID設定ロジックはここには不要になる
+  }, [isLoggedIn, setDeviceIdFromPlayer]); // 依存配列を更新
+
+  // playlistDataの曲を再生
+  const play = usePlay(deviceId);
+  const playMobile = useMobilePlay(deviceId);
+
+  useEffect(() => {
+    console.log("IsPlayingAtom is now", isPlaying);
+  }, [isPlaying]);
+
+  // useEffect(() => {
+  //   console.log("shuffleMode", shuffleMode);
+  // }, [shuffleMode]);
+
+  // useEffect(() => {
+  //   console.log("repeatMode", repeatMode);
+  // }, [repeatMode]);
+
+  // tuneが変更されたときに音楽を再生する
+  useEffect(() => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (tune && tune.tune.spotify_uri && deviceId) {
+      console.log(`Attempting to play tune on device with ID: ${deviceId}`);
+      if (isMobile) {
+        playMobile(spotifyUris, tune.index);
+      } else {
+        if (player) {
+          play(spotifyUris, tune.index);
+        }
       }
-    };
+    } else {
+      console.log(`Unable to play tune. Device ID: ${deviceId}`);
+    }
+  }, [tune, player, deviceId, shuffleMode, repeatMode, isMobile]);
 
-    checkScroll(tuneNameRef.current);
-    checkScroll(tuneArtistRef.current);
-  }, []);
+  // 音量を操作する
+  const handleSliderChange = (value) => {
+    const volume = value / 100;
+    // setVolume(volume); // スライダーの値をvolumeに設定
+    player.setVolume(volume);
+  };
 
-  const [tune] = useAtom(tuneAtom);
+  // ミュートコントロール
+  const [lastVolume, setLastVolume] = useState(0.5); // lastVolumeの状態を追加
+  const [isMuted, setIsMuted] = useState(false);
+
+  const handleVolumeOff = () => {
+    player.getVolume().then((volume) => {
+      if (!isMuted) {
+        setIsMuted(true);
+        setLastVolume(volume); // lastVolumeを更新
+        player.setVolume(0).then(() => {
+          console.log("Volume is now muted");
+        });
+      } else {
+        setIsMuted(false);
+        player.setVolume(lastVolume).then(() => {
+          // lastVolumeを使用して音量を設定
+          console.log("Volume is now unmuted");
+        });
+      }
+    });
+  };
+
+  // 再生時間をフォーマット（ミリ秒対応）
+  const formatTime = (milliseconds) => {
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  // 現在の再生時間を取得
+  const [currentTime, setCurrentTime] = useState(0);
+
+  useEffect(() => {
+    if (player) {
+      player.getCurrentState().then((state) => {
+        if (!state) {
+          console.error(
+            "User is not playing music through the Web Playback SDK",
+          );
+          return;
+        }
+        setCurrentTime(state.position);
+      });
+    }
+  }, [player, isPlaying]);
+
+  // console.log("currentTime", currentTime);
+
+  // 再生時間の更新
+  useEffect(() => {
+    let interval = null;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setCurrentTime((prevTime) => prevTime + 1000);
+      }, 1000);
+    } else if (!isPlaying && interval) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
+  useEffect(() => {
+    setCurrentTime(0);
+  }, [tune]);
+
+  // 再生時間が最後まで到達したら次の曲を再生
+  useEffect(() => {
+    if (currentTime >= tune.tune.time) {
+      setTune(nextTrack());
+    }
+  }, [currentTime, tune.tune.time]);
+
+  // 進行時間の操作
+  const handleProgressChange = (value) => {
+    const progress = value / 100;
+    const newPosition = Math.floor(tune.tune.time * progress);
+    player.seek(newPosition).then(() => {
+      setCurrentTime(newPosition); // 現在の再生時間を更新
+    });
+  };
 
   return (
     <footer className="mx-1 my-1">
@@ -39,7 +256,7 @@ export const TuneFooter = () => {
         {/* 楽曲データ */}
         <div className="flex flex-grow flex-shrink justify-start items-center space-x-3 pr-5 col-span-3 md:col-span-1 py-3 lg:py-0">
           <img
-            src={`${tune.images}`}
+            src={`${tune.tune.images}`}
             alt="images"
             className="object-cover h-12 w-12 bg-theme-gray rounded-sm ml-3"
           />
@@ -47,45 +264,109 @@ export const TuneFooter = () => {
             <h1
               ref={tuneNameRef}
               className="text-white text-sm font-extralight whitespace-nowrap overflow-x-visible"
-            >{`${tune.name}`}</h1>
+            >{`${tune.tune.name}`}</h1>
             <h2
               ref={tuneArtistRef}
               className="text-theme-gray text-xs font-extralight whitespace-nowrap overflow-x-visible"
-            >{`${tune.artist}`}</h2>
+            >{`${tune.tune.artist}`}</h2>
           </div>
           <FontAwesomeIcon
             icon={faCircleCheck}
             className="text-white hidden md:flex"
           />
         </div>
-        {/* 再生コントロール */}
-        <div className="flex-grow flex-shrink justify-center items-center col-span-3 md:col-span-1 md:flex px-3 md:px-0">
-          <div className="items-center w-full">
-            <div className="flex justify-center items-center space-x-5 mt-2">
-              <ColorIcon icon={faShuffle} />
-              <FontAwesomeIcon
-                icon={faBackwardStep}
-                className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
-              />
-              <PlayIcon color="text-white" size="8" />
-              <FontAwesomeIcon
-                icon={faForwardStep}
-                className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
-              />
-              <ColorIcon icon={faRepeat} />
-            </div>
-            <div className="flex flex-grow flex-shrink items-center space-x-2 mt-1">
-              <span className="text-theme-gray text-xs font-extralight">{`${tune.time}`}</span>
-              <Progress value={33} className="" />
-              <span className="text-theme-gray text-xs font-extralight">{`${tune.time}`}</span>
-            </div>
+        {isMobile ? (
+          <div className="flex-col space-y-2">
+            <h1 className="text-white text-center">Playing now in Spotify!</h1>
+            <p className="text-theme-gray text-center text-xs">
+              再生コントロールはSppotifyアプリ上で行えます。
+            </p>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* 再生コントロール */}
+            <div className="flex-grow flex-shrink justify-center items-center col-span-3 md:col-span-1 md:flex px-3 md:px-0">
+              <div className="items-center w-full">
+                <div className="flex justify-center items-center space-x-5 mt-2">
+                  <ModeColorIcon
+                    icon={faShuffle}
+                    mode={shuffleMode}
+                    onClick={async () => {
+                      if (repeatMode) {
+                        await setRepeatMode(false);
+                      }
+                      setShuffleMode(!shuffleMode);
+                    }}
+                  />
+                  <FontAwesomeIcon
+                    icon={faBackwardStep}
+                    className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
+                    onClick={() => {
+                      player.previousTrack();
+                      setTune(prevTrack());
+                    }}
+                  />
+                  <PlayIcon
+                    color="text-white"
+                    size="8"
+                    onClick={() => {
+                      player.togglePlay();
+                    }}
+                  />
+                  <FontAwesomeIcon
+                    icon={faForwardStep}
+                    className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
+                    onClick={() => {
+                      player.nextTrack();
+                      setTune(nextTrack());
+                    }}
+                  />
+                  <ModeColorIcon
+                    icon={faRepeat}
+                    mode={repeatMode}
+                    onClick={() => {
+                      if (shuffleMode) {
+                        setShuffleMode(false);
+                      }
+                      setRepeatMode(!repeatMode);
+                    }}
+                  />
+                </div>
+                <div className="flex justify-center flex-grow flex-shrink items-center space-x-2 mt-1">
+                  <span className="text-theme-gray text-xs font-extralight">
+                    {formatTime(currentTime)}
+                    {/* {formatTime(0)} */}
+                  </span>
+                  <Slider
+                    max={100}
+                    className="w-[250px] lg:w-[420px] transition-all"
+                    value={[
+                      tune.tune.time ? (currentTime / tune.tune.time) * 100 : 0,
+                    ]}
+                    onChange={handleProgressChange}
+                  />
+                  <span className="text-theme-gray text-xs font-extralight">
+                    {formatTime(tune.tune.time)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
         {/* 音量調整 */}
         <div className="flex-grow flex-shrink justify-end items-center hidden md:flex">
           <div className="flex flex-grow flex-shrink justify-end items-center space-x-3 mr-10">
-            <FontAwesomeIcon icon={faVolumeHigh} className="text-white" />
-            <Slider defaultValue={[33]} max={100} step={1} className="w-28" />
+            <FontAwesomeIcon
+              icon={isMuted ? faVolumeMute : faVolumeHigh}
+              className="text-white"
+              onClick={handleVolumeOff}
+            />
+            <Slider
+              defaultValue={[33]}
+              max={100}
+              className="w-28"
+              onChange={handleSliderChange}
+            />
           </div>
         </div>
       </div>
@@ -98,10 +379,7 @@ TuneFooter.propTypes = {
     name: PropTypes.string.isRequired,
     artist: PropTypes.string.isRequired,
     album: PropTypes.string.isRequired,
-    images: PropTypes.shape({
-      small: PropTypes.string.isRequired,
-      large: PropTypes.string.isRequired,
-    }).isRequired,
+    images: PropTypes.string.isRequired,
     time: PropTypes.string.isRequired,
   }),
 };
