@@ -1,7 +1,7 @@
 module RenderUserJson
   extend ActiveSupport::Concern
 
-  def render_user_json(user, session_id, access_token)
+  def render_user_json(user, access_token, status = :ok)
     render json: {
       user: user.as_json(
         except: :refresh_token,
@@ -11,11 +11,14 @@ module RenderUserJson
           },
           like_tunes: {
             only: [:id]
+          },
+          check_tunes: {
+            only: [:id]
           }
         }
       ),
-      session_id: session_id,
+      # session_id: session_id,
       access_token: access_token
-    }, status: :created
+    }, status: status
   end
 end

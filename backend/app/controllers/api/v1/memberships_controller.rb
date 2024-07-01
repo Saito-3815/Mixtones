@@ -17,7 +17,20 @@ module Api
             community: community.as_json(include: ['members']).merge(
               playlist_tunes: sorted_playlist_tunes.as_json
             ),
-            user: user.as_json(include: { communities: { only: [:id] } })
+            user: user.as_json(
+              except: :refresh_token,
+              include: {
+                communities: {
+                  only: [:id]
+                },
+                like_tunes: {
+                  only: [:id]
+                },
+                check_tunes: {
+                  only: [:id]
+                }
+              }
+            )
           }, status: :created
         else
           render json: @membership.errors, status: :unprocessable_entity
@@ -30,6 +43,7 @@ module Api
       def destroy
         @membership = Membership.find_by(community_id: params[:community_id], user_id: current_user.id)
         community = Community.find_by(id: params[:community_id])
+        user = current_user
         # current_userがコミュニティメンバーであるか確認
         if community.members.include?(current_user)
           @membership.destroy
@@ -42,14 +56,40 @@ module Api
             community.destroy
             render json: {
               message: 'Community and membership successfully deleted.',
-              user: current_user.as_json(include: { communities: { only: [:id] } })
+              user: user.as_json(
+                except: :refresh_token,
+                include: {
+                  communities: {
+                    only: [:id]
+                  },
+                  like_tunes: {
+                    only: [:id]
+                  },
+                  check_tunes: {
+                    only: [:id]
+                  }
+                }
+              )
             }, status: :accepted
           else
             render json: {
               community: community.as_json(include: ['members']).merge(
                 playlist_tunes: sorted_playlist_tunes.as_json
               ),
-              user: current_user.as_json(include: { communities: { only: [:id] } })
+              user: user.as_json(
+                except: :refresh_token,
+                include: {
+                  communities: {
+                    only: [:id]
+                  },
+                  like_tunes: {
+                    only: [:id]
+                  },
+                  check_tunes: {
+                    only: [:id]
+                  }
+                }
+              )
             }, status: :ok
           end
         else

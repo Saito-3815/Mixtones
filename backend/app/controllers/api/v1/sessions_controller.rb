@@ -4,6 +4,7 @@ module Api
       extend SpotifyAuth
       include SessionsHelper
       include UserLogin
+      include RenderUserJson
 
       def create
         decoded_code = Base64.decode64(spotify_login_params[:code])
@@ -60,20 +61,7 @@ module Api
           render json: { error: 'User not found' }, status: :not_found
         else
           access_token = SpotifyAuth.refresh_access_token(current_user.refresh_token)
-          render json: {
-            user: @current_user.as_json(
-              except: :refresh_token,
-              include: {
-                communities: {
-                  only: [:id, :name]
-                },
-                like_tunes: {
-                  only: [:id]
-                }
-              }
-            ),
-            access_token: access_token
-          },status: :ok
+          render_user_json(current_user, access_token)
         end
       end
 

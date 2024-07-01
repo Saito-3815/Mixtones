@@ -52,7 +52,7 @@ RSpec.describe Membership, type: :request do
     # 204ステータスコードを返すこと
     it 'returns 204 status code' do
       delete "/api/v1/communities/#{community.id}/memberships"
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(:accepted)
     end
 
     # community.playlist_tunesにuser.like_tunesが含まれないこと
