@@ -1,6 +1,8 @@
 module Api
   module V1
     class ChecksController < ApplicationController
+      include RenderUserJson
+
       # ユーザーのチェックした曲を新しい順に取得
       def index
         user = User.find(params[:user_id])
@@ -22,7 +24,20 @@ module Api
 
         user.check_tunes << existing_record
 
-        render json: { message: 'Check tune added' }, status: :created
+        render json: { user: user.as_json(
+          except: :refresh_token,
+          include: {
+            communities: {
+              only: [:id]
+            },
+            like_tunes: {
+              only: [:id]
+            },
+            check_tunes: {
+              only: [:id]
+            }
+          }
+        ), message: 'Check tune added' }, status: :created
       end
 
       # チェックした曲をuser.check_tunesから削除

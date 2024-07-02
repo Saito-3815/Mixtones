@@ -45,11 +45,6 @@ export const Header = () => {
     },
   });
 
-  // mutationFn: () => {
-  //   const source = axios.CancelToken.source();
-  //   return createCommunity({ cancelToken: source.token });
-  // },
-
   return (
     <header className="mx-1 my-1">
       <div className="flex justify-between items-center px-4 py-5 bg-theme-black rounded-sm h-16">

@@ -40,3 +40,6 @@ export const sessionsGuestLogin = `${DEFAULT_API_LOCALHOST}/sessions/guest`;
 // ユーザーのチェック楽曲を取得
 export const checksIndex = (userId) =>
   `${DEFAULT_API_LOCALHOST}/users/${userId}/checks`;
+// チェック楽曲を登録
+export const checksCreate = (userId) =>
+  `${DEFAULT_API_LOCALHOST}/users/${userId}/checks`;

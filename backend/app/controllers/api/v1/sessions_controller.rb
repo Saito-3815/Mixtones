@@ -23,22 +23,7 @@ module Api
         if existing_user
           update_result = update_user_and_like_tunes(existing_user, refresh_token, user_create_params)
           update_session_expiration(spotify_login_params[:is_persistent])
-
-          render json: {
-            user: update_result[:user].as_json(
-              except: :refresh_token,
-              include: {
-                communities: {
-                  only: [:id]
-                },
-                like_tunes: {
-                  only: [:id]
-                }
-              }
-            ),
-            session_id: update_result[:session_id],
-            access_token: access_token
-          }, status: :ok
+          render_user_json(update_result[:user], access_token)
         else
           signup_url = "#{ENV.fetch('SPOTIFY_REDIRECT_URI', nil)}signup"
           render json: { message: 'User not found', redirect_url: signup_url }, status: :not_found

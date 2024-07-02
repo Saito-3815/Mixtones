@@ -14,6 +14,9 @@ import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
 import { useAtom } from "jotai";
 import { playerAtom } from "@/atoms/playerAtom";
 import { formatTime } from "@/utils/formatTime";
+import { userAtom } from "@/atoms/userAtoms";
+import { CheckColorIcon } from "../ColorIcon/CheckColorIcon";
+import { useCheck } from "@/hooks/useCheck";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -86,6 +89,24 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   // 追加日をフォーマット
   const date = new Date(tune.added_at);
   const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+
+  // チェック機能の実装
+  // tuneのidがcheck_tunesに存在するか確認
+  const [user] = useAtom(userAtom);
+
+  const isTuneChecked =
+    user &&
+    Array.isArray(user.check_tunes) &&
+    user.check_tunes.some(
+      (tuneItem) => Number(tuneItem.id) === Number(tune.id),
+    );
+
+  // console.log("isTuneChecked:", isTuneChecked);
+
+  const checkTune = useCheck();
+  const handleCheck = () => {
+    checkTune.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
+  };
 
   return (
     <tr
@@ -179,7 +200,11 @@ export const TuneColumn = ({ tune, index, onClick }) => {
           </span>
           <div className="flex items-center space-x-14 pr-16">
             {/* チェックボタン */}
-            <ColorIcon icon={faCircleCheck} />
+            <CheckColorIcon
+              icon={faCircleCheck}
+              isTuneChecked={isTuneChecked}
+              onClick={handleCheck}
+            />
             {/* レコメンドボタン */}
             <ColorIcon icon={faThumbsUp} />
             {/* コメントボタン */}
@@ -214,6 +239,7 @@ TuneColumn.propTypes = {
     images: PropTypes.string.isRequired,
     added_at: PropTypes.string.isRequired,
     time: PropTypes.string.isRequired,
+    spotify_uri: PropTypes.string.isRequired,
   }),
   index: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,
