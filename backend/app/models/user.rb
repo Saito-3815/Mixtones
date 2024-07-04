@@ -11,6 +11,9 @@ class User < ApplicationRecord
   validates :introduction,  length: { maximum: 160 }
   validates :spotify_id,    uniqueness: true
 
+  encrypts :spotify_id, deterministic: true, downcase: true
+  encrypts :refresh_token
+
   def guest?
     spotify_id == 'guest_user'
   end

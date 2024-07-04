@@ -17,7 +17,7 @@ module Api
         spotify_id = user_create_params[:spotify_id]
         SpotifyAuth.fetch_saved_tracks(spotify_id, access_token, user_create_params)
 
-        existing_user = User.find_by(spotify_id: spotify_id)
+        existing_user = User.find_by(spotify_id: spotify_id.downcase)
 
         # ユーザーが存在する場合、ユーザー情報を更新し有効期限を設定
         if existing_user
@@ -53,7 +53,7 @@ module Api
       # ゲストログイン
       # オリジナルゲストユーザーデータをゲストユーザーにコピー
       def guest_login
-        user = User.find_by(spotify_id: 'guest_user')
+        user = User.find_by(spotify_id: 'guest_user'.downcase)
         if user
           copy_original_guest_data_to(user)
           log_in(user)
@@ -66,7 +66,7 @@ module Api
 
       # オリジナルゲストユーザーデータの取得
       def fetch_original_guest_data
-        @fetch_original_guest_data ||= User.find_by(spotify_id: 'original_guest_user')
+        @fetch_original_guest_data ||= User.find_by(spotify_id: 'original_guest_user'.downcase)
       end
 
       # オリジナルデータを現在のゲストユーザーにコピー
