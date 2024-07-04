@@ -65,8 +65,8 @@ module Api
             }
           }
         ),
-        check: @check,
-        message: 'Check tune deleted' }, status: :ok
+                       check: @check,
+                       message: 'Check tune deleted' }, status: :ok
       end
 
       private

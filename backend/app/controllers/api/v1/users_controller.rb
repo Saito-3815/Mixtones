@@ -31,7 +31,7 @@ module Api
         spotify_id = user_create_params[:spotify_id]
         SpotifyAuth.fetch_saved_tracks(spotify_id, access_token, user_create_params)
 
-        existing_user = User.find_by(spotify_id: spotify_id)
+        existing_user = User.find_by(spotify_id: spotify_id.downcase)
 
         if existing_user
           update_user_and_like_tunes(existing_user, refresh_token, user_create_params)

@@ -29,7 +29,13 @@ module Api
     # config.autoload_paths += %W(#{config.root}/lib)
     config.eager_load_paths << Rails.root.join('lib')
 
+    # セッションの設定
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::RedisStore
+
+    # Active Record 暗号化キーの設定
+    config.active_record.encryption.primary_key = ENV.fetch('PRIMARY_KEY', nil)
+    config.active_record.encryption.deterministic_key = ENV.fetch('DETERMINISTIC_KEY', nil)
+    config.active_record.encryption.key_derivation_salt = ENV.fetch('KEY_DERIVATION_SALT', nil)
   end
 end
