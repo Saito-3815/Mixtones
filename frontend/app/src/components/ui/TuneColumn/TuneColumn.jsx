@@ -13,6 +13,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
 import { useAtom } from "jotai";
 import { playerAtom } from "@/atoms/playerAtom";
+import { formatTime } from "@/utils/formatTime";
+import { userAtom } from "@/atoms/userAtoms";
+import { CheckColorIcon } from "../ColorIcon/CheckColorIcon";
+import { useCheck } from "@/hooks/useCheck";
+import { useCheckDelete } from "@/hooks/useCheckDelete";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -86,12 +91,25 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   const date = new Date(tune.added_at);
   const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 
-  // 再生時間をフォーマット（ミリ秒対応）
-  const formatTime = (milliseconds) => {
-    const seconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  // チェック機能の実装
+  // tuneのidがcheck_tunesに存在するか確認
+  const [user] = useAtom(userAtom);
+
+  const isTuneChecked =
+    user &&
+    Array.isArray(user.check_tunes) &&
+    user.check_tunes.some(
+      (tuneItem) => Number(tuneItem.id) === Number(tune.id),
+    );
+
+  const checkTune = useCheck();
+  const handleCheckCreate = () => {
+    checkTune.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
+  };
+
+  const checkDelete = useCheckDelete();
+  const handleCheckDelete = () => {
+    checkDelete.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
   };
 
   return (
@@ -186,7 +204,11 @@ export const TuneColumn = ({ tune, index, onClick }) => {
           </span>
           <div className="flex items-center space-x-14 pr-16">
             {/* チェックボタン */}
-            <ColorIcon icon={faCircleCheck} />
+            <CheckColorIcon
+              icon={faCircleCheck}
+              isTuneChecked={isTuneChecked}
+              onClick={isTuneChecked ? handleCheckDelete : handleCheckCreate}
+            />
             {/* レコメンドボタン */}
             <ColorIcon icon={faThumbsUp} />
             {/* コメントボタン */}
@@ -205,7 +227,10 @@ export const TuneColumn = ({ tune, index, onClick }) => {
       {/* ドットメニュー */}
       <td className="sm:hidden">
         <div className="md:hidden justify-center px-4">
-          <DotsMenu />
+          <DotsMenu
+            isTuneChecked={isTuneChecked}
+            onClick={isTuneChecked ? handleCheckDelete : handleCheckCreate}
+          />
         </div>
       </td>
     </tr>
@@ -221,6 +246,7 @@ TuneColumn.propTypes = {
     images: PropTypes.string.isRequired,
     added_at: PropTypes.string.isRequired,
     time: PropTypes.string.isRequired,
+    spotify_uri: PropTypes.string.isRequired,
   }),
   index: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,

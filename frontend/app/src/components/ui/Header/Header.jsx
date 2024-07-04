@@ -14,7 +14,7 @@ import axios from "axios";
 import { createCommunity } from "@/api/communitiesCreate";
 
 export const Header = () => {
-  const [, setUser] = useAtom(userAtom);
+  const [user, setUser] = useAtom(userAtom);
   const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   const navigate = useNavigate();
@@ -45,11 +45,6 @@ export const Header = () => {
     },
   });
 
-  // mutationFn: () => {
-  //   const source = axios.CancelToken.source();
-  //   return createCommunity({ cancelToken: source.token });
-  // },
-
   return (
     <header className="mx-1 my-1">
       <div className="flex justify-between items-center px-4 py-5 bg-theme-black rounded-sm h-16">
@@ -73,7 +68,7 @@ export const Header = () => {
                   onActionClick={handleCreateCommunity.mutate}
                   cancelText="キャンセル"
                 />
-                <AvatarMenu src="" />
+                <AvatarMenu userAvatar={user.avatar} />
               </div>
             </>
           ) : (

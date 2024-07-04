@@ -21,13 +21,13 @@ module SpotifyAuth
     request = Net::HTTP::Post.new(uri.path)
     request['Content-Type'] = 'application/x-www-form-urlencoded'
     request.body = URI.encode_www_form({
-      grant_type: 'authorization_code',
-      code: auth_code,
-      redirect_uri: REDIRECT_URI,
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      code_verifier: code_verifier
-    })
+                                         grant_type: 'authorization_code',
+                                         code: auth_code,
+                                         redirect_uri: REDIRECT_URI,
+                                         client_id: CLIENT_ID,
+                                         client_secret: CLIENT_SECRET,
+                                         code_verifier: code_verifier
+                                       })
 
     response = http.request(request)
     token_info = JSON.parse(response.body)
@@ -116,9 +116,9 @@ module SpotifyAuth
     request['Content-Type'] = 'application/x-www-form-urlencoded'
     request.basic_auth(CLIENT_ID, CLIENT_SECRET)
     request.body = URI.encode_www_form({
-      grant_type: 'refresh_token',
-      refresh_token: refresh_token
-    })
+                                         grant_type: 'refresh_token',
+                                         refresh_token: refresh_token
+                                       })
     response = http.request(request)
 
     if response.is_a?(Net::HTTPSuccess)

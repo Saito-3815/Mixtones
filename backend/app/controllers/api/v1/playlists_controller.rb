@@ -9,6 +9,7 @@ module Api
         community = Community.find_by(id: params[:community_id])
         Rails.logger.info "Found community with ID: #{community.id}" if community
 
+        # コミュニティのメンバーがログインしている場合、like_tunesを取得し、playlist_tunesに追加
         community.members.each do |member|
           if logged_in?(member)
             Rails.logger.info "Member #{member.id} is logged in."

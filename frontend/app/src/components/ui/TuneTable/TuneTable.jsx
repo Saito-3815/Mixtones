@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { TuneColumn } from "@/components/ui/TuneColumn/TuneColumn";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,6 +13,7 @@ import { playlistAtom } from "@/atoms/playlistAtom";
 import { playerAtom } from "@/atoms/playerAtom";
 import { isLoggedInAtom } from "@/atoms/userAtoms";
 import usePreviewPlay from "@/hooks/usePreviewPlay";
+import useSearchPlaylist from "@/hooks/useSearchPlaylist";
 
 export const TuneTable = () => {
   const { communityId } = useParams();
@@ -38,42 +39,16 @@ export const TuneTable = () => {
     }
   }, [playlistData]);
 
-  // データをそれぞれコンソールへ出力
-  // console.log("playlistData:",playlistData);
-
   // 検索機能
-  const [searchText, setSearchText] = useState("");
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
-
-  const filteredPlaylist =
-    (playlistData &&
-      playlistData.filter(
-        (tune) =>
-          tune.name.toLowerCase().includes(searchText.toLowerCase()) ||
-          tune.artist.toLowerCase().includes(searchText.toLowerCase()) ||
-          tune.album.toLowerCase().includes(searchText.toLowerCase()),
-      )) ||
-    [];
-
-  // ドロップダウンメニューの外側をクリックした場合に非表示にする
-  const node = useRef();
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (node.current.contains(e.target)) {
-        // inside click
-        return;
-      }
-      // outside click
-      setIsSearchVisible(false);
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  // 検索欄以外をクリックすると閉じる
+  const {
+    searchText,
+    setSearchText,
+    isSearchVisible,
+    setIsSearchVisible,
+    filteredPlaylist,
+    node,
+  } = useSearchPlaylist(playlistData || []); // playlistDataがundefinedの場合に空の配列を渡す
 
   // 楽曲を選択してグローバルステートへ
   const [tune, setTune] = useAtom(tuneAtom);
@@ -90,7 +65,10 @@ export const TuneTable = () => {
     if (isLoggedIn) {
       setTune({ index, tune });
     } else {
-      setPreviewUrl(tune.preview_url);
+      // tune.preview_url が存在するかチェック
+      if (tune.preview_url) {
+        setPreviewUrl(tune.preview_url);
+      }
       setTune({ index, tune });
     }
   };
