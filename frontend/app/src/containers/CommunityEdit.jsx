@@ -2,18 +2,37 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
-import { Switch } from "@/components/ui/Switch/Switch";
+// import { Switch } from "@/components/ui/Switch/Switch";
 import { Button } from "@/components/ui/Button/Button";
 import { useParams } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { fetchCommunity } from "@/api/communitiesShow";
+import { updateCommunities } from "@/api/communitiesUpdate";
 
 const CommunityEdit = () => {
-  const { communitiesId } = useParams();
+  const { communityId } = useParams();
+
+  // コミュニティ情報を取得
+  const {
+    data: communityData,
+    // status: communityStatus,
+    error: communityError,
+  } = useQuery({
+    queryKey: ["community", communityId],
+    queryFn: () => fetchCommunity({ communityId: communityId }),
+  });
+
+  // console.log(communityData);
+
+  if (communityError) {
+    console.error(communityError);
+  }
 
   const community = {
-    communityName: `${communitiesId}のコミュニティネーム`,
-    playlistName: `コミュニティ${communitiesId}のプレイリストネーム`,
-    introduction: "",
-    communityImage: "https://picsum.photos/500",
+    communityName: communityData ? communityData.name : "",
+    playlistName: communityData ? communityData.playlist_name : "",
+    introduction: communityData ? communityData.introduction : "",
+    communityImage: communityData ? communityData.avatar : "",
   };
 
   const {
@@ -21,17 +40,30 @@ const CommunityEdit = () => {
     setValue,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({ mode: "onChange" });
 
   useEffect(() => {
+    setValue("image", community.communityImage);
     setValue("communityName", community.communityName);
     setValue("playlistName", community.playlistName);
     setValue("introduction", community.introduction);
-  }, [setValue]);
+  }, [communityData]);
 
   const onSubmit = (data) => {
-    console.log(data);
+    CommunityEdit.mutate(data);
   };
+
+  const CommunityEdit = useMutation({
+    mutationFn: (data, communityId) => updateCommunities(data, communityId),
+    onSuccess: (data) => {
+      if (data.status === 201) {
+        console.log(data);
+      }
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
 
   return (
     <div className="container flex flex-col justify-start items-center my-20 max-w-[900px] bg-theme-black">
@@ -113,7 +145,7 @@ const CommunityEdit = () => {
           <p className="text-red-500">{errors.introduction.message}</p>
         )}
         {/* スイッチ制御 */}
-        <div className="flex justify-between items-center w-full pt-8 text-lg">
+        {/* <div className="flex justify-between items-center w-full pt-8 text-lg">
           <div className="flex flex-col">
             <h2 className="text-white">コメント</h2>
             <p className="text-theme-gray text-sm">
@@ -130,7 +162,7 @@ const CommunityEdit = () => {
             </p>
           </div>
           <Switch className="sm:mr-10 mr-0" />
-        </div>
+        </div> */}
         {/* 更新ボタン */}
         <div className="flex justify-center pt-16">
           <Button label="更新する" variant="secondary" type="submit" />

@@ -71,5 +71,6 @@ export const removeCodeVerifierAndRedirect = () => {
   sessionStorage.removeItem("redirectFrom");
   const urlWithoutCode = new URL(window.location.href);
   urlWithoutCode.searchParams.delete("code");
+  urlWithoutCode.searchParams.delete("state");
   window.history.replaceState(null, "", urlWithoutCode.href);
 };
