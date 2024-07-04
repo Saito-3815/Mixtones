@@ -10,6 +10,8 @@ import { formatTime } from "@/utils/formatTime";
 import { useAtom } from "jotai";
 import { playerAtom } from "@/atoms/playerAtom";
 import { isPlayingAtom, tuneAtom } from "@/atoms/tuneAtom";
+import { useCheckDelete } from "@/hooks/useCheckDelete";
+import { userAtom } from "@/atoms/userAtoms";
 
 export const TuneColumnChecked = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -54,10 +56,6 @@ export const TuneColumnChecked = ({ tune, index, onClick }) => {
     setIsHovered(false);
   };
 
-  // const handleClick = () => {
-  //   setisSelected(!isSelected);
-  // };
-
   // tuneが現在選択されているかどうかを判断する際に、currentTuneまたはcurrentTune.tuneがundefinedでないことを確認
   const isSelected =
     currentTune && currentTune.tune && currentTune.tune.id === Number(tune.id)
@@ -87,6 +85,14 @@ export const TuneColumnChecked = ({ tune, index, onClick }) => {
   // 追加日をフォーマット
   const date = new Date(tune.added_at);
   const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+
+  // チェックした楽曲の削除
+  const [user] = useAtom(userAtom);
+
+  const checkDelete = useCheckDelete();
+  const handleCheckDelete = () => {
+    checkDelete.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
+  };
 
   return (
     <tr
@@ -179,7 +185,11 @@ export const TuneColumnChecked = ({ tune, index, onClick }) => {
             {formattedDate}
           </span>
           {/* チェックボタン */}
-          <FontAwesomeIcon icon={faCircleCheck} className="text-theme-orange" />
+          <FontAwesomeIcon
+            icon={faCircleCheck}
+            className="text-theme-orange"
+            onClick={handleCheckDelete}
+          />
         </div>
       </td>
       {/* 再生時間 */}
@@ -203,6 +213,7 @@ TuneColumnChecked.propTypes = {
     images: PropTypes.string.isRequired,
     added_at: PropTypes.string.isRequired,
     time: PropTypes.string.isRequired,
+    spotify_uri: PropTypes.string.isRequired,
   }),
   index: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,

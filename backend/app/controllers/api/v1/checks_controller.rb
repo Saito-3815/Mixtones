@@ -49,8 +49,24 @@ module Api
         return render json: { message: 'Check tune not found' }, status: :not_found if check.nil?
 
         user.check_tunes.delete(check)
+        @check = user.check_tunes.order(id: :desc)
 
-        render json: { message: 'Check tune deleted' }, status: :ok
+        render json: { user: user.as_json(
+          except: :refresh_token,
+          include: {
+            communities: {
+              only: [:id]
+            },
+            like_tunes: {
+              only: [:id]
+            },
+            check_tunes: {
+              only: [:id]
+            }
+          }
+        ),
+        check: @check,
+        message: 'Check tune deleted' }, status: :ok
       end
 
       private

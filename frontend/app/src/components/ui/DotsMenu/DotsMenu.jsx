@@ -77,7 +77,7 @@ const DropdownMenuContent = React.forwardRef(
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
 const DropdownMenuItem = React.forwardRef(
-  ({ className, inset, ...props }, ref) => (
+  ({ className, inset, onClick, ...props }, ref) => (
     <DropdownMenuPrimitive.Item
       ref={ref}
       className={cn(
@@ -85,6 +85,7 @@ const DropdownMenuItem = React.forwardRef(
         inset && "pl-8",
         className,
       )}
+      onClick={onClick}
       {...props}
     />
   ),
@@ -189,6 +190,7 @@ DropdownMenuContent.propTypes = {
 DropdownMenuItem.propTypes = {
   className: PropTypes.string,
   inset: PropTypes.bool,
+  onClick: PropTypes.func,
 };
 
 DropdownMenuCheckboxItem.propTypes = {
@@ -233,7 +235,7 @@ export {
   DropdownMenuRadioGroup,
 };
 
-export function DotsMenu() {
+export function DotsMenu({ isTuneChecked, onClick }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -242,9 +244,11 @@ export function DotsMenu() {
       <DropdownMenuContent>
         {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator /> */}
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={onClick}>
           <FontAwesomeIcon icon={faCircleCheck} className="text-white" />
-          <h1 className="ml-2">チェックする</h1>
+          <h1 className="ml-2">
+            {isTuneChecked ? `チェックをはずす` : `チェックする`}
+          </h1>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <FontAwesomeIcon icon={faThumbsUp} className="text-white" />
@@ -258,3 +262,8 @@ export function DotsMenu() {
     </DropdownMenu>
   );
 }
+
+DotsMenu.propTypes = {
+  isTuneChecked: PropTypes.bool,
+  onClick: PropTypes.func,
+};

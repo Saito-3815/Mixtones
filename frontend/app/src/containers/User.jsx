@@ -26,9 +26,6 @@ const User = () => {
     queryFn: () => fetchUser({ userId: userId }),
   });
 
-  console.log("userData:", userData);
-  console.log("userStatus:", userStatus);
-
   if (userError) {
     console.error(userError);
   }
@@ -43,7 +40,7 @@ const User = () => {
             <Skeleton className="w-60 h-60 rounded-full" />
           ) : userData.avatar ? (
             <img
-              src="https://picsum.photos/500"
+              src={userData.avatar}
               alt="User"
               className="w-60 h-60 rounded-full object-cover"
             />

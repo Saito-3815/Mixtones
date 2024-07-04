@@ -14,7 +14,7 @@ import axios from "axios";
 import { createCommunity } from "@/api/communitiesCreate";
 
 export const Header = () => {
-  const [, setUser] = useAtom(userAtom);
+  const [user, setUser] = useAtom(userAtom);
   const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ export const Header = () => {
                   onActionClick={handleCreateCommunity.mutate}
                   cancelText="キャンセル"
                 />
-                <AvatarMenu src="" />
+                <AvatarMenu userAvatar={user.avatar} />
               </div>
             </>
           ) : (

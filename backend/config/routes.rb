@@ -16,6 +16,7 @@ Rails.application.routes.draw do
         resources :likes, only: [:create] # お気に入りを追加登録
         get 'likes/latest', to: 'likes#latest' # 最新のlike_tunesを取得
         resources :checks, only: [:index, :create, :destroy]
+        delete :checks, to: 'checks#destroy'
       end
       resources :sessions, only: [:create]
       delete 'sessions', to: 'sessions#destroy'

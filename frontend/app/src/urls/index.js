@@ -43,3 +43,6 @@ export const checksIndex = (userId) =>
 // チェック楽曲を登録
 export const checksCreate = (userId) =>
   `${DEFAULT_API_LOCALHOST}/users/${userId}/checks`;
+// チェック楽曲を削除
+export const checksDestroy = (userId) =>
+  `${DEFAULT_API_LOCALHOST}/users/${userId}/checks`;

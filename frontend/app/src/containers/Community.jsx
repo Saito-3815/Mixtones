@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button/Button";
 import React, { useEffect, useRef, useState } from "react";
 import { TuneTable } from "@/components/ui/TuneTable/TuneTable";
 import { AlertDialogSet } from "@/components/ui/AlertDialog/AlertDialog";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchCommunity } from "@/api/communitiesShow";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
@@ -51,10 +51,6 @@ const Community = () => {
   if (communityError) {
     console.error(communityError);
   }
-
-  //データをそれぞれコンソールへ出力
-  // console.log(communityData);
-  // console.log(communityError);
 
   // コミュニティに参加する
   const handleJoinCommunity = useMutation({
@@ -212,7 +208,9 @@ const Community = () => {
             </h2>
             <div className="flex space-x-3 mt-1">
               {communityData.members.map((member, index) => (
-                <AvatarSet key={index} src={member.avatar} size="6" />
+                <Link key={index} to={`/users/${member.id}`}>
+                  <AvatarSet src={member.avatar} size="6" />
+                </Link>
               ))}
             </div>
             <p

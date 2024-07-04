@@ -11,8 +11,9 @@ import { logoutUser, userAtom } from "@/atoms/userAtoms";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { destroySessions } from "@/api/sessionsDestroy";
-import { useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { useDestroyUser } from "@/api/usersDestroy";
+import { Link } from "react-router-dom";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -235,7 +236,7 @@ export {
 };
 
 export function AvatarMenu({ userAvatar }) {
-  const setUser = useSetAtom(userAtom);
+  const [user, setUser] = useAtom(userAtom);
 
   // ユーザーログアウトリクエスト
   const handleLogout = useMutation({
@@ -286,7 +287,9 @@ export function AvatarMenu({ userAvatar }) {
       <DropdownMenuContent>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>プロフィール</DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link to={`/users/${user.id}`}>プロフィール</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
           <AlertDialogSet
             triggerComponent={<span>ログアウト</span>}

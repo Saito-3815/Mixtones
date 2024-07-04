@@ -17,6 +17,7 @@ import { formatTime } from "@/utils/formatTime";
 import { userAtom } from "@/atoms/userAtoms";
 import { CheckColorIcon } from "../ColorIcon/CheckColorIcon";
 import { useCheck } from "@/hooks/useCheck";
+import { useCheckDelete } from "@/hooks/useCheckDelete";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -101,11 +102,14 @@ export const TuneColumn = ({ tune, index, onClick }) => {
       (tuneItem) => Number(tuneItem.id) === Number(tune.id),
     );
 
-  // console.log("isTuneChecked:", isTuneChecked);
-
   const checkTune = useCheck();
-  const handleCheck = () => {
+  const handleCheckCreate = () => {
     checkTune.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
+  };
+
+  const checkDelete = useCheckDelete();
+  const handleCheckDelete = () => {
+    checkDelete.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
   };
 
   return (
@@ -203,7 +207,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
             <CheckColorIcon
               icon={faCircleCheck}
               isTuneChecked={isTuneChecked}
-              onClick={handleCheck}
+              onClick={isTuneChecked ? handleCheckDelete : handleCheckCreate}
             />
             {/* レコメンドボタン */}
             <ColorIcon icon={faThumbsUp} />
@@ -223,7 +227,10 @@ export const TuneColumn = ({ tune, index, onClick }) => {
       {/* ドットメニュー */}
       <td className="sm:hidden">
         <div className="md:hidden justify-center px-4">
-          <DotsMenu />
+          <DotsMenu
+            isTuneChecked={isTuneChecked}
+            onClick={isTuneChecked ? handleCheckDelete : handleCheckCreate}
+          />
         </div>
       </td>
     </tr>
