@@ -48,7 +48,7 @@ const Community = () => {
     queryFn: () => fetchCommunity({ communityId: communityId }),
   });
 
-  console.log(communityData);
+  // console.log(communityData);
 
   if (communityError) {
     console.error(communityError);
@@ -111,7 +111,7 @@ const Community = () => {
         default:
           console.log("Unexpected status code:", data.status);
       }
-      console.log(data);
+      // console.log(data);
     },
     onError: (error) => {
       if (axios.isCancel(error)) {
@@ -228,10 +228,12 @@ const Community = () => {
           {/* ユーザー情報にコミュニティIDが含まれていれば編集、脱退ボタン */}
           {isMember ? (
             <>
-              <Button
-                label="コミュニティを編集する"
-                className="bg-theme-orange w-[300px]"
-              />
+              <Link to={`/communities/${communityId}/edit`}>
+                <Button
+                  label="コミュニティを編集する"
+                  className="bg-theme-orange w-[300px]"
+                />
+              </Link>
               <AlertDialogSet
                 triggerComponent={
                   <Button

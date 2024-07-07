@@ -9,7 +9,7 @@ export const updateCommunities = (data, communityId) => {
       name: data.communityName,
       playlist_name: data.playlistName,
       introduction: data.introduction,
-      avatar: data.image,
+      // avatar: data.image,
     },
     { withCredentials: true },
   );

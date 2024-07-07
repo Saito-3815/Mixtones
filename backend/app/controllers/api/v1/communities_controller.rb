@@ -23,11 +23,6 @@ module Api
         if @community.save
           create_membership
           add_like_tunes_to_playlist
-          # community_url = "#{ENV.fetch('FRONTEND_URL', nil)}communities/#{@community[:id]}"
-          # render json: {
-          #   community: @community,
-          #   redirect_url: community_url
-          #   }, status: :created
           render json: {
             community: @community,
             user: current_user.as_json(include: { communities: { only: [:id] } })
@@ -39,11 +34,16 @@ module Api
 
       def update
         @community = Community.find(params[:id])
+        # current_userがcommunityのメンバーに含まれているか確認
+        unless @community.members.include?(current_user)
+          return render json: { error: '権限がありません' }, status: :forbidden
+        end
+
         # リクエストに:communityが含まれている場合、community_paramsを更新
         if @community.update(community_params)
           render json: @community
         else
-          render status: :unprocessable_entity
+          render json: @community.errors, status: :unprocessable_entity
         end
       end
 
@@ -55,7 +55,7 @@ module Api
       private
 
       def community_params
-        params.require(:community).permit(:name, :introduction, :avatar)
+        params.require(:community).permit(:name, :introduction, :playlist_name)
       end
 
       def build_community

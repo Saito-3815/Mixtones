@@ -22,6 +22,8 @@ Rails.application.routes.draw do
       delete 'sessions', to: 'sessions#destroy'
       get 'sessions', to: 'sessions#current_user_show'
       post 'sessions/guest', to: 'sessions#guest_login'
+
+      post 'images', to: 'images#create'
     end
   end
 end

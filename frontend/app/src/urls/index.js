@@ -8,6 +8,9 @@ export const communitiesShow = (communityId) =>
   `${DEFAULT_API_LOCALHOST}/communities/${communityId}`;
 // コミュニティを作成
 export const communitiesCreate = `${DEFAULT_API_LOCALHOST}/communities`;
+// コミュニティを更新
+export const communitiesUpdate = (communityId) =>
+  `${DEFAULT_API_LOCALHOST}/communities/${communityId}`;
 
 // プレイリスト一覧
 export const playlistsIndex = (communityId) =>
@@ -46,3 +49,6 @@ export const checksCreate = (userId) =>
 // チェック楽曲を削除
 export const checksDestroy = (userId) =>
   `${DEFAULT_API_LOCALHOST}/users/${userId}/checks`;
+
+// 署名付きurlを取得
+export const imagesCreate = `${DEFAULT_API_LOCALHOST}/images`;
