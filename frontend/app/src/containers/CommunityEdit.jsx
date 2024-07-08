@@ -10,9 +10,10 @@ import { fetchCommunity } from "@/api/communitiesShow";
 import { updateCommunities } from "@/api/communitiesUpdate";
 import { useAtom } from "jotai";
 import { userAtom } from "@/atoms/userAtoms";
-import { createSignedUrl } from "@/api/imagesCreate";
 import axios from "axios";
-import { communitiesUpdateAvatar } from "@/urls";
+import { useRef } from "react";
+import { updateCommunitiesAvatar } from "@/api/communitiesAvatarUpdate";
+import { useGetSignedUrl } from "@/hooks/useGetSignedUrl";
 
 const CommunityEdit = () => {
   const { communityId } = useParams();
@@ -20,6 +21,8 @@ const CommunityEdit = () => {
   const navigate = useNavigate();
 
   const [user] = useAtom(userAtom);
+
+  const inputRef = useRef(null);
 
   // コミュニティ情報を取得
   const {
@@ -101,10 +104,6 @@ const CommunityEdit = () => {
   // 画像をアップロード
   const [, setImage] = useState(null);
 
-  // useEffect(() => {
-  //   console.log("image:", image);
-  // }, [image]);
-
   const ImageSubmit = async (e) => {
     console.log(e.target.files);
     const file = e.target.files[0];
@@ -135,9 +134,7 @@ const CommunityEdit = () => {
       const fileKey = extractFileKeyFromUrl(url);
       console.log("ファイルのkey:", fileKey);
 
-      const updateUrl = communitiesUpdateAvatar(communityId);
-
-      const uploadResponse = await axios.put(updateUrl, file, {
+      const uploadResponse = await axios.put(url, file, {
         headers: {
           "Content-Type": file.type,
         },
@@ -146,34 +143,28 @@ const CommunityEdit = () => {
 
       // アップロードが成功した場合、バックエンドにfileKeyを送信
       if (uploadResponse.status === 200) {
-        const updateAvatarResponse = await axios.put(
-          `http://localhost:3001/api/v1/communities/${communityId}/update_avatar`,
+        await updateAvatar.mutate(
+          { fileKey, communityId },
           {
-            fileKey: fileKey,
+            onSuccess: (data) => {
+              if (data.status === 200) {
+                console.log("アバター更新のレスポンス:", data);
+                navigate(`/communities/${communityId}`);
+              }
+            },
+            onError: (error) => {
+              console.error(error);
+            },
           },
         );
-        console.log("アバター更新のレスポンス:", updateAvatarResponse);
-        if (updateAvatarResponse.status === 200) {
-          navigate(`/communities/${communityId}`);
-        }
       }
     } catch (error) {
-      console.error("エラーが発生しました:", error);
+      console.error(error);
     }
   };
 
   // 署名付きURLを取得
-  const getSignedUrl = useMutation({
-    mutationFn: createSignedUrl,
-    onSuccess: (data) => {
-      if (data.status === 200) {
-        console.log("署名付きURLの取得に成功:", data.data.url);
-      }
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
+  const getSignedUrl = useGetSignedUrl();
 
   // URLからファイルのkeyを抽出する関数
   const extractFileKeyFromUrl = (url) => {
@@ -183,44 +174,70 @@ const CommunityEdit = () => {
     return key;
   };
 
+  // バックエンドにfileKeyを送信
+  const updateAvatar = useMutation({
+    mutationFn: updateCommunitiesAvatar,
+    onSuccess: (data) => {
+      if (data.status === 200) {
+        console.log("アバター更新のレスポンス:", data);
+        navigate(`/communities/${communityId}`);
+      }
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
   return (
     <div className="container flex flex-col justify-start items-center my-20 max-w-[900px] bg-theme-black">
       {/* 画像セクション */}
-      {/* <form
-        action=""
-        className="flex flex-col justify-start w-full sm:px-28 px-6 pt-10"
-        // onSubmit={(e) => e.preventDefault()}
-        onSubmit={handleSubmit(ImageSubmit)}
-      > */}
-      <input
-        type="file"
-        id="image"
-        accept="/image/*"
-        style={{ display: "none" }}
-        onChange={ImageSubmit}
-        // {...register("image")}
-      />
-      <label htmlFor="image">
-        <div className="w-40 h-40 mx-auto bg-gray-400 rounded-sm flex items-center justify-center cursor-pointer">
-          {community.communityImage ? (
-            <img
-              src={community.communityImage}
-              alt=""
-              className="object-cover object-center w-full h-full rounded-sm"
-            />
-          ) : (
-            <FontAwesomeIcon
-              icon={faUserGroup}
-              className="w-3/4 h-3/4 text-gray-500 self-center"
-            />
-          )}
+      <div className="flex flex-col justify-start w-full sm:px-28 px-6 pt-10">
+        <input
+          type="file"
+          id="image"
+          accept="/image/*"
+          style={{ display: "none" }}
+          onChange={ImageSubmit}
+        />
+        <label htmlFor="image">
+          <div className="w-40 h-40 mx-auto bg-gray-400 rounded-sm flex items-center justify-center cursor-pointer">
+            {community.communityImage ? (
+              <img
+                src={community.communityImage}
+                alt=""
+                className="object-cover object-center w-full h-full rounded-sm"
+              />
+            ) : (
+              <FontAwesomeIcon
+                icon={faUserGroup}
+                className="w-3/4 h-3/4 text-gray-500 self-center"
+              />
+            )}
+          </div>
+          <p className="text-white text-center text-xl pt-8">
+            コミュニティ画像
+          </p>
+        </label>
+        <div className="flex justify-center pt-8">
+          <input
+            type="file"
+            id="image-upload"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={ImageSubmit}
+            ref={inputRef} // inputRef は useRef() フックを使用して作成された参照です
+          />
+          <label htmlFor="image-upload">
+            <Button
+              label="画像をアップロード"
+              variant="secondary"
+              onClick={() => inputRef.current.click()} // Button をクリックしたときに input のクリックイベントを発火
+            >
+              画像をアップロード
+            </Button>
+          </label>
         </div>
-        <p className="text-white text-center text-xl pt-8">コミュニティ画像</p>
-      </label>
-      <div className="flex justify-center pt-8">
-        <Button label="画像をアップロード" variant="secondary" type="submit" />
       </div>
-      {/* </form> */}
 
       {/* コミュニティ名 */}
       <form

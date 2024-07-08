@@ -7,7 +7,7 @@ module Api
         @communities = Community.all
         @communities_with_avatar_url = @communities.map do |community|
           avatar_url = community.generate_s3_url(community.avatar) if community.avatar.present?
-          community.attributes.merge(avatar_url: avatar_url)
+          community.attributes.merge(avatar: avatar_url)
         end
         render json: @communities_with_avatar_url
       end
@@ -20,7 +20,7 @@ module Api
 
       def edit
         @community = Community.find(params[:id])
-        avatar_url = @community.generate_s3_url(key: @community.avatar)
+        avatar_url = @community.generate_s3_url(@community.avatar)
         render json: @community.as_json.merge(avatar: avatar_url)
       end
 
@@ -48,7 +48,7 @@ module Api
 
         # リクエストに:communityが含まれている場合、community_paramsを更新
         if @community.update(community_params)
-          avatar_url = @community.generate_s3_url(key: @community.avatar)
+          avatar_url = @community.generate_s3_url(@community.avatar)
           render json: @community.as_json.merge(avatar: avatar_url)
         else
           render json: @community.errors, status: :unprocessable_entity
@@ -59,7 +59,7 @@ module Api
         @community = Community.find(params[:community_id])
         @community.avatar = params[:key]
         @community.save
-        render status: :ok
+        render json: @community, status: :ok
       end
 
       def destroy
