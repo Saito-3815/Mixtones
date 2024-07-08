@@ -12,6 +12,7 @@ import { useAtom } from "jotai";
 import { userAtom } from "@/atoms/userAtoms";
 import { createSignedUrl } from "@/api/imagesCreate";
 import axios from "axios";
+import { communitiesUpdateAvatar } from "@/urls";
 
 const CommunityEdit = () => {
   const { communityId } = useParams();
@@ -131,16 +132,31 @@ const CommunityEdit = () => {
         throw new Error("URLがresponseに含まれていません。");
       }
 
-      let presignedUrl = url;
-      const fileName = encodeURIComponent(file.name);
-      presignedUrl = presignedUrl.replace("${filename}", fileName);
+      const fileKey = extractFileKeyFromUrl(url);
+      console.log("ファイルのkey:", fileKey);
 
-      const uploadResponse = await axios.put(presignedUrl, file, {
+      const updateUrl = communitiesUpdateAvatar(communityId);
+
+      const uploadResponse = await axios.put(updateUrl, file, {
         headers: {
           "Content-Type": file.type,
         },
       });
       console.log("アップロード後のレスポンス:", uploadResponse);
+
+      // アップロードが成功した場合、バックエンドにfileKeyを送信
+      if (uploadResponse.status === 200) {
+        const updateAvatarResponse = await axios.put(
+          `http://localhost:3001/api/v1/communities/${communityId}/update_avatar`,
+          {
+            fileKey: fileKey,
+          },
+        );
+        console.log("アバター更新のレスポンス:", updateAvatarResponse);
+        if (updateAvatarResponse.status === 200) {
+          navigate(`/communities/${communityId}`);
+        }
+      }
     } catch (error) {
       console.error("エラーが発生しました:", error);
     }
@@ -158,6 +174,14 @@ const CommunityEdit = () => {
       console.error(error);
     },
   });
+
+  // URLからファイルのkeyを抽出する関数
+  const extractFileKeyFromUrl = (url) => {
+    // URLからパス部分を取得
+    const path = new URL(url).pathname;
+    const key = `uploads/${path.split("uploads/")[1]}`;
+    return key;
+  };
 
   return (
     <div className="container flex flex-col justify-start items-center my-20 max-w-[900px] bg-theme-black">

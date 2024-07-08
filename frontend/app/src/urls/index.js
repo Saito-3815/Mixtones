@@ -11,6 +11,9 @@ export const communitiesCreate = `${DEFAULT_API_LOCALHOST}/communities`;
 // コミュニティを更新
 export const communitiesUpdate = (communityId) =>
   `${DEFAULT_API_LOCALHOST}/communities/${communityId}`;
+// コミュニティの画像を更新
+export const communitiesUpdateAvatar = (communityId) =>
+  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/update_avatar`;
 
 // プレイリスト一覧
 export const playlistsIndex = (communityId) =>

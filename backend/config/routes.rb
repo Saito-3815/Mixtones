@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       root 'communities#index'
 
       resources :communities, only: [:index, :show, :create, :edit, :update, :destroy] do
+        put :update_avatar, to: 'communities#update_avatar'
         resources :memberships, only: [:create]
         delete :memberships, to: 'memberships#destroy'
         resources :playlists, only: [:index]
@@ -18,6 +19,7 @@ Rails.application.routes.draw do
         resources :checks, only: [:index, :create, :destroy]
         delete :checks, to: 'checks#destroy'
       end
+
       resources :sessions, only: [:create]
       delete 'sessions', to: 'sessions#destroy'
       get 'sessions', to: 'sessions#current_user_show'
