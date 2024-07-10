@@ -48,7 +48,7 @@ const Community = () => {
     queryFn: () => fetchCommunity({ communityId: communityId }),
   });
 
-  console.log(communityData);
+  // console.log(communityData);
 
   if (communityError) {
     console.error(communityError);

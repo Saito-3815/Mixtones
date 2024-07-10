@@ -10,10 +10,10 @@ import { fetchCommunity } from "@/api/communitiesShow";
 import { updateCommunities } from "@/api/communitiesUpdate";
 import { useAtom } from "jotai";
 import { userAtom } from "@/atoms/userAtoms";
-import axios from "axios";
 import { useRef } from "react";
-import { updateCommunitiesAvatar } from "@/api/communitiesAvatarUpdate";
 import { useGetSignedUrl } from "@/hooks/useGetSignedUrl";
+import { useUploadS3 } from "@/hooks/useUploadS3";
+import { useUpdateCommunitiesAvatar } from "@/hooks/useUpdateCommunitiesAvatar";
 
 const CommunityEdit = () => {
   const { communityId } = useParams();
@@ -85,6 +85,7 @@ const CommunityEdit = () => {
     CommunityEdit.mutate(dataWithId);
   };
 
+  // コミュニティのテキスト情報を更新
   const CommunityEdit = useMutation({
     mutationFn: (dataWithId) => {
       const { communityId, ...data } = dataWithId;
@@ -101,7 +102,7 @@ const CommunityEdit = () => {
     },
   });
 
-  // 画像をアップロード
+  // 画像をアップロードして更新する
   const [, setImage] = useState(null);
 
   const ImageSubmit = async (e) => {
@@ -109,22 +110,10 @@ const CommunityEdit = () => {
     const file = e.target.files[0];
     setImage(file);
 
+    // バックエンドから署名付きURLを取得
     try {
-      // mutateメソッドの結果をPromiseを使用してawaitで待つ
-      const response = await new Promise((resolve, reject) => {
-        getSignedUrl.mutate(file, {
-          onSuccess: (data) => {
-            if (data.status === 200) {
-              resolve(data);
-            } else {
-              reject(new Error("signedUrlを取得できませんでした。"));
-            }
-          },
-          onError: (error) => {
-            reject(error);
-          },
-        });
-      });
+      // mutateAsyncで結果をPromiseを使用してawaitで待つ
+      const response = await getSignedUrl.mutateAsync(file);
 
       const url = response.data.url;
       if (!url) {
@@ -134,29 +123,16 @@ const CommunityEdit = () => {
       const fileKey = extractFileKeyFromUrl(url);
       console.log("ファイルのkey:", fileKey);
 
-      const uploadResponse = await axios.put(url, file, {
-        headers: {
-          "Content-Type": file.type,
-        },
-      });
-      console.log("アップロード後のレスポンス:", uploadResponse);
+      // S3へファイルをアップロード
+      const uploadResponse = await uploadS3.mutateAsync({ file, url });
 
       // アップロードが成功した場合、バックエンドにfileKeyを送信
-      if (uploadResponse.status === 200) {
-        await updateAvatar.mutate(
-          { fileKey, communityId },
-          {
-            onSuccess: (data) => {
-              if (data.status === 200) {
-                console.log("アバター更新のレスポンス:", data);
-                navigate(`/communities/${communityId}`);
-              }
-            },
-            onError: (error) => {
-              console.error(error);
-            },
-          },
-        );
+      if (uploadResponse && uploadResponse.status === 200) {
+        await updateAvatar.mutate({ fileKey, communityId });
+      } else {
+        // uploadResponseが期待通りでない場合のエラーハンドリング
+        console.error("アップロードに失敗しました。", uploadResponse);
+        throw new Error("アップロードに失敗しました。");
       }
     } catch (error) {
       console.error(error);
@@ -174,19 +150,11 @@ const CommunityEdit = () => {
     return key;
   };
 
+  // s3へファイルをアップロードする関数
+  const uploadS3 = useUploadS3();
+
   // バックエンドにfileKeyを送信
-  const updateAvatar = useMutation({
-    mutationFn: updateCommunitiesAvatar,
-    onSuccess: (data) => {
-      if (data.status === 200) {
-        console.log("アバター更新のレスポンス:", data);
-        navigate(`/communities/${communityId}`);
-      }
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
+  const updateAvatar = useUpdateCommunitiesAvatar();
 
   return (
     <div className="container flex flex-col justify-start items-center my-20 max-w-[900px] bg-theme-black">
