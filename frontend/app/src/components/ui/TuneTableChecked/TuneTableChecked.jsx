@@ -31,9 +31,12 @@ export const TuneTableChecked = () => {
   console.log("checkTunesData:", checkTunesData);
   console.log("checkTunesStatus:", checkTunesStatus);
 
-  if (checkTunesError) {
-    return <div>Error</div>;
-  }
+  useEffect(() => {
+    if (checkTunesError) {
+      // エラーハンドリングのロジックをここに移動
+      console.error("Error loading tunes:", checkTunesError);
+    }
+  }, [checkTunesError]);
 
   // チェックした楽曲データが取得できた場合、グローバルステートで管理する
   useEffect(() => {
@@ -86,6 +89,11 @@ export const TuneTableChecked = () => {
       player.togglePlay();
     }
   };
+
+  // エラーがある場合はここで早期リターン
+  if (checkTunesError) {
+    return <div>Error</div>;
+  }
 
   return (
     <div className="flex flex-col items-end max-w-[1200px]">

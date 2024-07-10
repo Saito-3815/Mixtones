@@ -5,17 +5,23 @@ module Api
 
       def index
         @communities = Community.all
-        render json: @communities
+        @communities_with_avatar_url = @communities.map do |community|
+          avatar_url = community.generate_s3_url(community.avatar) if community.avatar.present?
+          community.attributes.merge(avatar: avatar_url)
+        end
+        render json: @communities_with_avatar_url
       end
 
       def show
         @community = Community.find(params[:id])
-        render json: @community.as_json(include: ['members'], methods: [:playlist_tunes_count])
+        avatar_url = @community.generate_s3_url(@community.avatar) if @community.avatar.present?
+        render json: @community.as_json(include: ['members'], methods: [:playlist_tunes_count]).merge(avatar: avatar_url)
       end
 
       def edit
         @community = Community.find(params[:id])
-        render json: @community
+        avatar_url = @community.generate_s3_url(@community.avatar)
+        render json: @community.as_json.merge(avatar: avatar_url)
       end
 
       def create
@@ -23,11 +29,7 @@ module Api
         if @community.save
           create_membership
           add_like_tunes_to_playlist
-          # community_url = "#{ENV.fetch('FRONTEND_URL', nil)}communities/#{@community[:id]}"
-          # render json: {
-          #   community: @community,
-          #   redirect_url: community_url
-          #   }, status: :created
+          # avatar_url = @community.generate_s3_url(key: @community.avatar)
           render json: {
             community: @community,
             user: current_user.as_json(include: { communities: { only: [:id] } })
@@ -39,12 +41,25 @@ module Api
 
       def update
         @community = Community.find(params[:id])
+        # current_userがcommunityのメンバーに含まれているか確認
+        unless @community.members.include?(current_user)
+          return render json: { error: '権限がありません' }, status: :forbidden
+        end
+
         # リクエストに:communityが含まれている場合、community_paramsを更新
         if @community.update(community_params)
-          render json: @community
+          avatar_url = @community.generate_s3_url(@community.avatar)
+          render json: @community.as_json.merge(avatar: avatar_url)
         else
-          render status: :unprocessable_entity
+          render json: @community.errors, status: :unprocessable_entity
         end
+      end
+
+      def update_avatar
+        @community = Community.find(params[:community_id])
+        @community.avatar = params[:key]
+        @community.save
+        render json: @community, status: :ok
       end
 
       def destroy
@@ -55,7 +70,7 @@ module Api
       private
 
       def community_params
-        params.require(:community).permit(:name, :introduction, :avatar)
+        params.require(:community).permit(:name, :introduction, :playlist_name)
       end
 
       def build_community

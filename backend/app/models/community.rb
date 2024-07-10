@@ -1,4 +1,6 @@
 class Community < ApplicationRecord
+  include S3Presignable
+
   has_many :memberships, dependent: :destroy
   has_many :members, through: :memberships, source: :user
   has_many :playlists, dependent: :destroy

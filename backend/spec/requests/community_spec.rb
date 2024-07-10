@@ -69,8 +69,21 @@ RSpec.describe Community, type: :request do
 
   # updateアクションのテスト
   describe 'PATCH /api/v1/communities/:id' do
+    let(:user) { create(:user) }
+    let(:community) { create(:community) }
+    let(:membership_params) do
+      {
+        user_id: user.id
+      }
+    end
+
+    # current_userをコミュニティに参加
+    before do
+      login_with_spotify(user)
+      post "/api/v1/communities/#{community.id}/memberships", params: membership_params
+    end
+
     it 'returns 200 status code if community object exists' do
-      community = create(:community)
       patch "/api/v1/communities/#{community.id}",
             params: { community: {
               name: 'Test',
@@ -83,7 +96,6 @@ RSpec.describe Community, type: :request do
 
     # communityオブジェクトの属性を更新すること
     it 'updates a community' do
-      community = create(:community)
       patch "/api/v1/communities/#{community.id}",
             params: { community: {
               name: 'Test',
