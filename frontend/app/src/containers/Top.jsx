@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getCodeFromUrl, removeCodeVerifierAndRedirect } from "@/SpotifyAuth";
 import axios from "axios";
 import { useAtom } from "jotai";
-import { isLoggedInAtom, loginUser, userAtom } from "@/atoms/userAtoms";
+import { loginUser, userAtom } from "@/atoms/userAtoms";
 
 // api
 import { fetchCommunities } from "@/api/communitiesIndex";
@@ -16,7 +16,7 @@ import { tokenAtom } from "@/atoms/tokenAtoms";
 
 const Top = () => {
   const [user, setUser] = useAtom(userAtom);
-  const [token, setToken] = useAtom(tokenAtom);
+  const [, setToken] = useAtom(tokenAtom);
 
   // コミュニティー一覧を取得
   const {
@@ -61,6 +61,7 @@ const Top = () => {
       if (!user) {
         loginUser(setUser, data.data.user);
         setToken(data.data.access_token);
+        console.log("user:", data);
       }
     },
     onError: (error) => {
@@ -74,14 +75,14 @@ const Top = () => {
     },
   });
 
-  const [isLoggedIn] = useAtom(isLoggedInAtom);
+  // const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   // userAtom の変更を監視
-  useEffect(() => {
-    console.log("userAtom updated:", user);
-    console.log("isLoggedIn?:", isLoggedIn);
-    console.log("token:", token);
-  }, [user]);
+  // useEffect(() => {
+  //   console.log("userAtom updated:", user);
+  //   console.log("isLoggedIn?:", isLoggedIn);
+  //   console.log("token:", token);
+  // }, [user]);
 
   // 認証ページからリダイレクトされた際にコードを取得し、ユーザー作成もしくはログインリクエストを送信
   useEffect(() => {

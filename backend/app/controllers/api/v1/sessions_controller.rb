@@ -23,7 +23,7 @@ module Api
         if existing_user
           update_result = update_user_and_like_tunes(existing_user, refresh_token, user_create_params)
           update_session_expiration(spotify_login_params[:is_persistent])
-          render_user_json(update_result[:user], access_token)
+          render_user_json(update_result[:user],update_result[:session_id], access_token)
         else
           signup_url = "#{ENV.fetch('SPOTIFY_REDIRECT_URI', nil)}signup"
           render json: { message: 'User not found', redirect_url: signup_url }, status: :not_found
@@ -42,10 +42,18 @@ module Api
       end
 
       def current_user_show
+        Rails.logger.info "current_user_show called"
         if current_user.nil?
+          # Rails.logger.info "current_user is nil"
           render json: { error: 'User not found' }, status: :not_found
+        elsif current_user.spotify_id == 'guest_user'
+          # Rails.logger.info "current_user is a guest_user"
+          # ゲストユーザーの場合は、何も処理せずにユーザーデータを返却
+          render json: { user: current_user.as_json(except: :refresh_token), message: 'Guest user data' }, status: :ok
         else
+          # Rails.logger.info "current_user is a regular user"
           access_token = SpotifyAuth.refresh_access_token(current_user.refresh_token)
+          # Rails.logger.info "Access token refreshed for current_user"
           render_user_json(current_user, access_token)
         end
       end
@@ -56,9 +64,16 @@ module Api
         user = User.find_by(spotify_id: 'guest_user'.downcase)
         if user
           copy_original_guest_data_to(user)
+          # セッションの状態をログに出力（ログイン前）
+          Rails.logger.info "Session before login: #{session.to_hash}"
           log_in(user)
+          # セッションの状態をログに出力（ログイン後）
+          Rails.logger.info "Session after login: #{session.to_hash}"
           request.session_options[:expire_after] = 1.hour
-          render json: { user: user.as_json(except: :refresh_token), message: 'Guest login successful' }, status: :ok
+          # セッションオプション設定後の状態をログに出力
+          Rails.logger.info "Session options after setting expire_after: #{request.session_options}"
+          # session_id = request.session_options[:id] || session[:session_id]
+          render json: { user: user.as_json(except: :refresh_token), session_id: session[:session_id], message: 'Guest login successful' }, status: :ok
         else
           render json: { message: 'Guest user not found' }, status: :not_found
         end

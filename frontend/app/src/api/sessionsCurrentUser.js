@@ -1,4 +1,3 @@
-// src/api/communities.js
 import axios from "axios";
 import { currentUser } from "@/urls/index";
 

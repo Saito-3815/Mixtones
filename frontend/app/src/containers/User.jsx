@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button/Button";
 import PropTypes from "prop-types";
 import { TuneTableChecked } from "@/components/ui/TuneTableChecked/TuneTableChecked";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { fetchUser } from "@/api/usersShow";
 import { Skeleton } from "@/components/ui/Skeleton/Skeleton";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -26,6 +26,8 @@ const User = () => {
     queryFn: () => fetchUser({ userId: userId }),
   });
 
+  console.log("userData:", userData);
+
   if (userError) {
     console.error(userError);
   }
@@ -36,20 +38,22 @@ const User = () => {
       <div className="container mt-10 flex flex-wrap items-start justify-between mx-auto py-10 bg-theme-black max-w-[1200px] rounded-md">
         {/* 画像 */}
         <div className="flex justify-center max-w-[240px] items-start pl-5 sm:pl-3">
-          {userStatus === "pending" || !userData ? (
-            <Skeleton className="w-60 h-60 rounded-full" />
-          ) : userData.avatar ? (
-            <img
-              src={userData.avatar}
-              alt="User"
-              className="w-60 h-60 rounded-full object-cover"
-            />
-          ) : (
-            <FontAwesomeIcon
-              icon={faUser}
-              className="w-3/4 h-3/4 text-gray-500 self-center"
-            />
-          )}
+          <div className="flex bg-gray-400 w-60 h-60 rounded-full items-center justify-center">
+            {userStatus === "pending" || !userData ? (
+              <Skeleton className="w-60 h-60 rounded-full" />
+            ) : userData.avatar ? (
+              <img
+                src={userData.avatar}
+                alt="User"
+                className="w-60 h-60 rounded-full object-cover"
+              />
+            ) : (
+              <FontAwesomeIcon
+                icon={faUser}
+                className="w-3/4 h-3/4 text-gray-500 self-center"
+              />
+            )}
+          </div>
         </div>
         {/* テキスト情報 */}
         {userStatus === "pending" || !userData ? (
@@ -70,11 +74,13 @@ const User = () => {
         {/* ボタン類 */}
         <div className="max-w-[480px] pr-10 flex flex-col h-full py-10 space-y-5">
           {user && parseInt(userId, 10) === user.id && (
-            <Button
-              label="プロフィールを編集する"
-              variant="secondary"
-              className="w-[300px]"
-            />
+            <Link to={`/users/${userId}/edit`}>
+              <Button
+                label="プロフィールを編集する"
+                variant="secondary"
+                className="w-[300px]"
+              />
+            </Link>
           )}
         </div>
       </div>

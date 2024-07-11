@@ -24,12 +24,12 @@ export const TuneTableChecked = () => {
   // チェックした楽曲を取得
   const {
     data: checkTunesData,
-    status: checkTunesStatus,
+    // status: checkTunesStatus,
     error: checkTunesError,
   } = useCheckTunes(userId);
 
-  console.log("checkTunesData:", checkTunesData);
-  console.log("checkTunesStatus:", checkTunesStatus);
+  // console.log("checkTunesData:", checkTunesData);
+  // console.log("checkTunesStatus:", checkTunesStatus);
 
   useEffect(() => {
     if (checkTunesError) {
@@ -63,9 +63,9 @@ export const TuneTableChecked = () => {
   // previewUrlが変更されたときにusePreviewPlayを呼び出す
   usePreviewPlay(previewUrl);
 
-  useEffect(() => {
-    console.log("tuneAtom updated:", tune);
-  }, [tune]);
+  // useEffect(() => {
+  //   console.log("tuneAtom updated:", tune);
+  // }, [tune]);
 
   const handleColumnClick = (index, tune) => {
     if (isLoggedIn) {

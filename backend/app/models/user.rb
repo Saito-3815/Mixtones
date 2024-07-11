@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include S3Presignable
+
   has_many :memberships, dependent: :destroy
   has_many :communities, through: :memberships
   has_many :comments, dependent: :destroy

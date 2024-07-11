@@ -48,7 +48,7 @@ const Community = () => {
     queryFn: () => fetchCommunity({ communityId: communityId }),
   });
 
-  // console.log(communityData);
+  console.log(communityData);
 
   if (communityError) {
     console.error(communityError);
@@ -72,7 +72,7 @@ const Community = () => {
           data.data.community.playlist_tunes,
         );
       }
-      console.log(data);
+      // console.log(data);
     },
     onError: (error) => {
       if (axios.isCancel(error)) {
@@ -109,7 +109,7 @@ const Community = () => {
           navigate("/");
           break;
         default:
-          console.log("Unexpected status code:", data.status);
+        // console.log("Unexpected status code:", data.status);
       }
       // console.log(data);
     },

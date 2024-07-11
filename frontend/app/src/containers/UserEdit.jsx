@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 // import { Switch } from "@/components/ui/Switch/Switch";
 import { Button } from "@/components/ui/Button/Button";
 import { useNavigate, useParams } from "react-router-dom";
 // import { AvatarSet } from "@/components/ui/Avatar/Avatar";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchUser } from "@/api/usersShow";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useAtom } from "jotai";
 import { userAtom } from "@/atoms/userAtoms";
+import { updateUsers } from "@/api/usersUpdate";
+import { useUploadS3 } from "@/hooks/useUploadS3";
+import { useGetSignedUrl } from "@/hooks/useGetSignedUrl";
+import { useUpdateUsersAvatar } from "@/hooks/useUpdateUsersAvatar";
 
 const userEdit = () => {
   const { userId } = useParams();
@@ -17,6 +21,8 @@ const userEdit = () => {
   const [loginUser] = useAtom(userAtom);
 
   const navigate = useNavigate();
+
+  const inputRef = useRef(null);
 
   // ユーザー情報を取得
   const {
@@ -39,7 +45,8 @@ const userEdit = () => {
 
   useEffect(() => {
     if (loginUser && userData && userId) {
-      setIsUser(loginUser.id === userId);
+      // loginUser.idとuserIdを数値型に変換して比較
+      setIsUser(Number(loginUser.id) === Number(userId));
     }
   }, [loginUser, userData, userId]);
 
@@ -71,8 +78,80 @@ const userEdit = () => {
   }, [userData]);
 
   const onSubmit = (data) => {
-    console.log(data);
+    const dataWithId = { ...data, userId };
+    UserEdit.mutate(dataWithId);
   };
+
+  //  ユーザーのテキスト情報を更新
+  const UserEdit = useMutation({
+    mutationFn: (dataWithId) => {
+      const { userId, ...data } = dataWithId;
+      return updateUsers(data, userId);
+    },
+    onSuccess: (data) => {
+      if (data.status === 200) {
+        // console.log(data);
+        navigate(`/users/${userId}`);
+      }
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+  // 画像をアップロードして更新する
+  const [, setImage] = useState(null);
+
+  const ImageSubmit = async (e) => {
+    console.log(e.target.files);
+    const file = e.target.files[0];
+    setImage(file);
+
+    // バックエンドから署名付きURLを取得
+    try {
+      // mutateAsyncで結果をPromiseを使用してawaitで待つ
+      const response = await getSignedUrl.mutateAsync(file);
+
+      const url = response.data.url;
+      if (!url) {
+        throw new Error("URLがresponseに含まれていません。");
+      }
+
+      const fileKey = extractFileKeyFromUrl(url);
+      console.log("ファイルのkey:", fileKey);
+
+      // S3へファイルをアップロード
+      const uploadResponse = await uploadS3.mutateAsync({ file, url });
+
+      // アップロードが成功した場合、バックエンドにfileKeyを送信
+      if (uploadResponse && uploadResponse.status === 200) {
+        await updateAvatar.mutate({ fileKey, userId });
+      } else {
+        // uploadResponseが期待通りでない場合のエラーハンドリング
+        console.error("アップロードに失敗しました。", uploadResponse);
+        throw new Error("アップロードに失敗しました。");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // 署名付きURLを取得
+  const getSignedUrl = useGetSignedUrl();
+
+  // URLからファイルのkeyを抽出する関数
+  const extractFileKeyFromUrl = (url) => {
+    // URLからパス部分を取得
+    const path = new URL(url).pathname;
+    const key = `uploads/${path.split("uploads/")[1]}`;
+    return key;
+  };
+
+  // s3へファイルをアップロードする関数
+  const uploadS3 = useUploadS3();
+
+  // バックエンドにfileKeyを送信
+  const updateAvatar = useUpdateUsersAvatar();
 
   return (
     <div className="container flex flex-col justify-start items-center my-20 max-w-[900px] bg-theme-black">
@@ -83,15 +162,15 @@ const userEdit = () => {
           id="image"
           accept="/image/*"
           style={{ display: "none" }}
-          // onChange={ImageSubmit}
+          onChange={ImageSubmit}
         />
         <label htmlFor="image">
-          <div className="w-40 h-40 mx-auto bg-gray-400 rounded-sm flex items-center justify-center cursor-pointer">
+          <div className="w-40 h-40 mx-auto bg-gray-400 rounded-full flex items-center justify-center cursor-pointer">
             {user.image ? (
               <img
                 src={user.image}
                 alt=""
-                className="object-cover object-center w-full h-full rounded-sm"
+                className="object-cover object-center w-full h-full rounded-full"
               />
             ) : (
               <FontAwesomeIcon
@@ -108,14 +187,14 @@ const userEdit = () => {
             id="image-upload"
             accept="image/*"
             style={{ display: "none" }}
-            // onChange={ImageSubmit}
-            // ref={inputRef} // inputRef は useRef() フックを使用して作成された参照です
+            onChange={ImageSubmit}
+            ref={inputRef} // inputRef は useRef() フックを使用して作成された参照です
           />
           <label htmlFor="image-upload">
             <Button
               label="画像をアップロード"
               variant="secondary"
-              // onClick={() => inputRef.current.click()} // Button をクリックしたときに input のクリックイベントを発火
+              onClick={() => inputRef.current.click()} // Button をクリックしたときに input のクリックイベントを発火
             >
               画像をアップロード
             </Button>

@@ -10,12 +10,27 @@ module Api
 
       def show
         @user = User.find(params[:id])
-        render json: @user, only: [:name, :introduction, :avatar]
+        # avatarが特定の形式に一致するかどうかをチェック
+        if @user.avatar.present? && @user.avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+          avatar_url = @user.generate_s3_url(@user.avatar)
+          render json: @user.as_json(only: [:name, :introduction, :avatar]).merge(avatar: avatar_url)
+          return
+        end
+
+        render json: @user.as_json(only: [:name, :introduction, :avatar])
       end
 
       def edit
         @user = User.find(params[:id])
-        render json: @user, only: [:name, :introduction, :avatar]
+        return render json: { error: '権限がありません' }, status: :forbidden unless @user == current_user
+
+        if @user.avatar.present? && @user.avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+          avatar_url = @user.generate_s3_url(@user.avatar)
+          render json: @user.as_json(only: [:name, :introduction, :avatar]).merge(avatar: avatar_url)
+          return
+        end
+
+        render json: @user.as_json(only: [:name, :introduction, :avatar])
       end
 
       # ユーザー作成
@@ -31,6 +46,7 @@ module Api
         spotify_id = user_create_params[:spotify_id]
         SpotifyAuth.fetch_saved_tracks(spotify_id, access_token, user_create_params)
 
+        # 暗号化されたspotify_idを検索するために小文字に変換
         existing_user = User.find_by(spotify_id: spotify_id.downcase)
 
         if existing_user
@@ -73,7 +89,24 @@ module Api
             update_session_expiration(spotify_login_params[:is_persistent])
           end
 
-          render_user_json(@user, access_token, :created)
+          render json: {
+            user: @user.as_json(
+              except: :refresh_token,
+              include: {
+                communities: {
+                  only: [:id]
+                },
+                like_tunes: {
+                  only: [:id]
+                },
+                check_tunes: {
+                  only: [:id]
+                }
+              }
+            ),
+            # session_id: session_id,
+            access_token: access_token
+          }, status: :created
         end
       rescue StandardError => e
         Rails.logger.error "An error occurred: #{e.message}"
@@ -81,13 +114,24 @@ module Api
         render json: { error: e.message }, status: :unprocessable_entity
       end
 
+      # テキスト情報のみ更新
       def update
         @user = User.find(params[:id])
+        return render json: { error: '権限がありません' }, status: :forbidden unless @user == current_user
+
         if @user.update(user_update_params)
           render json: @user
         else
           render json: @user.errors, status: :unprocessable_entity
         end
+      end
+
+      # 画像を更新
+      def update_avatar
+        @user = User.find(params[:user_id])
+        @user.avatar = params[:key]
+        @user.save
+        render json: @user, status: :ok
       end
 
       def destroy
@@ -116,7 +160,7 @@ module Api
       end
 
       def user_update_params
-        params.require(:user).permit(:name, :introduction, :avatar)
+        params.require(:user).permit(:name, :introduction)
       end
     end
   end

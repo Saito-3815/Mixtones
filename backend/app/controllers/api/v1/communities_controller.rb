@@ -15,7 +15,18 @@ module Api
       def show
         @community = Community.find(params[:id])
         avatar_url = @community.generate_s3_url(@community.avatar) if @community.avatar.present?
-        render json: @community.as_json(include: ['members'], methods: [:playlist_tunes_count]).merge(avatar: avatar_url)
+        # @communityのmembersのavatar_urlを取得
+        @community.members.each do |member|
+          if member.avatar.present? && member.avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+            member.avatar = member.generate_s3_url(member.avatar)
+          end
+        end
+        render json: @community.as_json(include: {
+                                          members: {
+                                            avatar: avatar_url
+                                          }
+                                        },
+                                        methods: [:playlist_tunes_count]).merge(avatar: avatar_url)
       end
 
       def edit
@@ -42,9 +53,7 @@ module Api
       def update
         @community = Community.find(params[:id])
         # current_userがcommunityのメンバーに含まれているか確認
-        unless @community.members.include?(current_user)
-          return render json: { error: '権限がありません' }, status: :forbidden
-        end
+        return render json: { error: '権限がありません' }, status: :forbidden unless @community.members.include?(current_user)
 
         # リクエストに:communityが含まれている場合、community_paramsを更新
         if @community.update(community_params)

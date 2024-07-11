@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       end
 
       resources :users, only: [:show, :create, :edit, :update, :destroy] do
+        put :update_avatar, to: 'users#update_avatar'
         resources :likes, only: [:create] # お気に入りを追加登録
         get 'likes/latest', to: 'likes#latest' # 最新のlike_tunesを取得
         resources :checks, only: [:index, :create, :destroy]

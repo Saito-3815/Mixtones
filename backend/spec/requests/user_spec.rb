@@ -16,6 +16,10 @@ RSpec.describe User, type: :request do
   describe 'GET /api/v1/users/:id/edit' do
     let(:user) { create(:user) }
 
+    before do
+      login_with_spotify(user)
+    end
+
     # userオブジェクトが存在する場合、200ステータスコードを返すこと
     it 'returns 200 status code if user:user object exists' do
       get "/api/v1/users/#{user.id}/edit"
@@ -153,18 +157,22 @@ RSpec.describe User, type: :request do
 
   # updateアクションのテスト
   describe 'PATCH /api/v1/users/:id' do
+    let(:user) { create(:user) }
+
+    before do
+      login_with_spotify(user)
+    end
+
     it 'returns 200 status code if user object exists' do
-      user = create(:user)
       patch "/api/v1/users/#{user.id}",
-            params: { user: { name: 'Test', introduction: 'Test Introduction', avatar: 'Test Avatar' } }
+            params: { user: { name: 'Test', introduction: 'Test Introduction' } }
       expect(response).to have_http_status(:ok)
     end
 
     # userの属性が更新されていること
     it 'updates user name' do
-      user = create(:user)
       patch "/api/v1/users/#{user.id}",
-            params: { user: { name: 'Test', introduction: 'Test Introduction', avatar: 'Test Avatar' } }
+            params: { user: { name: 'Test', introduction: 'Test Introduction' } }
       user.reload
       expect(user.name).to eq 'Test'
     end
