@@ -15,7 +15,6 @@ const useCheckSession = () => {
   useEffect(() => {
     if (user === null && isInitialLoad) {
       setIsInitialLoad(false); // 初回ロードが完了したら、isInitialLoadをfalseに設定
-      // ここに、userがnullである場合に一度だけ実行したい処理を記述
     }
   }, [user, isInitialLoad]); // 依存配列にisInitialLoadを追加
 

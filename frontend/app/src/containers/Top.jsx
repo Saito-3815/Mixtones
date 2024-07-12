@@ -13,6 +13,7 @@ import { fetchCommunities } from "@/api/communitiesIndex";
 import { createUser } from "@/api/usersCreate";
 import { createSessions } from "@/api/sessionsCreate";
 import { tokenAtom } from "@/atoms/tokenAtoms";
+// import useBackgroundLogin from "@/hooks/useBackgroundLogin";
 
 const Top = () => {
   const [user, setUser] = useAtom(userAtom);
@@ -61,8 +62,8 @@ const Top = () => {
       if (!user) {
         loginUser(setUser, data.data.user);
         setToken(data.data.access_token);
-        console.log("user:", data);
       }
+      console.log("user:", data);
     },
     onError: (error) => {
       if (axios.isCancel(error)) {
@@ -124,6 +125,8 @@ const Top = () => {
       source.cancel("Operation canceled by the user.");
     };
   }, []);
+
+  // useBackgroundLogin(userCreate, userLogin);
 
   return (
     <div className="flex justify-center py-4">

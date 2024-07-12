@@ -19,4 +19,11 @@ class User < ApplicationRecord
   def guest?
     spotify_id == 'guest_user'
   end
+
+  # アバターURLをS3のURLに更新
+  def update_avatar_url
+    if avatar.present? && avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+      self.avatar = generate_s3_url(avatar)
+    end
+  end
 end

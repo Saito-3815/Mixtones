@@ -19,7 +19,7 @@ module RenderUserJson
             }
           }
         ).merge(avatar: avatar_url),
-        session_id: session[:session_id],
+        # session_id: session[:session_id],
         access_token: access_token
       }, status: status
       return
@@ -40,7 +40,7 @@ module RenderUserJson
           }
         }
       ),
-      session_id: session[:session_id],
+      # session_id: session[:session_id],
       access_token: access_token
     }, status: status
   end

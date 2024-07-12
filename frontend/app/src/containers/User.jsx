@@ -66,7 +66,7 @@ const User = () => {
             <h1 className="text-white font-bold text-5xl mt-3 whitespace-nowrap">
               {userData.name}
             </h1>
-            <p className="text-theme-gray text-md mt-5 whitespace-nowrap">
+            <p className="text-theme-gray text-md mt-5">
               {userData.introduction}
             </p>
           </div>

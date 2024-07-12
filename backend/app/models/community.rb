@@ -13,4 +13,20 @@ class Community < ApplicationRecord
 
   # プレイリストの曲数を返す
   delegate :count, to: :playlist_tunes, prefix: true
+
+  # アバターURLをS3のURLに更新
+  def update_avatar_url
+    if avatar.present? && avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+      self.avatar = generate_s3_url(avatar)
+    end
+  end
+
+  # メンバーのアバターURLをS3のURLに更新
+  def update_member_avatars
+    members.each do |member|
+      if member.avatar.present? && member.avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+        member.avatar = member.generate_s3_url(member.avatar)
+      end
+    end
+  end
 end

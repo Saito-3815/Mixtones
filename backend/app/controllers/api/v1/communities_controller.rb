@@ -5,34 +5,26 @@ module Api
 
       def index
         @communities = Community.all
-        @communities_with_avatar_url = @communities.map do |community|
-          avatar_url = community.generate_s3_url(community.avatar) if community.avatar.present?
-          community.attributes.merge(avatar: avatar_url)
+        @communities.each do |community|
+          community.update_avatar_url
         end
-        render json: @communities_with_avatar_url
+        render json: @communities
       end
 
       def show
         @community = Community.find(params[:id])
-        avatar_url = @community.generate_s3_url(@community.avatar) if @community.avatar.present?
+        @community.update_avatar_url
         # @communityのmembersのavatar_urlを取得
-        @community.members.each do |member|
-          if member.avatar.present? && member.avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
-            member.avatar = member.generate_s3_url(member.avatar)
-          end
-        end
-        render json: @community.as_json(include: {
-                                          members: {
-                                            avatar: avatar_url
-                                          }
-                                        },
-                                        methods: [:playlist_tunes_count]).merge(avatar: avatar_url)
+        @community.update_member_avatars
+        render json: @community.as_json(
+          include: ['members'],
+          methods: [:playlist_tunes_count])
       end
 
       def edit
         @community = Community.find(params[:id])
-        avatar_url = @community.generate_s3_url(@community.avatar)
-        render json: @community.as_json.merge(avatar: avatar_url)
+        @community.update_avatar_url
+        render json: @community.as_json
       end
 
       def create
@@ -57,8 +49,8 @@ module Api
 
         # リクエストに:communityが含まれている場合、community_paramsを更新
         if @community.update(community_params)
-          avatar_url = @community.generate_s3_url(@community.avatar)
-          render json: @community.as_json.merge(avatar: avatar_url)
+          @community.update_avatar_url
+          render json: @community
         else
           render json: @community.errors, status: :unprocessable_entity
         end
