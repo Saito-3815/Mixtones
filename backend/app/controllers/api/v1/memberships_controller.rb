@@ -10,8 +10,10 @@ module Api
 
         @membership = Membership.new(community_id: params[:community_id], user_id: params[:user_id])
         if @membership.save
-
-          add_like_tunes_to_community_playlist(community, user)
+          # userのspotify_idが'guest_user'でない場合のみplaylistの更新処理を実行
+          unless user.spotify_id == 'guest_user'
+            add_like_tunes_to_community_playlist(community, user)
+          end
           sorted_playlist_tunes = community.playlist_tunes.order('added_at DESC')
           render json: {
             community: community.as_json(include: ['members']).merge(

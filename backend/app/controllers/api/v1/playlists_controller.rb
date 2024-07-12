@@ -11,6 +11,9 @@ module Api
 
         # コミュニティのメンバーがログインしている場合、like_tunesを取得し、playlist_tunesに追加
         community.members.each do |member|
+          # Spotify IDが'guest_user'の場合は処理をスキップ
+          next if member.spotify_id == 'guest_user'
+
           if logged_in?(member)
             Rails.logger.info "Member #{member.id} is logged in."
             access_token = SpotifyAuth.refresh_access_token(member.refresh_token)

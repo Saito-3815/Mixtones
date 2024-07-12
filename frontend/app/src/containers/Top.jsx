@@ -78,11 +78,11 @@ const Top = () => {
   // const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   // userAtom の変更を監視
-  // useEffect(() => {
-  //   console.log("userAtom updated:", user);
-  //   console.log("isLoggedIn?:", isLoggedIn);
-  //   console.log("token:", token);
-  // }, [user]);
+  useEffect(() => {
+    console.log("userAtom updated:", user);
+    // console.log("isLoggedIn?:", isLoggedIn);
+    // console.log("token:", token);
+  }, [user]);
 
   // 認証ページからリダイレクトされた際にコードを取得し、ユーザー作成もしくはログインリクエストを送信
   useEffect(() => {

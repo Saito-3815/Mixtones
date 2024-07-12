@@ -44,16 +44,16 @@ module Api
       def current_user_show
         Rails.logger.info "current_user_show called"
         if current_user.nil?
-          # Rails.logger.info "current_user is nil"
+          Rails.logger.info "current_user is nil"
           render json: { error: 'User not found' }, status: :not_found
         elsif current_user.spotify_id == 'guest_user'
-          # Rails.logger.info "current_user is a guest_user"
+          Rails.logger.info "current_user is a guest_user"
           # ゲストユーザーの場合は、何も処理せずにユーザーデータを返却
           render json: { user: current_user.as_json(except: :refresh_token), message: 'Guest user data' }, status: :ok
         else
-          # Rails.logger.info "current_user is a regular user"
+          Rails.logger.info "current_user is a regular user"
           access_token = SpotifyAuth.refresh_access_token(current_user.refresh_token)
-          # Rails.logger.info "Access token refreshed for current_user"
+        Rails.logger.info "Access token refreshed for current_user"
           render_user_json(current_user, access_token)
         end
       end
@@ -64,15 +64,8 @@ module Api
         user = User.find_by(spotify_id: 'guest_user'.downcase)
         if user
           copy_original_guest_data_to(user)
-          # セッションの状態をログに出力（ログイン前）
-          Rails.logger.info "Session before login: #{session.to_hash}"
           log_in(user)
-          # セッションの状態をログに出力（ログイン後）
-          Rails.logger.info "Session after login: #{session.to_hash}"
           request.session_options[:expire_after] = 1.hour
-          # セッションオプション設定後の状態をログに出力
-          Rails.logger.info "Session options after setting expire_after: #{request.session_options}"
-          # session_id = request.session_options[:id] || session[:session_id]
           render json: { user: user.as_json(except: :refresh_token), session_id: session[:session_id], message: 'Guest login successful' }, status: :ok
         else
           render json: { message: 'Guest user not found' }, status: :not_found
@@ -86,7 +79,12 @@ module Api
 
       # オリジナルデータを現在のゲストユーザーにコピー
       def copy_original_guest_data_to(user)
-        original_data = fetch_original_guest_data.attributes.except('id', 'created_at', 'updated_at', 'spotify_id')
+        user.checks.destroy_all
+        user.likes.destroy_all
+        user.memberships.destroy_all
+        user.comments.destroy_all
+
+        original_data = fetch_original_guest_data.attributes.except('id', 'created_at', 'updated_at', 'spotify_id','communities')
         user.update(original_data)
       end
 
