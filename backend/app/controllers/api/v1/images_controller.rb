@@ -7,7 +7,8 @@ module Api
 
         filename = params[:filename]
 
-        presigned_url = signer.presigned_url(:put_object, bucket: ENV['S3_BUCKET_NAME'], key: "uploads/#{SecureRandom.uuid}/#{filename}")
+        presigned_url = signer.presigned_url(:put_object, bucket: ENV.fetch('S3_BUCKET_NAME', nil),
+                                                          key: "uploads/#{SecureRandom.uuid}/#{filename}")
 
         render json: { url: presigned_url }
       end

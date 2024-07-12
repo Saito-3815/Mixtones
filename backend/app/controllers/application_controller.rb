@@ -24,5 +24,9 @@ class ApplicationController < ActionController::API
   def update_session_expiration(is_persistent_param)
     is_persistent = ActiveModel::Type::Boolean.new.cast(is_persistent_param)
     request.session_options[:expire_after] = is_persistent ? 30.days : 1.hour
+
+    # セッションオプションのexpire_afterの値を直接ログに出力
+    expire_after_value = request.session_options[:expire_after]
+    Rails.logger.info "Session expire_after set to: #{expire_after_value}"
   end
 end

@@ -15,7 +15,7 @@ export const useGuestLogin = () => {
       if (!user) {
         loginUser(setUser, data.data.user);
         navigate("/");
-        console.log("Guest login success:", data.data.user);
+        console.log("Guest login success:", data);
       }
     },
     onError: (error) => {

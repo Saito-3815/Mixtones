@@ -42,10 +42,18 @@ module Api
       end
 
       def current_user_show
+        Rails.logger.info "current_user_show called"
         if current_user.nil?
+          Rails.logger.info "current_user is nil"
           render json: { error: 'User not found' }, status: :not_found
+        elsif current_user.spotify_id == 'guest_user'
+          Rails.logger.info "current_user is a guest_user"
+          # ゲストユーザーの場合は、何も処理せずにユーザーデータを返却
+          render json: { user: current_user.as_json(except: :refresh_token), message: 'Guest user data' }, status: :ok
         else
+          Rails.logger.info "current_user is a regular user"
           access_token = SpotifyAuth.refresh_access_token(current_user.refresh_token)
+        Rails.logger.info "Access token refreshed for current_user"
           render_user_json(current_user, access_token)
         end
       end
@@ -58,7 +66,7 @@ module Api
           copy_original_guest_data_to(user)
           log_in(user)
           request.session_options[:expire_after] = 1.hour
-          render json: { user: user.as_json(except: :refresh_token), message: 'Guest login successful' }, status: :ok
+          render json: { user: user.as_json(except: :refresh_token), session_id: session[:session_id], message: 'Guest login successful' }, status: :ok
         else
           render json: { message: 'Guest user not found' }, status: :not_found
         end
@@ -71,7 +79,12 @@ module Api
 
       # オリジナルデータを現在のゲストユーザーにコピー
       def copy_original_guest_data_to(user)
-        original_data = fetch_original_guest_data.attributes.except('id', 'created_at', 'updated_at', 'spotify_id')
+        user.checks.destroy_all
+        user.likes.destroy_all
+        user.memberships.destroy_all
+        user.comments.destroy_all
+
+        original_data = fetch_original_guest_data.attributes.except('id', 'created_at', 'updated_at', 'spotify_id','communities')
         user.update(original_data)
       end
 

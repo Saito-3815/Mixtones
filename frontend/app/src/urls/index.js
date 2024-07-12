@@ -33,6 +33,12 @@ export const usersDestroy = (userId) =>
   `${DEFAULT_API_LOCALHOST}/users/${userId}`;
 // ユーザー情報の取得
 export const usersShow = (userId) => `${DEFAULT_API_LOCALHOST}/users/${userId}`;
+// ユーザー情報の更新
+export const usersUpdate = (userId) =>
+  `${DEFAULT_API_LOCALHOST}/users/${userId}`;
+// ユーザーの画像を更新
+export const usersUpdateAvatar = (userId) =>
+  `${DEFAULT_API_LOCALHOST}/users/${userId}/update_avatar`;
 
 // ユーザーのログイン
 export const sessionsCreate = `${DEFAULT_API_LOCALHOST}/sessions`;

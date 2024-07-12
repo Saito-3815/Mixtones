@@ -109,9 +109,9 @@ const Community = () => {
           navigate("/");
           break;
         default:
-          console.log("Unexpected status code:", data.status);
+        // console.log("Unexpected status code:", data.status);
       }
-      // console.log(data);
+      console.log(data);
     },
     onError: (error) => {
       if (axios.isCancel(error)) {

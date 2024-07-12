@@ -5,23 +5,26 @@ module Api
 
       def index
         @communities = Community.all
-        @communities_with_avatar_url = @communities.map do |community|
-          avatar_url = community.generate_s3_url(community.avatar) if community.avatar.present?
-          community.attributes.merge(avatar: avatar_url)
+        @communities.each do |community|
+          community.update_avatar_url
         end
-        render json: @communities_with_avatar_url
+        render json: @communities
       end
 
       def show
         @community = Community.find(params[:id])
-        avatar_url = @community.generate_s3_url(@community.avatar) if @community.avatar.present?
-        render json: @community.as_json(include: ['members'], methods: [:playlist_tunes_count]).merge(avatar: avatar_url)
+        @community.update_avatar_url
+        # @communityのmembersのavatar_urlを取得
+        @community.update_member_avatars
+        render json: @community.as_json(
+          include: ['members'],
+          methods: [:playlist_tunes_count])
       end
 
       def edit
         @community = Community.find(params[:id])
-        avatar_url = @community.generate_s3_url(@community.avatar)
-        render json: @community.as_json.merge(avatar: avatar_url)
+        @community.update_avatar_url
+        render json: @community.as_json
       end
 
       def create
@@ -42,14 +45,12 @@ module Api
       def update
         @community = Community.find(params[:id])
         # current_userがcommunityのメンバーに含まれているか確認
-        unless @community.members.include?(current_user)
-          return render json: { error: '権限がありません' }, status: :forbidden
-        end
+        return render json: { error: '権限がありません' }, status: :forbidden unless @community.members.include?(current_user)
 
         # リクエストに:communityが含まれている場合、community_paramsを更新
         if @community.update(community_params)
-          avatar_url = @community.generate_s3_url(@community.avatar)
-          render json: @community.as_json.merge(avatar: avatar_url)
+          @community.update_avatar_url
+          render json: @community
         else
           render json: @community.errors, status: :unprocessable_entity
         end
