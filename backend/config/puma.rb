@@ -18,7 +18,7 @@ worker_timeout 3600 if ENV.fetch('RAILS_ENV', 'development') == 'development'
 # port ENV.fetch('PORT') { 3000 }
 
 # ec2で起動用に追加
-bind "unix:///var/www/Mixify/backend/tmp/sockets/puma.sock"
+bind "unix:///var/www/mixify/backend/tmp/sockets/puma.sock"
 
 # Specifies the `environment` that Puma will run in.
 #
