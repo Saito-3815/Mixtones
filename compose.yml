@@ -20,6 +20,7 @@ services:
     # ./backend配下を/apiに同期マウント
     volumes:
       - ./backend:/api
+      # - ./backend:/var/www/mixify/backend
     ports:
       - 3001:3000
     # db起動後にapiを起動
