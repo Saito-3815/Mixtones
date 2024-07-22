@@ -1,63 +1,61 @@
+// 環境変数から取得したURL文字列を返す定数
+const baseURL = import.meta.env.VITE_REACT_APP_BASE_URL;
+
 // サーバーサイドで定義したURL文字列を返す定数
-const DEFAULT_API_LOCALHOST = "http://localhost:3001/api/v1";
+// const DEFAULT_API_LOCALHOST = "http://localhost:3001/api/v1";
 
 // コミュニティ一覧
-export const communitiesIndex = `${DEFAULT_API_LOCALHOST}/communities`;
+export const communitiesIndex = `${baseURL}/communities`;
 // コミュニティ詳細
 export const communitiesShow = (communityId) =>
-  `${DEFAULT_API_LOCALHOST}/communities/${communityId}`;
+  `${baseURL}/communities/${communityId}`;
 // コミュニティを作成
-export const communitiesCreate = `${DEFAULT_API_LOCALHOST}/communities`;
+export const communitiesCreate = `${baseURL}/communities`;
 // コミュニティを更新
 export const communitiesUpdate = (communityId) =>
-  `${DEFAULT_API_LOCALHOST}/communities/${communityId}`;
+  `${baseURL}/communities/${communityId}`;
 // コミュニティの画像を更新
 export const communitiesUpdateAvatar = (communityId) =>
-  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/update_avatar`;
+  `${baseURL}/communities/${communityId}/update_avatar`;
 
 // プレイリスト一覧
 export const playlistsIndex = (communityId) =>
-  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/playlists`;
+  `${baseURL}/communities/${communityId}/playlists`;
 
 // コミュニティへ参加
 export const membershipsCreate = (communityId) =>
-  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/memberships`;
+  `${baseURL}/communities/${communityId}/memberships`;
 // コミュニティから脱退
 export const membershipsDestroy = (communityId) =>
-  `${DEFAULT_API_LOCALHOST}/communities/${communityId}/memberships`;
+  `${baseURL}/communities/${communityId}/memberships`;
 
 // spotifyユーザーをデータベースへ登録
-export const usersCreate = `${DEFAULT_API_LOCALHOST}/users`;
+export const usersCreate = `${baseURL}/users`;
 // ユーザーを削除
-export const usersDestroy = (userId) =>
-  `${DEFAULT_API_LOCALHOST}/users/${userId}`;
+export const usersDestroy = (userId) => `${baseURL}/users/${userId}`;
 // ユーザー情報の取得
-export const usersShow = (userId) => `${DEFAULT_API_LOCALHOST}/users/${userId}`;
+export const usersShow = (userId) => `${baseURL}/users/${userId}`;
 // ユーザー情報の更新
-export const usersUpdate = (userId) =>
-  `${DEFAULT_API_LOCALHOST}/users/${userId}`;
+export const usersUpdate = (userId) => `${baseURL}/users/${userId}`;
 // ユーザーの画像を更新
 export const usersUpdateAvatar = (userId) =>
-  `${DEFAULT_API_LOCALHOST}/users/${userId}/update_avatar`;
+  `${baseURL}/users/${userId}/update_avatar`;
 
 // ユーザーのログイン
-export const sessionsCreate = `${DEFAULT_API_LOCALHOST}/sessions`;
+export const sessionsCreate = `${baseURL}/sessions`;
 // ユーザーのログアウト
-export const sessionsDestroy = `${DEFAULT_API_LOCALHOST}/sessions`;
+export const sessionsDestroy = `${baseURL}/sessions`;
 // セッションに対応したユーザー情報の取得
-export const currentUser = `${DEFAULT_API_LOCALHOST}/sessions`;
+export const currentUser = `${baseURL}/sessions`;
 // ゲストログイン
-export const sessionsGuestLogin = `${DEFAULT_API_LOCALHOST}/sessions/guest`;
+export const sessionsGuestLogin = `${baseURL}/sessions/guest`;
 
 // ユーザーのチェック楽曲を取得
-export const checksIndex = (userId) =>
-  `${DEFAULT_API_LOCALHOST}/users/${userId}/checks`;
+export const checksIndex = (userId) => `${baseURL}/users/${userId}/checks`;
 // チェック楽曲を登録
-export const checksCreate = (userId) =>
-  `${DEFAULT_API_LOCALHOST}/users/${userId}/checks`;
+export const checksCreate = (userId) => `${baseURL}/users/${userId}/checks`;
 // チェック楽曲を削除
-export const checksDestroy = (userId) =>
-  `${DEFAULT_API_LOCALHOST}/users/${userId}/checks`;
+export const checksDestroy = (userId) => `${baseURL}/users/${userId}/checks`;
 
 // 署名付きurlを取得
-export const imagesCreate = `${DEFAULT_API_LOCALHOST}/images`;
+export const imagesCreate = `${baseURL}/images`;
