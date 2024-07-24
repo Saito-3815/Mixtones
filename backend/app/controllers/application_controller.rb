@@ -2,6 +2,11 @@ class ApplicationController < ActionController::API
   include SessionsHelper
   before_action :set_last_active_at
 
+  rescue_from StandardError do |exception|
+    log_error(exception)
+    render json: { error: '内部サーバーエラーが発生しました。' }, status: :internal_server_error
+  end
+
   private
 
   # ユーザーがアクションを行うたびにlast_active_atを更新する
@@ -29,4 +34,10 @@ class ApplicationController < ActionController::API
     expire_after_value = request.session_options[:expire_after]
     Rails.logger.info "Session expire_after set to: #{expire_after_value}"
   end
+
+  # エラー情報をログに記録するメソッド
+def log_error(exception)
+  Rails.logger.error "500 Internal Server Error: #{exception.message}"
+  Rails.logger.error exception.backtrace.join("\n")
+end
 end

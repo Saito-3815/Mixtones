@@ -6,7 +6,7 @@ ARG RUBYGEMS_VERSION=3.5.3
 
 # vimをインストールするために追加
 RUN apt-get update -qq && \
-    apt-get install -y vim && \
+    apt-get install -y vim redis-tools && \
     mkdir /api
 
 WORKDIR /api

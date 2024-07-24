@@ -17,6 +17,10 @@ function App() {
   // セッションをチェックしてユーザー情報を取得
   useCheckSession();
 
+  if (import.meta.env.MODE === "production") {
+    console.log = function () {};
+  }
+
   const [tune] = useAtom(tuneAtom);
 
   return (
