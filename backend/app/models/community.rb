@@ -16,9 +16,7 @@ class Community < ApplicationRecord
 
   # アバターURLをS3のURLに更新
   def update_avatar_url
-    if avatar.present? && avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
-      self.avatar = generate_s3_url(avatar)
-    end
+    self.avatar = generate_s3_url(avatar) if avatar.present? && avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
   end
 
   # メンバーのアバターURLをS3のURLに更新

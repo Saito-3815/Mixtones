@@ -53,7 +53,7 @@ module Api
         else
           Rails.logger.info "current_user is a regular user"
           access_token = SpotifyAuth.refresh_access_token(current_user.refresh_token)
-        Rails.logger.info "Access token refreshed for current_user"
+          Rails.logger.info "Access token refreshed for current_user"
           render_user_json(current_user, access_token)
         end
       end
@@ -66,7 +66,12 @@ module Api
           copy_original_guest_data_to(user)
           log_in(user)
           request.session_options[:expire_after] = 1.hour
-          render json: { user: user.as_json(except: :refresh_token), session_id: session[:session_id], message: 'Guest login successful' }, status: :ok
+          render json: {
+                   user: user.as_json(except: :refresh_token),
+                   session_id: session[:session_id],
+                   message: 'Guest login successful'
+                 },
+                 status: :ok
         else
           render json: { message: 'Guest user not found' }, status: :not_found
         end
@@ -84,7 +89,8 @@ module Api
         user.memberships.destroy_all
         user.comments.destroy_all
 
-        original_data = fetch_original_guest_data.attributes.except('id', 'created_at', 'updated_at', 'spotify_id','communities')
+        original_data = fetch_original_guest_data.attributes.except('id', 'created_at', 'updated_at', 'spotify_id',
+                                                                    'communities')
         user.update(original_data)
       end
 

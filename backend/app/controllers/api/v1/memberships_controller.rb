@@ -5,31 +5,30 @@ module Api
       # Userのlike_tunesをCommunityのplaylist_tunesに追加
       def create
         community = Community.find_by(id: params[:community_id])
-        community.update_avatar_url
         user = User.find_by(id: params[:user_id])
         return render json: { error: 'Community or User not found' }, status: :not_found if community.nil? || user.nil?
 
+        community.update_avatar_url
         @membership = Membership.new(community_id: params[:community_id], user_id: params[:user_id])
         if @membership.save
           community.reload
           # userのspotify_idが'guest_user'でない場合のみplaylistの更新処理を実行
-          unless user.spotify_id == 'guest_user'
-            add_like_tunes_to_community_playlist(community, user)
-          end
+          add_like_tunes_to_community_playlist(community, user) unless user.spotify_id == 'guest_user'
           sorted_playlist_tunes = community.playlist_tunes.order('added_at DESC')
           community.update_member_avatars
           user.update_avatar_url
           render json: {
             community: community.as_json(
               include: ['members'],
-              methods: [:playlist_tunes_count]).merge(
+              methods: [:playlist_tunes_count]
+            ).merge(
               playlist_tunes: sorted_playlist_tunes.as_json
             ),
             user: user.as_json(
               except: :refresh_token,
               include: {
                 communities: {
-                  only: [:id],
+                  only: [:id]
                 },
                 like_tunes: {
                   only: [:id]
@@ -88,7 +87,7 @@ module Api
               community: community.as_json(
                 include: ['members'],
                 methods: [:playlist_tunes_count]
-                ).merge(
+              ).merge(
                 playlist_tunes: sorted_playlist_tunes.as_json
               ),
               user: user.as_json(

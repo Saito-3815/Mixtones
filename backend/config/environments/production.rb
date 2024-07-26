@@ -43,7 +43,7 @@ Rails.application.configure do
 
   # Include generic and useful information about system operation, but avoid logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII).
-  config.log_level = :info
+  config.log_level = :debug
 
   # Prepend all log lines with the following tags.
   config.log_tags = [:request_id]
@@ -75,6 +75,8 @@ Rails.application.configure do
   # require "syslog/logger"
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new "app-name")
 
+  # ログを標準出力（STDOUT）に出力するように指示する
+  # 環境変数RAILS_LOG_TO_STDOUTをtrueに設定している場合のみ
   if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = config.log_formatter
@@ -83,4 +85,13 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  # SPOTIFY_REDIRECT_URIを本番環境用のURLに設定
+  ENV["SPOTIFY_REDIRECT_URI"] = ENV["MIXTONES_URL"]
+
+  # 本番環境のRedis
+  ENV["REDIS_URL"] = ENV["ELASTICACHE_REDIS_URL"]
+
+  # 本番環境のセッションストアをElastiCacheに設定
+  Rails.application.config.session_store :action_dispatch_session_redis_store, servers: ENV["REDIS_URL"], expire_after: 90.minutes
 end

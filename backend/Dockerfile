@@ -2,7 +2,12 @@ FROM ruby:3.3.0
 
 ARG RUBYGEMS_VERSION=3.5.3
 
-RUN mkdir /api
+# RUN mkdir /api
+
+# vimをインストールするために追加
+RUN apt-get update -qq && \
+    apt-get install -y vim redis-tools && \
+    mkdir /api
 
 WORKDIR /api
 
@@ -20,3 +25,5 @@ RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 
 CMD ["rails", "server", "-b", "0.0.0.0"]
+
+# CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]

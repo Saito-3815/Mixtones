@@ -5,9 +5,7 @@ module Api
 
       def index
         @communities = Community.all
-        @communities.each do |community|
-          community.update_avatar_url
-        end
+        @communities.each(&:update_avatar_url)
         render json: @communities
       end
 
@@ -18,7 +16,8 @@ module Api
         @community.update_member_avatars
         render json: @community.as_json(
           include: ['members'],
-          methods: [:playlist_tunes_count])
+          methods: [:playlist_tunes_count]
+        )
       end
 
       def edit
