@@ -51,7 +51,7 @@ export const Header = () => {
         <Link to="/">
           <div className="flex space-x-2 items-center">
             <FontAwesomeIcon icon={faSpotify} className="text-white text-4xl" />
-            <h1 className="font-bold text-white text-2xl">Mixify</h1>
+            <h1 className="font-bold text-white text-2xl">Mixtones</h1>
           </div>
         </Link>
         <div className="hidden md:flex">

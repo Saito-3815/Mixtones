@@ -12,6 +12,7 @@ import UserEdit from "./containers/UserEdit";
 import { useCheckSession } from "./hooks/useCheckSession";
 import { useAtom } from "jotai";
 import { tuneAtom } from "./atoms/tuneAtom";
+import PrivacyPolicy from "./containers/PrivacyPolicy";
 
 function App() {
   // セッションをチェックしてユーザー情報を取得
@@ -51,6 +52,9 @@ function App() {
             <Route path="/users/:userId" element={<User />} />
             {/* ユーザー編集 */}
             <Route path="/users/:userId/edit" element={<UserEdit />} />
+            {/* プライバシーポリシー */}
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            {/* 利用規約 */}
           </Routes>
           <div className="px-16">
             <WordFooter />
