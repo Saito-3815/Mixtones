@@ -13,12 +13,9 @@ export const WordFooter = () => (
         >
           プライバシーポリシー
         </Link>
-        <a
-          href="/terms-of-service"
-          className="underline text-theme-gray text-sm"
-        >
+        <Link to="/terms" className="underline text-theme-gray text-sm">
           利用規約
-        </a>
+        </Link>
       </div>
     </div>
   </footer>

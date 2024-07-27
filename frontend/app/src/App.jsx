@@ -13,6 +13,7 @@ import { useCheckSession } from "./hooks/useCheckSession";
 import { useAtom } from "jotai";
 import { tuneAtom } from "./atoms/tuneAtom";
 import PrivacyPolicy from "./containers/PrivacyPolicy";
+import Terms from "./containers/Terms";
 
 function App() {
   // セッションをチェックしてユーザー情報を取得
@@ -55,6 +56,7 @@ function App() {
             {/* プライバシーポリシー */}
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             {/* 利用規約 */}
+            <Route path="/terms" element={<Terms />} />
           </Routes>
           <div className="px-16">
             <WordFooter />
