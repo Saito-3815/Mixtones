@@ -1,5 +1,4 @@
 // import { useParams } from "react
-import { Button } from "@/components/ui/Button/Button";
 import PropTypes from "prop-types";
 import { TuneTableChecked } from "@/components/ui/TuneTableChecked/TuneTableChecked";
 import { useQuery } from "@tanstack/react-query";
@@ -10,6 +9,7 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAtom } from "jotai";
 import { userAtom } from "@/atoms/userAtoms";
+import { Button } from "@/components/ui/Button/Button";
 
 const User = () => {
   const { userId } = useParams();
