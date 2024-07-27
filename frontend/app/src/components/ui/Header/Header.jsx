@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 
-import { Button } from "@/components/ui/Button/Button";
 import { AvatarMenu } from "../AvatarMenu/AvatarMenu";
 import { BarMenu } from "@/components/ui/BarMenu/BarMenu";
 import { AlertDialogSet } from "../AlertDialog/AlertDialog";
@@ -12,6 +11,7 @@ import { useAtom } from "jotai";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { createCommunity } from "@/api/communitiesCreate";
+import { Button } from "@/components/ui/Button/Button.jsx";
 
 export const Header = () => {
   const [user, setUser] = useAtom(userAtom);
