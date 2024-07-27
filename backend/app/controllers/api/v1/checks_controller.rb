@@ -23,6 +23,7 @@ module Api
         return render json: { message: 'Tune not found' }, status: :not_found if existing_record.nil?
 
         user.check_tunes << existing_record
+        user.update_avatar_url
 
         render json: { user: user.as_json(
           except: :refresh_token,
@@ -50,6 +51,8 @@ module Api
 
         user.check_tunes.delete(check)
         @check = user.check_tunes.order(id: :desc)
+
+        user.update_avatar_url
 
         render json: { user: user.as_json(
           except: :refresh_token,

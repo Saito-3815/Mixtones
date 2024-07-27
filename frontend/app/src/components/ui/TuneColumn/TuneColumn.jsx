@@ -18,6 +18,7 @@ import { userAtom } from "@/atoms/userAtoms";
 import { CheckColorIcon } from "../ColorIcon/CheckColorIcon";
 import { useCheck } from "@/hooks/useCheck";
 import { useCheckDelete } from "@/hooks/useCheckDelete";
+import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -222,6 +223,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
           <span className="text-sm font-extralight">
             {formatTime(tune.time)}
           </span>
+          <FontAwesomeIcon icon={faSpotify} className="text-white text-xl" />
         </div>
       </td>
       {/* ドットメニュー */}

@@ -22,6 +22,7 @@ import { ModeColorIcon } from "../ColorIcon/ModeColoorIcon";
 import { isLoggedInAtom } from "@/atoms/userAtoms";
 import { useMobilePlayer } from "@/hooks/useMobilePlayer";
 import { useMobilePlay } from "@/hooks/useMobilePlay";
+import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 
 export const TuneFooter = () => {
   const [tune, setTune] = useAtom(tuneAtom);
@@ -356,6 +357,10 @@ export const TuneFooter = () => {
         {/* 音量調整 */}
         <div className="flex-grow flex-shrink justify-end items-center hidden md:flex">
           <div className="flex flex-grow flex-shrink justify-end items-center space-x-3 mr-10">
+            <FontAwesomeIcon
+              icon={faSpotify}
+              className="text-white mr-20 text-xl"
+            />
             <FontAwesomeIcon
               icon={isMuted ? faVolumeMute : faVolumeHigh}
               className="text-white"
