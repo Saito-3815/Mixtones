@@ -1,5 +1,5 @@
 import { accessUrl, generateCodeChallenge } from "@/SpotifyAuth";
-import { Button } from "@/components/ui/Button/Button";
+import { Button } from "@/components/ui/Button/Button.jsx";
 import { Switch } from "@/components/ui/Switch/Switch";
 import { useGuestLogin } from "@/hooks/useGuestLogin";
 import { useEffect, useState } from "react";
