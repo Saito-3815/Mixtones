@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import { ColorIcon } from "../ColorIcon/ColorIcon";
 import {
   faCircleCheck,
   faCommentDots,
@@ -113,6 +112,13 @@ export const TuneColumn = ({ tune, index, onClick }) => {
     checkDelete.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
   };
 
+  // spotifyのリンクをクリックした際に、外部リンクを開く
+  const handleSpotifyClick = () => {
+    if (tune.external_url) {
+      window.open(tune.external_url, "_blank");
+    }
+  };
+
   return (
     <tr
       className={`cursor-pointer bg-black ${isSelected ? "bg-theme-black" : "hover:bg-theme-black"} text-theme-gray ${isSelected ? "text-white" : "hover:text-white"} h-[56px] w-full`}
@@ -203,7 +209,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
           <span className="hidden sm:flex text-sm font-extralight ">
             {formattedDate}
           </span>
-          <div className="flex items-center space-x-14 pr-16">
+          <div className="flex items-center space-x-10 px-16">
             {/* チェックボタン */}
             <CheckColorIcon
               icon={faCircleCheck}
@@ -211,9 +217,23 @@ export const TuneColumn = ({ tune, index, onClick }) => {
               onClick={isTuneChecked ? handleCheckDelete : handleCheckCreate}
             />
             {/* レコメンドボタン */}
-            <ColorIcon icon={faThumbsUp} />
+            <FontAwesomeIcon
+              icon={faThumbsUp}
+              className="h-4 w-4 cursor-pointer text-theme-white"
+              onClick={() => alert("レコメンド機能は現在開発中です")}
+            />
             {/* コメントボタン */}
-            <ColorIcon icon={faCommentDots} />
+            <FontAwesomeIcon
+              icon={faCommentDots}
+              className="h-4 w-4 cursor-pointer text-theme-white"
+              onClick={() => alert("コメント機能は現在開発中です")}
+            />
+            {/* Spotifyリンク */}
+            <FontAwesomeIcon
+              icon={faSpotify}
+              className="text-white h-4 w-4 cursor-pointer"
+              onClick={handleSpotifyClick}
+            />
           </div>
         </div>
       </td>
@@ -223,7 +243,6 @@ export const TuneColumn = ({ tune, index, onClick }) => {
           <span className="text-sm font-extralight">
             {formatTime(tune.time)}
           </span>
-          <FontAwesomeIcon icon={faSpotify} className="text-white text-xl" />
         </div>
       </td>
       {/* ドットメニュー */}
@@ -249,6 +268,7 @@ TuneColumn.propTypes = {
     added_at: PropTypes.string.isRequired,
     time: PropTypes.string.isRequired,
     spotify_uri: PropTypes.string.isRequired,
+    external_url: PropTypes.string,
   }),
   index: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,

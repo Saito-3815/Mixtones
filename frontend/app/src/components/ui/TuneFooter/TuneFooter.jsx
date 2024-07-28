@@ -251,6 +251,14 @@ export const TuneFooter = () => {
     });
   };
 
+  // spotifyのリンクをクリックした際に、外部リンクを開く
+  const handleSpotifyClick = () => {
+    if (tune.tune.external_url) {
+      const url = String(tune.tune.external_url);
+      window.open(url, "_blank");
+    }
+  };
+
   return (
     <footer className="mx-1 my-1">
       <div className="grid grid-cols-1 md:grid-cols-3 items-center bg-theme-black rounded-sm md:h-[72px]">
@@ -336,7 +344,6 @@ export const TuneFooter = () => {
                 <div className="flex justify-center flex-grow flex-shrink items-center space-x-2 mt-1">
                   <span className="text-theme-gray text-xs font-extralight">
                     {formatTime(currentTime)}
-                    {/* {formatTime(0)} */}
                   </span>
                   <Slider
                     max={100}
@@ -359,7 +366,8 @@ export const TuneFooter = () => {
           <div className="flex flex-grow flex-shrink justify-end items-center space-x-3 mr-10">
             <FontAwesomeIcon
               icon={faSpotify}
-              className="text-white mr-20 text-xl"
+              className="text-white mr-20 text-xl cursor-pointer"
+              onClick={handleSpotifyClick}
             />
             <FontAwesomeIcon
               icon={isMuted ? faVolumeMute : faVolumeHigh}

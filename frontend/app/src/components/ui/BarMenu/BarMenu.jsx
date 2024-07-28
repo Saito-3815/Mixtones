@@ -239,6 +239,7 @@ export {
 
 export const BarMenu = () => {
   const setUser = useSetAtom(userAtom);
+  const [user] = useAtom(userAtom);
   const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   // ユーザーログアウトリクエスト
@@ -292,7 +293,9 @@ export const BarMenu = () => {
           <DropdownMenuContent>
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>プロフィール</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to={`/users/${user.id}`}>プロフィール</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
               <AlertDialogSet
                 triggerComponent={<span>ログアウト</span>}

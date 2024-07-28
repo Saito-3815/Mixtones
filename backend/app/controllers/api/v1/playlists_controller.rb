@@ -18,7 +18,12 @@ module Api
             Rails.logger.info "Member #{member.id} is logged in."
             access_token = SpotifyAuth.refresh_access_token(member.refresh_token)
             like_tunes = SpotifyAuth.fetch_latest_saved_track(member, access_token)
+
+            # 既存のトラックに新しいカラムのデータをフェッチして挿入
+            # SpotifyAuth.update_existing_tracks_with_external_url(member, access_token)
+
             extract_first_image_url(like_tunes)
+
             like_tunes.each do |like_tune|
               Rails.logger.info "Processing like_tune: #{like_tune[:name]}, URI: #{like_tune[:spotify_uri]}"
               existing_record = Tune.find_by(spotify_uri: like_tune[:spotify_uri])
@@ -32,7 +37,8 @@ module Api
                   spotify_uri: like_tune[:spotify_uri],
                   preview_url: like_tune[:preview_url],
                   added_at: like_tune[:added_at],
-                  time: like_tune[:time]
+                  time: like_tune[:time],
+                  external_url: like_tune[:external_url]
                 )
                 Rails.logger.info "Created new like_tune: #{like_tune[:name]}, URI: #{like_tune[:spotify_uri]}"
               elsif member.like_tunes.exists?(existing_record.id)
@@ -43,6 +49,7 @@ module Api
                 Rails.logger.info "Added existing like_tune: #{existing_record.name},
                 URI: #{existing_record.spotify_uri}"
               end
+
             end
 
             member.like_tunes.each do |like_tune|

@@ -21,6 +21,6 @@ module SessionsHelper
   # end
 
   def logged_in?(user)
-    user.last_active_at && user.last_active_at > 60.minutes.ago
+    user.last_active_at && user.last_active_at > 24.hours.ago
   end
 end

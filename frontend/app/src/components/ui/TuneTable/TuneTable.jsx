@@ -36,6 +36,7 @@ export const TuneTable = () => {
   useEffect(() => {
     if (playlistData) {
       setCurrentPlaylist(playlistData);
+      console.log("playlistData updated:", playlistData);
     }
   }, [playlistData]);
 
