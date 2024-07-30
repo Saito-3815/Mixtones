@@ -30,6 +30,7 @@ export const TuneFooter = () => {
   const [player] = useAtom(playerAtom);
   const [playlistData, setPlaylistData] = useAtom(playlistAtom);
   const [isLoggedIn] = useAtom(isLoggedInAtom);
+  // const [user] = useAtom(userAtom)
 
   const [deviceId, setDeviceId] = useState(null);
   const [shuffleMode, setShuffleMode] = useState(false);

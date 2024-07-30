@@ -6,7 +6,7 @@ export const updateUsers = (data, userId) => {
   return axios.put(
     url,
     {
-      name: data.ame,
+      name: data.name,
       introduction: data.introduction,
     },
     { withCredentials: true },

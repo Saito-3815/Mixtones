@@ -24,4 +24,14 @@ class User < ApplicationRecord
   def update_avatar_url
     self.avatar = generate_s3_url(avatar) if avatar.present? && avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
   end
+
+  # spotify_idが存在するか
+def spotify_id_present
+  self.spotify_id.present? && self.spotify_id != 'guest_user' && self.spotify_id != 'original_guest_user'
+end
+
+  # spotify_idをフロントエンドに返却時、真偽値に変換
+  def as_json(options = {})
+    super(options).merge('spotify_id' => spotify_id_present)
+  end
 end

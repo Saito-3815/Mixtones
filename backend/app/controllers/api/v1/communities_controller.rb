@@ -4,7 +4,7 @@ module Api
       include SessionsHelper
 
       def index
-        @communities = Community.all
+        @communities = Community.order(updated_at: :desc)
         @communities.each(&:update_avatar_url)
         render json: @communities
       end

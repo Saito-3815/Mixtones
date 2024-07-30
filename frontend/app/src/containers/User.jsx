@@ -63,7 +63,7 @@ const User = () => {
           </div>
         ) : (
           <div className="max-w-[480px] h-full flex flex-col items-start pr-40 overflow-hidden sm:p-0 p-5">
-            <h1 className="text-white font-bold text-5xl mt-3 whitespace-nowrap">
+            <h1 className="text-white font-bold text-3xl md:text-5xl mt-3 whitespace-nowrap">
               {userData.name}
             </h1>
             <p className="text-theme-gray text-md mt-5">

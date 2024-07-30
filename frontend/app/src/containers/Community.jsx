@@ -197,7 +197,7 @@ const Community = () => {
               コミュニティプレイリスト
             </h2>
             <h1
-              className="text-white font-bold text-5xl mt-3 whitespace-nowrap"
+              className="text-white font-bold text-3xl md:text-5xl mt-3 whitespace-nowrap"
               ref={playlistNameRef}
             >
               {communityData.playlist_name}
