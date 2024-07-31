@@ -19,10 +19,13 @@ import { playlistAtom } from "@/atoms/playlistAtom";
 import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
 import { usePlay } from "@/hooks/usePlay";
 import { ModeColorIcon } from "../ColorIcon/ModeColoorIcon";
-import { isLoggedInAtom } from "@/atoms/userAtoms";
+import { isLoggedInAtom, userAtom } from "@/atoms/userAtoms";
 import { useMobilePlayer } from "@/hooks/useMobilePlayer";
 import { useMobilePlay } from "@/hooks/useMobilePlay";
 import { faSpotify } from "@fortawesome/free-brands-svg-icons";
+import { useCheck } from "@/hooks/useCheck";
+import { useCheckDelete } from "@/hooks/useCheckDelete";
+import { CheckColorIcon } from "../ColorIcon/CheckColorIcon";
 
 export const TuneFooter = () => {
   const [tune, setTune] = useAtom(tuneAtom);
@@ -30,7 +33,7 @@ export const TuneFooter = () => {
   const [player] = useAtom(playerAtom);
   const [playlistData, setPlaylistData] = useAtom(playlistAtom);
   const [isLoggedIn] = useAtom(isLoggedInAtom);
-  // const [user] = useAtom(userAtom)
+  const [user] = useAtom(userAtom);
 
   const [deviceId, setDeviceId] = useState(null);
   const [shuffleMode, setShuffleMode] = useState(false);
@@ -134,17 +137,9 @@ export const TuneFooter = () => {
   const play = usePlay(deviceId);
   const playMobile = useMobilePlay(deviceId);
 
-  useEffect(() => {
-    console.log("IsPlayingAtom is now", isPlaying);
-  }, [isPlaying]);
-
   // useEffect(() => {
-  //   console.log("shuffleMode", shuffleMode);
-  // }, [shuffleMode]);
-
-  // useEffect(() => {
-  //   console.log("repeatMode", repeatMode);
-  // }, [repeatMode]);
+  //   console.log("IsPlayingAtom is now", isPlaying);
+  // }, [isPlaying]);
 
   // tuneが変更されたときに音楽を再生する
   useEffect(() => {
@@ -260,6 +255,25 @@ export const TuneFooter = () => {
     }
   };
 
+  // チェック機能の実装
+  // tuneのidがcheck_tunesに存在するか確認
+  const isTuneChecked =
+    user &&
+    Array.isArray(user.check_tunes) &&
+    user.check_tunes.some(
+      (tuneItem) => Number(tuneItem.id) === Number(tune.tune.id),
+    );
+
+  const checkTune = useCheck();
+  const handleCheckCreate = () => {
+    checkTune.mutate({ userId: user.id, spotify_uri: tune.tune.spotify_uri });
+  };
+
+  const checkDelete = useCheckDelete();
+  const handleCheckDelete = () => {
+    checkDelete.mutate({ userId: user.id, spotify_uri: tune.tune.spotify_uri });
+  };
+
   return (
     <footer className="mx-1 my-1">
       <div className="grid grid-cols-1 md:grid-cols-3 items-center bg-theme-black rounded-sm md:h-[72px]">
@@ -280,86 +294,125 @@ export const TuneFooter = () => {
               className="text-theme-gray text-xs font-extralight whitespace-nowrap overflow-x-visible"
             >{`${tune.tune.artist}`}</h2>
           </div>
-          <FontAwesomeIcon
+          <CheckColorIcon
             icon={faCircleCheck}
             className="text-white hidden md:flex"
+            isTuneChecked={isTuneChecked}
+            onClick={isTuneChecked ? handleCheckDelete : handleCheckCreate}
           />
         </div>
         {isMobile ? (
-          <div className="flex-col space-y-2">
-            <h1 className="text-white text-center">Playing now in Spotify!</h1>
-            <p className="text-theme-gray text-center text-xs">
-              再生コントロールはSppotifyアプリ上で行えます。
-            </p>
-          </div>
+          user && user.spotify_id ? (
+            <div className="flex-col space-y-2">
+              <h1 className="text-white text-center">
+                Playing now in Spotify!
+              </h1>
+              <p className="text-theme-gray text-center text-xs">
+                モバイル環境では再生コントロールはSppotifyアプリ上で行えます。
+                <br />
+                Spotifyアプリを起動してから再生してください。
+              </p>
+            </div>
+          ) : (
+            <div className="flex-col space-y-2">
+              <div className="flex justify-center space-x-4">
+                <h1 className="text-white text-center">
+                  プレビュー再生中です。
+                </h1>
+                <FontAwesomeIcon
+                  icon={faSpotify}
+                  className="text-white text-xl cursor-pointer"
+                  onClick={handleSpotifyClick}
+                />
+              </div>
+              <p className="text-theme-gray text-center text-xs">
+                フルサイズ再生はSpotifyに登録する必要があります。
+              </p>
+            </div>
+          )
         ) : (
           <>
             {/* 再生コントロール */}
-            <div className="flex-grow flex-shrink justify-center items-center col-span-3 md:col-span-1 md:flex px-3 md:px-0">
-              <div className="items-center w-full">
-                <div className="flex justify-center items-center space-x-5 mt-2">
-                  <ModeColorIcon
-                    icon={faShuffle}
-                    mode={shuffleMode}
-                    onClick={async () => {
-                      if (repeatMode) {
-                        await setRepeatMode(false);
-                      }
-                      setShuffleMode(!shuffleMode);
-                    }}
-                  />
-                  <FontAwesomeIcon
-                    icon={faBackwardStep}
-                    className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
-                    onClick={() => {
-                      player.previousTrack();
-                      setTune(prevTrack());
-                    }}
-                  />
-                  <PlayIcon
-                    color="text-white"
-                    size="8"
-                    onClick={() => {
-                      player.togglePlay();
-                    }}
-                  />
-                  <FontAwesomeIcon
-                    icon={faForwardStep}
-                    className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
-                    onClick={() => {
-                      player.nextTrack();
-                      setTune(nextTrack());
-                    }}
-                  />
-                  <ModeColorIcon
-                    icon={faRepeat}
-                    mode={repeatMode}
-                    onClick={() => {
-                      if (shuffleMode) {
-                        setShuffleMode(false);
-                      }
-                      setRepeatMode(!repeatMode);
-                    }}
-                  />
-                </div>
-                <div className="flex justify-center flex-grow flex-shrink items-center space-x-2 mt-1">
-                  <span className="text-theme-gray text-xs font-extralight">
-                    {formatTime(currentTime)}
-                  </span>
-                  <Slider
-                    max={100}
-                    className="w-[250px] lg:w-[420px] transition-all"
-                    value={[
-                      tune.tune.time ? (currentTime / tune.tune.time) * 100 : 0,
-                    ]}
-                    onChange={handleProgressChange}
-                  />
-                  <span className="text-theme-gray text-xs font-extralight">
-                    {formatTime(tune.tune.time)}
-                  </span>
+            {user && user.spotify_id ? (
+              <div className="flex-grow flex-shrink justify-center items-center col-span-3 md:col-span-1 md:flex px-3 md:px-0">
+                <div className="items-center w-full">
+                  <div className="flex justify-center items-center space-x-5 mt-2">
+                    <ModeColorIcon
+                      icon={faShuffle}
+                      mode={shuffleMode}
+                      onClick={async () => {
+                        if (repeatMode) {
+                          await setRepeatMode(false);
+                        }
+                        setShuffleMode(!shuffleMode);
+                      }}
+                    />
+                    <FontAwesomeIcon
+                      icon={faBackwardStep}
+                      className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
+                      onClick={() => {
+                        player.previousTrack();
+                        setTune(prevTrack());
+                      }}
+                    />
+                    <PlayIcon
+                      color="text-white"
+                      size="8"
+                      onClick={() => {
+                        player.togglePlay();
+                      }}
+                    />
+                    <FontAwesomeIcon
+                      icon={faForwardStep}
+                      className="h-4 w-4 text-theme-white hover:text-white active:text-theme-white"
+                      onClick={() => {
+                        player.nextTrack();
+                        setTune(nextTrack());
+                      }}
+                    />
+                    <ModeColorIcon
+                      icon={faRepeat}
+                      mode={repeatMode}
+                      onClick={() => {
+                        if (shuffleMode) {
+                          setShuffleMode(false);
+                        }
+                        setRepeatMode(!repeatMode);
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-center flex-grow flex-shrink items-center space-x-2 mt-1">
+                    <span className="text-theme-gray text-xs font-extralight">
+                      {formatTime(currentTime)}
+                    </span>
+                    <Slider
+                      max={100}
+                      className="w-[250px] lg:w-[420px] transition-all"
+                      value={[
+                        tune.tune.time
+                          ? (currentTime / tune.tune.time) * 100
+                          : 0,
+                      ]}
+                      onChange={handleProgressChange}
+                    />
+                    <span className="text-theme-gray text-xs font-extralight">
+                      {formatTime(tune.tune.time)}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex-col space-y-2">
+                <div className="flex justify-center space-x-4">
+                  <h1 className="text-white text-center">
+                    プレビュー再生中です。
+                  </h1>
+                </div>
+                <p className="text-theme-gray text-center text-xs">
+                  フルサイズ再生はSpotifyに登録する必要があります。
+                </p>
+              </div>
+            )}
           </>
         )}
         {/* 音量調整 */}
@@ -370,17 +423,21 @@ export const TuneFooter = () => {
               className="text-white mr-20 text-xl cursor-pointer"
               onClick={handleSpotifyClick}
             />
-            <FontAwesomeIcon
-              icon={isMuted ? faVolumeMute : faVolumeHigh}
-              className="text-white"
-              onClick={handleVolumeOff}
-            />
-            <Slider
-              defaultValue={[33]}
-              max={100}
-              className="w-28"
-              onChange={handleSliderChange}
-            />
+            {user && user.spotify_id && (
+              <>
+                <FontAwesomeIcon
+                  icon={isMuted ? faVolumeMute : faVolumeHigh}
+                  className="text-white"
+                  onClick={handleVolumeOff}
+                />
+                <Slider
+                  defaultValue={[33]}
+                  max={100}
+                  className="w-28"
+                  onChange={handleSliderChange}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>

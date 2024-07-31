@@ -145,7 +145,7 @@ module SpotifyAuth
     saved_tracks = JSON.parse(res.body)
 
     # デバッグ用にレスポンスをログに出力
-    puts "Spotify API Response: #{saved_tracks}"
+    Rails.logger.info "Spotify API Response: #{saved_tracks}"
 
     # latest_added_atより新しい楽曲のみを選択
     filtered_tracks = saved_tracks['items'].select do |item|

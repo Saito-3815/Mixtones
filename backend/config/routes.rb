@@ -1,11 +1,9 @@
 Rails.application.routes.draw do
-
   get '/health_check', to: 'health_checks#index'
 
   namespace :api do
     namespace :v1 do
       root 'communities#index'
-
 
       resources :communities, only: [:index, :show, :create, :edit, :update, :destroy] do
         put :update_avatar, to: 'communities#update_avatar'

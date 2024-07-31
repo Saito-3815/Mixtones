@@ -26,9 +26,9 @@ class User < ApplicationRecord
   end
 
   # spotify_idが存在するか
-def spotify_id_present
-  self.spotify_id.present? && self.spotify_id != 'guest_user' && self.spotify_id != 'original_guest_user'
-end
+  def spotify_id_present
+    spotify_id.present? && spotify_id != 'guest_user' && spotify_id != 'original_guest_user'
+  end
 
   # spotify_idをフロントエンドに返却時、真偽値に変換
   def as_json(options = {})

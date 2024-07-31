@@ -26,7 +26,7 @@ const User = () => {
     queryFn: () => fetchUser({ userId: userId }),
   });
 
-  console.log("userData:", userData);
+  // console.log("userData:", userData);
 
   if (userError) {
     console.error(userError);

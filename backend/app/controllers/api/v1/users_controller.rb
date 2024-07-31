@@ -105,7 +105,6 @@ module Api
                 }
               }
             ),
-            # session_id: session_id,
             access_token: access_token
           }, status: :created
         end
@@ -121,7 +120,7 @@ module Api
         return render json: { error: '権限がありません' }, status: :forbidden unless @user == current_user
 
         if @user.update(user_update_params)
-          render json: @user
+          render status: :ok
         else
           render json: @user.errors, status: :unprocessable_entity
         end

@@ -7,7 +7,7 @@ module RenderUserJson
       render json: {
         user: user.as_json(
           except: :refresh_token,
-          methods: :spotify_id_present,
+          # methods: :spotify_id_present,
           include: {
             communities: {
               only: [:id]
@@ -29,7 +29,7 @@ module RenderUserJson
     render json: {
       user: user.as_json(
         except: :refresh_token,
-        methods: :spotify_id_present,
+        # methods: :spotify_id_present,
         include: {
           communities: {
             only: [:id]

@@ -49,7 +49,6 @@ module Api
                 Rails.logger.info "Added existing like_tune: #{existing_record.name},
                 URI: #{existing_record.spotify_uri}"
               end
-
             end
 
             member.like_tunes.each do |like_tune|
