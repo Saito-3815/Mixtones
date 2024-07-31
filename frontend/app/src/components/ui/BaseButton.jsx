@@ -35,7 +35,7 @@ const buttonVariants = cva(
   },
 );
 
-const Button = React.forwardRef(
+const BaseButton = React.forwardRef(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     return (
@@ -47,12 +47,12 @@ const Button = React.forwardRef(
     );
   },
 );
-Button.displayName = "Button";
-Button.propTypes = {
+BaseButton.displayName = "Button";
+BaseButton.propTypes = {
   className: PropTypes.string,
   variant: PropTypes.string,
   size: PropTypes.string,
   asChild: PropTypes.bool,
 };
 
-export { Button, buttonVariants };
+export { BaseButton, buttonVariants };

@@ -1,5 +1,4 @@
 // import { useParams } from "react
-import { Button } from "@/components/ui/Button/Button";
 import PropTypes from "prop-types";
 import { TuneTableChecked } from "@/components/ui/TuneTableChecked/TuneTableChecked";
 import { useQuery } from "@tanstack/react-query";
@@ -10,6 +9,7 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAtom } from "jotai";
 import { userAtom } from "@/atoms/userAtoms";
+import { Button } from "@/components/ui/Button/Button";
 
 const User = () => {
   const { userId } = useParams();
@@ -26,7 +26,7 @@ const User = () => {
     queryFn: () => fetchUser({ userId: userId }),
   });
 
-  console.log("userData:", userData);
+  // console.log("userData:", userData);
 
   if (userError) {
     console.error(userError);
@@ -63,7 +63,7 @@ const User = () => {
           </div>
         ) : (
           <div className="max-w-[480px] h-full flex flex-col items-start pr-40 overflow-hidden sm:p-0 p-5">
-            <h1 className="text-white font-bold text-5xl mt-3 whitespace-nowrap">
+            <h1 className="text-white font-bold text-3xl md:text-5xl mt-3 whitespace-nowrap">
               {userData.name}
             </h1>
             <p className="text-theme-gray text-md mt-5">

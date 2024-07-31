@@ -36,8 +36,8 @@ class ApplicationController < ActionController::API
   end
 
   # エラー情報をログに記録するメソッド
-def log_error(exception)
-  Rails.logger.error "500 Internal Server Error: #{exception.message}"
-  Rails.logger.error exception.backtrace.join("\n")
-end
+  def log_error(exception)
+    Rails.logger.error "500 Internal Server Error: #{exception.message}"
+    Rails.logger.error exception.backtrace.join("\n")
+  end
 end

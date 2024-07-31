@@ -12,6 +12,9 @@ import UserEdit from "./containers/UserEdit";
 import { useCheckSession } from "./hooks/useCheckSession";
 import { useAtom } from "jotai";
 import { tuneAtom } from "./atoms/tuneAtom";
+import PrivacyPolicy from "./containers/PrivacyPolicy";
+import Terms from "./containers/Terms";
+import { Helmet } from "react-helmet-async";
 
 function App() {
   // セッションをチェックしてユーザー情報を取得
@@ -26,6 +29,18 @@ function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen w-screen min-w-screen bg-black relative overflow-hidden">
+        <Helmet>
+          <title>
+            {/* <FontAwesomeIcon icon={faRecordVinyl} className="text-white" /> */}
+            Mixtones
+          </title>
+          <meta name="description" content="This is my application" />
+          <link
+            rel="icon"
+            href="/images/trumpet_logo2.jpeg"
+            type="image/jpeg"
+          />
+        </Helmet>
         <div className="fixed z-10 w-full">
           <Header user={""} />
         </div>
@@ -51,6 +66,10 @@ function App() {
             <Route path="/users/:userId" element={<User />} />
             {/* ユーザー編集 */}
             <Route path="/users/:userId/edit" element={<UserEdit />} />
+            {/* プライバシーポリシー */}
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            {/* 利用規約 */}
+            <Route path="/terms" element={<Terms />} />
           </Routes>
           <div className="px-16">
             <WordFooter />

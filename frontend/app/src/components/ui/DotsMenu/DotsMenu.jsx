@@ -250,11 +250,13 @@ export function DotsMenu({ isTuneChecked, onClick }) {
             {isTuneChecked ? `チェックをはずす` : `チェックする`}
           </h1>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => alert("レコメンド機能は現在開発中です")}
+        >
           <FontAwesomeIcon icon={faThumbsUp} className="text-white" />
           <h1 className="ml-2">レコメンドする</h1>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => alert("コメント機能は現在開発中です")}>
           <FontAwesomeIcon icon={faCommentDots} className="text-white" />
           <h1 className="ml-2">コメントする</h1>
         </DropdownMenuItem>

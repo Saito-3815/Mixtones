@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export const WordFooter = () => (
   <footer className="bg-transparent text-white border-t border-theme-gray h-16 p-0 w-full">
     <div className="container flex justify-between px-0">
@@ -5,15 +7,15 @@ export const WordFooter = () => (
         &copy; {new Date().getFullYear()} All rights reserved.
       </p>
       <div>
-        <a href="/privacy-policy" className="underline text-theme-gray text-sm">
-          プライバシーポリシー
-        </a>
-        <a
-          href="/terms-of-service"
+        <Link
+          to="/privacy-policy"
           className="underline text-theme-gray text-sm"
         >
+          プライバシーポリシー
+        </Link>
+        <Link to="/terms" className="underline text-theme-gray text-sm">
           利用規約
-        </a>
+        </Link>
       </div>
     </div>
   </footer>

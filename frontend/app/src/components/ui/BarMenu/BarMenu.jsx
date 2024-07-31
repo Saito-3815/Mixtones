@@ -9,13 +9,19 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
 import PropTypes from "prop-types";
-import { isLoggedInAtom, logoutUser, userAtom } from "@/atoms/userAtoms";
+import {
+  isLoggedInAtom,
+  loginUser,
+  logoutUser,
+  userAtom,
+} from "@/atoms/userAtoms";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { destroySessions } from "@/api/sessionsDestroy";
 import { useAtom, useSetAtom } from "jotai";
 import { useDestroyUser } from "@/api/usersDestroy";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { createCommunity } from "@/api/communitiesCreate";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -239,6 +245,7 @@ export {
 
 export const BarMenu = () => {
   const setUser = useSetAtom(userAtom);
+  const [user] = useAtom(userAtom);
   const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   // ユーザーログアウトリクエスト
@@ -282,6 +289,35 @@ export const BarMenu = () => {
     },
   });
 
+  // コミュニティ作成ロジック
+  const navigate = useNavigate();
+
+  const handleCreateCommunity = useMutation({
+    mutationFn: createCommunity,
+    onSuccess: (data) => {
+      if (data.status === 201) {
+        console.log("Community created:", data);
+        console.log("Community ID:", data.data.id);
+        console.log("User :", data.data.user);
+        loginUser(setUser, data.data.user);
+        navigate(`/communities/${data.data.community.id}`);
+      }
+      console.log(data);
+    },
+    onError: (error) => {
+      if (axios.isCancel(error)) {
+        console.log("Request was canceled by the user");
+      } else {
+        const errorInfo = {
+          message: error.message || "Unknown error",
+          statusCode: error.response ? error.response.status : "No status code",
+        };
+        // 新しいオブジェクトをログに記録
+        console.error(`Error in createCommunity mutation:`, errorInfo);
+      }
+    },
+  });
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -292,7 +328,19 @@ export const BarMenu = () => {
           <DropdownMenuContent>
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>プロフィール</DropdownMenuItem>
+            <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+              <AlertDialogSet
+                triggerComponent={<spon>コミュニティを作る</spon>}
+                dialogTitle="新しいコミュニティが作成されます。よろしいですか？"
+                dialogText="コミュニティを作成するとあなたのお気に入りが共有されます。"
+                actionText="コミュニティを作る"
+                onActionClick={handleCreateCommunity.mutate}
+                cancelText="キャンセル"
+              />
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to={`/users/${user.id}`}>プロフィール</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
               <AlertDialogSet
                 triggerComponent={<span>ログアウト</span>}
@@ -303,7 +351,6 @@ export const BarMenu = () => {
                 cancelText="キャンセル"
               />
             </DropdownMenuItem>
-            {/* <DropdownMenuItem>アカウント削除</DropdownMenuItem> */}
             <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
               <AlertDialogSet
                 triggerComponent={<span>アカウント削除</span>}

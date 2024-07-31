@@ -1,9 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpotify } from "@fortawesome/free-brands-svg-icons";
+// import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 
-import { Button } from "@/components/ui/Button/Button";
 import { AvatarMenu } from "../AvatarMenu/AvatarMenu";
 import { BarMenu } from "@/components/ui/BarMenu/BarMenu";
 import { AlertDialogSet } from "../AlertDialog/AlertDialog";
@@ -12,6 +11,8 @@ import { useAtom } from "jotai";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { createCommunity } from "@/api/communitiesCreate";
+import { Button } from "@/components/ui/Button/Button.jsx";
+import { faRecordVinyl } from "@fortawesome/free-solid-svg-icons";
 
 export const Header = () => {
   const [user, setUser] = useAtom(userAtom);
@@ -50,8 +51,12 @@ export const Header = () => {
       <div className="flex justify-between items-center px-4 py-5 bg-theme-black rounded-sm h-16">
         <Link to="/">
           <div className="flex space-x-2 items-center">
-            <FontAwesomeIcon icon={faSpotify} className="text-white text-4xl" />
-            <h1 className="font-bold text-white text-2xl">Mixify</h1>
+            {/* <FontAwesomeIcon icon={faSpotify} className="text-white text-4xl" /> */}
+            <FontAwesomeIcon
+              icon={faRecordVinyl}
+              className="text-white text-4xl"
+            />
+            <h1 className="font-bold text-white text-2xl">Mixtones</h1>
           </div>
         </Link>
         <div className="hidden md:flex">

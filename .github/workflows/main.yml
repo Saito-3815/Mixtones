@@ -1,8 +1,8 @@
 name: Build React on S3
 on:
   push:
-      branches:
-        - main
+    branches-ignore:
+      - '**'  # すべてのブランチを無視
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,14 +11,19 @@ jobs:
         uses: actions/checkout@main  # リポジトリをチェックアウト
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          cd ./frontend/app
+          npm install
 
       - name: Build
-        run: npm run build  # React ビルド
+        run: |
+          cd ./frontend/app
+          npm run build  # React ビルド
 
       - name: Deploy  # S3にデプロイ 
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run:
-          aws s3 cp --recursive --region ap-northeast-1 build s3://mixtones-web/
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+        run: |
+          aws s3 cp --recursive --region ap-northeast-1 build s3://$S3_BUCKET_NAME/

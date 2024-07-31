@@ -78,7 +78,8 @@ module Api
                   spotify_uri: like_tune[:spotify_uri],
                   preview_url: like_tune[:preview_url],
                   added_at: like_tune[:added_at],
-                  time: like_tune[:time]
+                  time: like_tune[:time],
+                  external_url: like_tune[:external_url]
                 )
               else
                 @user.like_tunes << existing_record
@@ -104,7 +105,6 @@ module Api
                 }
               }
             ),
-            # session_id: session_id,
             access_token: access_token
           }, status: :created
         end
@@ -120,7 +120,7 @@ module Api
         return render json: { error: '権限がありません' }, status: :forbidden unless @user == current_user
 
         if @user.update(user_update_params)
-          render json: @user
+          render status: :ok
         else
           render json: @user.errors, status: :unprocessable_entity
         end

@@ -96,7 +96,8 @@ module SpotifyAuth
         spotify_uri: track['uri'],
         preview_url: track['preview_url'],
         added_at: item['added_at'],
-        time: track['duration_ms']
+        time: track['duration_ms'],
+        external_url: track['external_urls']['spotify']
       }
     end
 
@@ -143,6 +144,9 @@ module SpotifyAuth
 
     saved_tracks = JSON.parse(res.body)
 
+    # デバッグ用にレスポンスをログに出力
+    Rails.logger.info "Spotify API Response: #{saved_tracks}"
+
     # latest_added_atより新しい楽曲のみを選択
     filtered_tracks = saved_tracks['items'].select do |item|
       Time.zone.parse(item['added_at']) > latest_added_at
@@ -158,8 +162,40 @@ module SpotifyAuth
         spotify_uri: track['uri'],
         preview_url: track['preview_url'],
         added_at: item['added_at'],
-        time: track['duration_ms']
+        time: track['duration_ms'],
+        external_url: track['external_urls']['spotify']
       }
+    end
+  end
+
+  # 既存のレコードに後からカラムを追加した外部URLデータを追加
+  def self.update_existing_tracks_with_external_url(user, access_token)
+    # 既存のレコードを取得
+    existing_tracks = user.like_tunes
+
+    existing_tracks.each do |track|
+      # Spotify APIから最新のデータをフェッチ
+      uri = URI("https://api.spotify.com/v1/tracks/#{track.spotify_uri.split(':').last}")
+      req = Net::HTTP::Get.new(uri)
+      req['Authorization'] = "Bearer #{access_token}"
+
+      res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+        http.request(req)
+      end
+
+      if res.code.to_i == 429
+        retry_after = res['Retry-After'].to_i
+        sleep(retry_after)
+        redo
+      end
+
+      track_data = JSON.parse(res.body)
+
+      # 新しいカラムのデータを追加
+      external_url = track_data.dig('external_urls', 'spotify')
+
+      # 既存のレコードを更新
+      track.update(external_url: external_url)
     end
   end
 end

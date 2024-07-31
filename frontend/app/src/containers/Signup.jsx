@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button/Button";
+import { Button } from "@/components/ui/Button/Button.jsx";
 import { Switch } from "@/components/ui/Switch/Switch";
 import { useGuestLogin } from "@/hooks/useGuestLogin";
 import { generateCodeChallenge } from "@/SpotifyAuth.js";

@@ -11,7 +11,7 @@ import { Skeleton } from "../Skeleton/Skeleton";
 import { useCommunityPlaylist } from "@/hooks/useCommunityPlaylist";
 import { playlistAtom } from "@/atoms/playlistAtom";
 import { playerAtom } from "@/atoms/playerAtom";
-import { isLoggedInAtom } from "@/atoms/userAtoms";
+import { userAtom } from "@/atoms/userAtoms";
 import usePreviewPlay from "@/hooks/usePreviewPlay";
 import useSearchPlaylist from "@/hooks/useSearchPlaylist";
 
@@ -19,7 +19,7 @@ export const TuneTable = () => {
   const { communityId } = useParams();
   const [currentPlaylist, setCurrentPlaylist] = useAtom(playlistAtom);
   const [player] = useAtom(playerAtom);
-  const [isLoggedIn] = useAtom(isLoggedInAtom);
+  const [user] = useAtom(userAtom);
 
   // プレイリスト楽曲を取得
   const {
@@ -36,6 +36,7 @@ export const TuneTable = () => {
   useEffect(() => {
     if (playlistData) {
       setCurrentPlaylist(playlistData);
+      console.log("playlistData updated:", playlistData);
     }
   }, [playlistData]);
 
@@ -62,7 +63,7 @@ export const TuneTable = () => {
   }, [tune]);
 
   const handleColumnClick = (index, tune) => {
-    if (isLoggedIn) {
+    if (user && user.spotify_id) {
       setTune({ index, tune });
     } else {
       // tune.preview_url が存在するかチェック
@@ -75,12 +76,21 @@ export const TuneTable = () => {
 
   // プレイリストの再生コントロール
   const handlePlay = () => {
+    if (!user || !user.spotify_id) {
+      alert(
+        "プレイリストの再生はSpotifyアカウントが必要です。楽曲データをクリックするとプレビューが再生されます。",
+      );
+      return;
+    }
+
     if (!tune) {
       setTune({ index: 0, tune: currentPlaylist[0] });
     }
     // playerが存在し、togglePlayメソッドがある場合にのみ実行
-    if (tune && player && typeof player.togglePlay === "function") {
+    if (player && typeof player.togglePlay === "function") {
       player.togglePlay();
+    } else {
+      console.error("player or player.togglePlay is not available");
     }
   };
 
