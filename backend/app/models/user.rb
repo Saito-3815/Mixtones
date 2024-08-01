@@ -11,8 +11,9 @@ class User < ApplicationRecord
 
   validates :name,          presence: true, length: { maximum: 40 }
   validates :introduction,  length: { maximum: 160 }
-  validates :spotify_id,    uniqueness: true
-  validates :email,         uniqueness: true
+  validates :spotify_id, uniqueness: true, allow_nil: true
+  validates :email, uniqueness: true, allow_nil: true
+  validate  :email_format
 
   encrypts :spotify_id, deterministic: true, downcase: true
   encrypts :refresh_token
@@ -36,5 +37,15 @@ class User < ApplicationRecord
   # spotify_idをフロントエンドに返却時、真偽値に変換
   def as_json(options = {})
     super(options).merge('spotify_id' => spotify_id_present)
+  end
+
+  private
+
+  # emailのフォーマットをチェックするカスタムバリデーション
+  def email_format
+    return if email.nil?
+    unless email.match?(/\A[^@\s]+@[^@\s]+\z/)
+      errors.add(:email, 'は有効なメールアドレスではありません')
+    end
   end
 end

@@ -155,6 +155,9 @@ RSpec.describe User, type: :request do
     end
   end
 
+  # create_password_userのテスト
+  
+
   # updateアクションのテスト
   describe 'PATCH /api/v1/users/:id' do
     let(:user) { create(:user) }

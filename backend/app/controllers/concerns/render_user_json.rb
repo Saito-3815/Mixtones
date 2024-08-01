@@ -7,7 +7,6 @@ module RenderUserJson
       render json: {
         user: user.as_json(
           except: :refresh_token,
-          # methods: :spotify_id_present,
           include: {
             communities: {
               only: [:id]
@@ -20,7 +19,6 @@ module RenderUserJson
             }
           }
         ).merge(avatar: avatar_url),
-        # session_id: session[:session_id],
         access_token: access_token
       }, status: status
       return
@@ -29,7 +27,6 @@ module RenderUserJson
     render json: {
       user: user.as_json(
         except: :refresh_token,
-        # methods: :spotify_id_present,
         include: {
           communities: {
             only: [:id]
@@ -42,7 +39,6 @@ module RenderUserJson
           }
         }
       ),
-      # session_id: session[:session_id],
       access_token: access_token
     }, status: status
   end

@@ -33,7 +33,7 @@ module Api
         render json: @user.as_json(only: [:name, :introduction, :avatar])
       end
 
-      # ユーザー作成
+      # spotifyユーザー作成
       # ユーザー作成時には、like_tunesも一緒に登録する
       def create
         decoded_code = Base64.decode64(spotify_login_params[:code])
@@ -114,7 +114,16 @@ module Api
         render json: { error: e.message }, status: :unprocessable_entity
       end
 
-      # パスワードログイン
+      # パスワードユーザーの作成
+      def create_password_user
+        @user = User.new(password_user_create_params)
+        if @user.save
+          log_in(@user)
+          render_user_json(@user, nil, :created)
+        else
+          render json: @user.errors, status: :unprocessable_entity
+        end
+      end
 
       # テキスト情報のみ更新
       def update
@@ -159,6 +168,10 @@ module Api
 
       def spotify_login_params
         params.require(:user).permit(:code, :code_verifier, :is_persistent)
+      end
+
+      def password_user_create_params
+        params.require(:user).permit(:name, :email, :password)
       end
 
       def user_update_params
