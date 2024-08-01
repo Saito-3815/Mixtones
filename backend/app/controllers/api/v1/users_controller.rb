@@ -114,6 +114,8 @@ module Api
         render json: { error: e.message }, status: :unprocessable_entity
       end
 
+      # パスワードログイン
+
       # テキスト情報のみ更新
       def update
         @user = User.find(params[:id])
