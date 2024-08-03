@@ -156,7 +156,92 @@ RSpec.describe User, type: :request do
   end
 
   # create_password_userのテスト
-  
+  describe 'POST /api/v1/users/password' do
+    let(:valid_attributes) do
+      {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password',
+      }
+    end
+
+    let(:invalid_attributes) do
+      {
+        name: 'Test User',
+        email: 'invalid_email',
+        password: 'password',
+      }
+    end
+
+    # 正しい属性値の場合
+    context 'with valid attributes' do
+      # ユーザーが作成されること
+      it 'creates a new user' do
+        expect {
+          post '/api/v1/users/password', params: { user: valid_attributes }
+        }.to change(User, :count).by(1)
+      end
+
+      # 201ステータスコードを返すこと
+      it 'returns a created status' do
+        post '/api/v1/users/password', params: { user: valid_attributes }
+        expect(response).to have_http_status(:created)
+      end
+
+      # レスポンスがuser.nameの文字列が含まれること
+      it 'logs in the user' do
+        post '/api/v1/users/password', params: { user: valid_attributes }
+        expect(session[:user_id]).to eq(User.last.id)
+      end
+    end
+
+    # 不正な属性値の場合
+    context 'with invalid attributes' do
+      # ユーザーが作成されないこと
+      it 'does not create a new user' do
+        expect {
+          post '/api/v1/users/password', params: { user: invalid_attributes }
+        }.not_to change(User, :count)
+      end
+
+      # 422ステータスコードを返すこと
+      it 'returns an unprocessable entity status' do
+        post '/api/v1/users/password', params: { user: invalid_attributes }
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      # エラーメッセージが含まれること
+      it 'returns the errors' do
+        post '/api/v1/users/password', params: { user: invalid_attributes }
+        expect(JSON.parse(response.body)['email']).to include('は有効なメールアドレスではありません')
+      end
+    end
+
+    # 既に存在するemailの場合
+    context 'with an existing email' do
+      let(:existing_user) { create(:user, email: 'test@example.com') }
+
+      before do
+        existing_user
+        post '/api/v1/users/password', params: { user: valid_attributes }
+      end
+
+      # ユーザーが作成されないこと
+      it 'does not create a new user' do
+        expect(User.count).to eq(1)
+      end
+
+      # エラーメッセージが含まれること
+      it 'returns an error message' do
+        expect(response.body).to include('ユーザーは既に存在します')
+      end
+
+      # 422ステータスコードを返すこと
+      it 'returns a status of unprocessable entity' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+  end
 
   # updateアクションのテスト
   describe 'PATCH /api/v1/users/:id' do

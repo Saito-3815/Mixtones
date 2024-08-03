@@ -22,11 +22,13 @@ Rails.application.routes.draw do
         resources :checks, only: [:index, :create, :destroy]
         delete :checks, to: 'checks#destroy'
       end
+      post 'users/password', to: 'users#create_password_user'
 
       resources :sessions, only: [:create]
       delete 'sessions', to: 'sessions#destroy'
       get 'sessions', to: 'sessions#current_user_show'
       post 'sessions/guest', to: 'sessions#guest_login'
+      post 'sessions/password', to: 'sessions#password_login'
 
       post 'images', to: 'images#create'
     end

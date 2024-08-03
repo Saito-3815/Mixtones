@@ -116,12 +116,19 @@ module Api
 
       # パスワードユーザーの作成
       def create_password_user
-        @user = User.new(password_user_create_params)
-        if @user.save
-          log_in(@user)
-          render_user_json(@user, nil, :created)
+        email = password_user_create_params[:email]
+        existing_user = User.find_by(email: email.downcase)
+
+        if existing_user
+          render json: { error: 'ユーザーは既に存在します' }, status: :unprocessable_entity
         else
-          render json: @user.errors, status: :unprocessable_entity
+          @user = User.new(password_user_create_params)
+          if @user.save
+            log_in(@user)
+            render_user_json(@user, nil, :created)
+          else
+            render json: @user.errors, status: :unprocessable_entity
+          end
         end
       end
 

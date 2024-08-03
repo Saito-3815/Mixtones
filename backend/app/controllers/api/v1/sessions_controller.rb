@@ -58,6 +58,23 @@ module Api
         end
       end
 
+      # パスワードログイン
+      def password_login
+        user = User.find_by(email: params[:email].downcase)
+        # ユーザーが存在しない場合
+        if user.nil?
+          render json: { message: 'User not found' }, status: :not_found
+          return
+        end
+        # ユーザーが存在する場合、パスワードが一致するか確認
+        if user.authenticate(params[:password])
+          log_in(user)
+          render json: { user: user.as_json(except: :refresh_token), message: 'Login successful' }, status: :ok
+        else
+          render json: { message: 'Password incorrect' }, status: :unauthorized
+        end
+      end
+
       # ゲストログイン
       # オリジナルゲストユーザーデータをゲストユーザーにコピー
       def guest_login

@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   include S3Presignable
 
+  has_secure_password  validations: false # デフォルトのバリデーションを無効化して、カスタムバリデーションを使用する
   has_many :memberships, dependent: :destroy
   has_many :communities, through: :memberships
   has_many :comments, dependent: :destroy
@@ -15,10 +16,11 @@ class User < ApplicationRecord
   validates :email, uniqueness: true, allow_nil: true
   validate  :email_format
 
+  validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
+
   encrypts :spotify_id, deterministic: true, downcase: true
   encrypts :refresh_token
   encrypts :email, deterministic: true, downcase: true
-  encrypts :password
 
   def guest?
     spotify_id == 'guest_user'

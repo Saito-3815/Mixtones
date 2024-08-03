@@ -53,6 +53,36 @@ RSpec.describe "Sessions", type: :request do
     end
   end
 
+  # password_loginアクションのテスト
+  describe 'POST /api/v1/sessions/password' do
+    let(:user) { create(:user, name: 'Test', email: 'test@example.com', password: 'password') }
+
+    context 'when user exists and password is correct' do
+      it 'logs in the user and returns a success message' do
+        post :'/api/v1/sessions/password', params: { email: 'test@example.com', password: 'password' }
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['message']).to eq('Login successful')
+        expect(JSON.parse(response.body)['user']['email']).to eq('test@example.com')
+      end
+    end
+
+    context 'when user does not exist' do
+      it 'returns a not found message' do
+        post :'/api/v1/sessions/password', params: { email: 'nonexistent@example.com', password: 'password' }
+        expect(response).to have_http_status(:not_found)
+        expect(JSON.parse(response.body)['message']).to eq('User not found')
+      end
+    end
+
+    context 'when password is incorrect' do
+      it 'returns an unauthorized message' do
+        post :'/api/v1/sessions/password', params: { email: 'test@example.com', password: 'wrongpassword' }
+        expect(response).to have_http_status(:unauthorized)
+        expect(JSON.parse(response.body)['message']).to eq('Password incorrect')
+      end
+    end
+  end
+
   # destroyアクションのテスト
   describe 'DELETE /api/v1/sessions' do
     before do
