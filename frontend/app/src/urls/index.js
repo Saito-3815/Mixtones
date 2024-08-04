@@ -31,6 +31,8 @@ export const membershipsDestroy = (communityId) =>
 
 // spotifyユーザーをデータベースへ登録
 export const usersCreate = `${baseURL}/users`;
+// パスワードユーザーをデータベースへ登録
+export const usersCreatePassword = `${baseURL}/users/password`;
 // ユーザーを削除
 export const usersDestroy = (userId) => `${baseURL}/users/${userId}`;
 // ユーザー情報の取得
@@ -43,6 +45,8 @@ export const usersUpdateAvatar = (userId) =>
 
 // ユーザーのログイン
 export const sessionsCreate = `${baseURL}/sessions`;
+// パスワードユーザーのログイン
+export const sessionsCreatePassword = `${baseURL}/sessions/password`;
 // ユーザーのログアウト
 export const sessionsDestroy = `${baseURL}/sessions`;
 // セッションに対応したユーザー情報の取得

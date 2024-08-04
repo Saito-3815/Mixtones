@@ -36,8 +36,10 @@ module Api
       def destroy
         restore_guest_data
         log_out
-        response.set_cookie('_session_id', value: '', path: '/', domain: 'localhost', expires: 1.year.ago,
-                                           httponly: true)
+        ['localhost', 'web.mixtones.tech'].each do |domain|
+          response.set_cookie('_session_id', value: '', path: '/', domain: domain, expires: 1.year.ago,
+                             httponly: true, secure: (domain == 'web.mixtones.tech' && Rails.env.production?))
+        end
         render json: { message: 'Logged out' }, status: :ok
       end
 
@@ -60,15 +62,18 @@ module Api
 
       # パスワードログイン
       def password_login
-        user = User.find_by(email: params[:email].downcase)
+        email = password_login_params[:email].downcase
+        user = User.find_by(email: email)
         # ユーザーが存在しない場合
         if user.nil?
-          render json: { message: 'User not found' }, status: :not_found
+          signup_url = "#{ENV.fetch('SPOTIFY_REDIRECT_URI', nil)}signup"
+          render json: { message: 'User not found', redirect_url: signup_url }, status: :not_found
           return
         end
         # ユーザーが存在する場合、パスワードが一致するか確認
-        if user.authenticate(params[:password])
+        if user.authenticate(password_login_params[:password])
           log_in(user)
+          update_session_expiration(spotify_login_params[:is_persistent])
           render json: { user: user.as_json(except: :refresh_token), message: 'Login successful' }, status: :ok
         else
           render json: { message: 'Password incorrect' }, status: :unauthorized
@@ -123,6 +128,10 @@ module Api
 
       def spotify_login_params
         params.require(:user).permit(:code, :code_verifier, :is_persistent)
+      end
+
+      def password_login_params
+        params.require(:user).permit(:email, :password, :isPersistent)
       end
     end
   end

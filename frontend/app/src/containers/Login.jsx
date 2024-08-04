@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button/Button.jsx";
 import { Switch } from "@/components/ui/Switch/Switch";
 import { useGuestLogin } from "@/hooks/useGuestLogin";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   // isPersistent状態を追加
@@ -61,9 +62,15 @@ const Login = () => {
           className="bg-theme-green hover:bg-theme-green/90 w-[290px]"
           onClick={handleLogin}
         />
+        <Link to="/passlogin" state={{ isPersistent }}>
+          <Button
+            label="emailでログインする"
+            className="bg-theme-orange hover:bg-theme-orange/90 w-[290px]"
+          />
+        </Link>
         <Button
           label="ゲストログインする"
-          className="bg-theme-orange w-[290px]"
+          className="bg-white w-[290px]"
           onClick={handleGuestLogin}
         />
       </div>

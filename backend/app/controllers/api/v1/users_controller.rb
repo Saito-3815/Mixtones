@@ -125,6 +125,7 @@ module Api
           @user = User.new(password_user_create_params)
           if @user.save
             log_in(@user)
+            update_session_expiration(password_user_create_params[:is_persistent])
             render_user_json(@user, nil, :created)
           else
             render json: @user.errors, status: :unprocessable_entity
@@ -178,7 +179,7 @@ module Api
       end
 
       def password_user_create_params
-        params.require(:user).permit(:name, :email, :password)
+        params.require(:user).permit(:name, :email, :password, :is_persistent)
       end
 
       def user_update_params

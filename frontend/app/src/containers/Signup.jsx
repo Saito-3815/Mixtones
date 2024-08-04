@@ -5,6 +5,7 @@ import { generateCodeChallenge } from "@/SpotifyAuth.js";
 
 import { accessUrl } from "@/SpotifyAuth.js";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   // isPersistent状態を追加
@@ -64,9 +65,15 @@ const Signup = () => {
             className="bg-theme-green hover:bg-theme-green/90 w-[290px]"
           />
         </div>
+        <Link to="/passsignup" state={{ isPersistent }}>
+          <Button
+            label="emailでログインする"
+            className="bg-theme-orange hover:bg-theme-orange/90 w-[290px]"
+          />
+        </Link>
         <Button
           label="ゲストログインする"
-          className="bg-theme-orange w-[290px]"
+          className="bg-white w-[290px]"
           onClick={handleGuestLogin}
         />
       </div>

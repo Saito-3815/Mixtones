@@ -55,29 +55,50 @@ RSpec.describe "Sessions", type: :request do
 
   # password_loginアクションのテスト
   describe 'POST /api/v1/sessions/password' do
-    let(:user) { create(:user, name: 'Test', email: 'test@example.com', password: 'password') }
+    before do
+      @user = create(:user, name: 'Test', email: 'test@example.com', password: 'password')
+    end
 
+    # ユーザーが存在し、パスワードが正しい場合
     context 'when user exists and password is correct' do
-      it 'logs in the user and returns a success message' do
-        post :'/api/v1/sessions/password', params: { email: 'test@example.com', password: 'password' }
+      it 'returns a success status' do
+        post '/api/v1/sessions/password', params: { email: 'test@example.com', password: 'password' }
         expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns a success message' do
+        post '/api/v1/sessions/password', params: { email: 'test@example.com', password: 'password' }
         expect(JSON.parse(response.body)['message']).to eq('Login successful')
+      end
+
+      it 'returns the correct user email' do
+        post '/api/v1/sessions/password', params: { email: 'test@example.com', password: 'password' }
         expect(JSON.parse(response.body)['user']['email']).to eq('test@example.com')
       end
     end
 
+    # ユーザーが存在しない場合
     context 'when user does not exist' do
-      it 'returns a not found message' do
-        post :'/api/v1/sessions/password', params: { email: 'nonexistent@example.com', password: 'password' }
+      it 'returns a not found status' do
+        post '/api/v1/sessions/password', params: { email: 'nonexistent@example.com', password: 'password' }
         expect(response).to have_http_status(:not_found)
+      end
+
+      it 'returns a not found message' do
+        post '/api/v1/sessions/password', params: { email: 'nonexistent@example.com', password: 'password' }
         expect(JSON.parse(response.body)['message']).to eq('User not found')
       end
     end
 
+    # パスワードが間違っている場合
     context 'when password is incorrect' do
-      it 'returns an unauthorized message' do
-        post :'/api/v1/sessions/password', params: { email: 'test@example.com', password: 'wrongpassword' }
+      it 'returns an unauthorized status' do
+        post '/api/v1/sessions/password', params: { email: 'test@example.com', password: 'wrongpassword' }
         expect(response).to have_http_status(:unauthorized)
+      end
+
+      it 'returns an unauthorized message' do
+        post '/api/v1/sessions/password', params: { email: 'test@example.com', password: 'wrongpassword' }
         expect(JSON.parse(response.body)['message']).to eq('Password incorrect')
       end
     end
