@@ -3,7 +3,11 @@ import { usersUpdateAvatar } from "@/urls/index";
 
 export const updateUsersAvatar = ({ fileKey, userId }) => {
   const url = usersUpdateAvatar(userId);
-  return axios.put(url, {
-    key: fileKey,
-  });
+  return axios.put(
+    url,
+    {
+      key: fileKey,
+    },
+    { withCredentials: true },
+  );
 };

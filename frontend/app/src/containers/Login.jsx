@@ -47,9 +47,11 @@ const Login = () => {
           Spotifyへログインしますか？
         </h1>
         <p className="text-theme-gray pt-12">
-          ログインすると最新のSpotifyのユーザープロフィールと「お気に入りの曲」がこのアプリケーションと連携されます。ログイン情報を保持するとSpotifyの更新が自動で連携されます。
+          ログインすると最新のSpotifyのユーザープロフィールと「お気に入りの曲」がこのアプリケーションと連携されます。Mixtonesに定期的にログインすることでSpotify上のアクティビティを自動で取得します。
           <br />
-          ゲストログインすると一部を除いたアプリケーションの全機能が使えるようになります。
+          emailログインする場合は、emailとパスワードを入力してください。
+          <br />
+          ゲストログインすると一部を除いたemailログイン時に利用できるアプリケーションの全機能が使えるようになります。
         </p>
       </div>
       <div className="w-full max-w-[550px] flex items-center justify-center space-x-10 pt-12">
@@ -70,7 +72,8 @@ const Login = () => {
         </Link>
         <Button
           label="ゲストログインする"
-          className="bg-white w-[290px]"
+          className="w-[290px]"
+          variant="secondary"
           onClick={handleGuestLogin}
         />
       </div>

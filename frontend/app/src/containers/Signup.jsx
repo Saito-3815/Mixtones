@@ -49,9 +49,11 @@ const Signup = () => {
           ログインしますか？
         </h1>
         <p className="text-theme-gray pt-12">
-          ログインするとSpotifyのユーザープロフィールと「お気に入りの曲」がこのアプリケーションと連携されます。ログイン情報を保持するとSpotifyの更新が自動で連携されます。
+          SpotifyでログインするとSpotifyのユーザープロフィールと「お気に入りの曲」がこのアプリケーションと連携されます。Mixtonesに定期的にログインすることでSpotify上のアクティビティを自動で取得します。なお、この機能を利用する場合はSpotiifyのプレミアムプランに加入する必要があります。
           <br />
-          ゲストログインすると一部を除いたアプリケーションの全機能が使えるようになります。
+          emailでログインすると、あなたのemailとパスワードをMixtonesに登録します。emailでログインする場合は、楽曲のフル再生などのSpotifyと連携した一部機能が制限されます。
+          <br />
+          ゲストログインすると一部を除いたemailログイン時に利用できるアプリケーションの全機能が使えるようになります。
         </p>
       </div>
       <div className="w-full max-w-[550px] flex items-center justify-center space-x-10 pt-12">
@@ -73,7 +75,8 @@ const Signup = () => {
         </Link>
         <Button
           label="ゲストログインする"
-          className="bg-white w-[290px]"
+          className="w-[290px]"
+          variant="secondary"
           onClick={handleGuestLogin}
         />
       </div>

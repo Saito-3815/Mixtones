@@ -2,6 +2,7 @@ module Api
   module V1
     class CommunitiesController < ApplicationController
       include SessionsHelper
+      include RenderUserJson
 
       def index
         @communities = Community.order(updated_at: :desc)
@@ -31,10 +32,23 @@ module Api
         if @community.save
           create_membership
           add_like_tunes_to_playlist
-          # avatar_url = @community.generate_s3_url(key: @community.avatar)
+          current_user.update_avatar_url
           render json: {
             community: @community,
-            user: current_user.as_json(include: { communities: { only: [:id] } })
+            user: current_user.as_json(
+              except: [:refresh_token, :email, :password_digest],
+              include: {
+                communities: {
+                  only: [:id]
+                },
+                like_tunes: {
+                  only: [:id]
+                },
+                check_tunes: {
+                  only: [:id]
+                }
+              }
+            )
           }, status: :created
         else
           render json: @community.errors, status: :unprocessable_entity

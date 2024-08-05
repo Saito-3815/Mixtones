@@ -48,10 +48,11 @@ module Api
         if current_user.nil?
           Rails.logger.info "current_user is nil"
           render json: { error: 'User not found' }, status: :not_found
-        elsif current_user.spotify_id == 'guest_user'
+        elsif current_user.spotify_id == 'guest_user' || current_user.spotify_id.nil?
           Rails.logger.info "current_user is a guest_user"
-          # ゲストユーザーの場合は、何も処理せずにユーザーデータを返却
-          render json: { user: current_user.as_json(except: :refresh_token), message: 'Guest user data' }, status: :ok
+          # パスワード・ゲストユーザーの場合は、何も処理せずにユーザーデータを返却
+          # render json: { user: current_user.as_json(except: :refresh_token), message: ' not spotify user ' }, status: :ok
+          render_user_json(current_user, nil)
         else
           Rails.logger.info "current_user is a regular user"
           access_token = SpotifyAuth.refresh_access_token(current_user.refresh_token)
@@ -74,7 +75,8 @@ module Api
         if user.authenticate(password_login_params[:password])
           log_in(user)
           update_session_expiration(spotify_login_params[:is_persistent])
-          render json: { user: user.as_json(except: :refresh_token), message: 'Login successful' }, status: :ok
+          # render json: { user: user.as_json(except: :refresh_token), message: 'Login successful' }, status: :ok
+          render_user_json(user, nil, :ok, 'Login successful')
         else
           render json: { message: 'Password incorrect' }, status: :unauthorized
         end

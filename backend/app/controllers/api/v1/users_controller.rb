@@ -147,10 +147,17 @@ module Api
 
       # 画像を更新
       def update_avatar
-        @user = User.find(params[:user_id])
+        @user = User.find_by(id: params[:user_id])
+        return render json: { error: 'User not found' }, status: :not_found unless @user
         @user.avatar = params[:key]
         @user.save
-        render json: @user, status: :ok
+        if @user.save
+          render_user_json(@user, nil)
+          # render json: @user, status: :ok
+          # render status: :ok
+        else
+          render json: @user.errors, status: :unprocessable_entity
+        end
       end
 
       def destroy
