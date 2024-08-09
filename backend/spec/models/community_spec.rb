@@ -63,12 +63,30 @@ RSpec.describe Community, type: :model do
       # Add more validation tests here
     end
 
-    # describe 'associations' do
-    #   # Add association tests here
-    # end
+    describe 'associations' do
+      it 'reflects correct association macro for playlist_tunes' do
+        expect(Community.reflect_on_association(:playlist_tunes).macro).to eq(:has_many)
+      end
 
-    # describe 'methods' do
-    #   # Add method tests here
-    # end
+      it 'reflects correct association through option for playlist_tunes' do
+        expect(Community.reflect_on_association(:playlist_tunes).options[:through]).to eq(:playlists)
+      end
+
+      it 'reflects correct association source option for playlist_tunes' do
+        expect(Community.reflect_on_association(:playlist_tunes).options[:source]).to eq(:tune)
+      end
+    end
+
+    describe 'scopes' do
+      let!(:community) { create(:community) }
+      let!(:playlist1) { create(:playlist, community: community, recommend: true) }
+      let!(:playlist2) { create(:playlist, community: community, recommend: false) }
+      let!(:tune1) { create(:tune, playlists: [playlist1]) }
+      let!(:tune2) { create(:tune, playlists: [playlist2]) }
+
+      it 'orders playlist_tunes by recommend DESC' do
+        expect(community.playlist_tunes).to eq([tune1, tune2])
+      end
+    end
   end
 end

@@ -10,6 +10,7 @@ Rails.application.routes.draw do
         resources :memberships, only: [:create]
         delete :memberships, to: 'memberships#destroy'
         resources :playlists, only: [:index]
+        post 'playlists/:tune_id', to: 'playlists#create_recommend'
         get 'tunes/:tune_id/comments', to: 'comments#index'
         post 'tunes/:tune_id/users/:user_id/comments', to: 'comments#create'
         delete 'tunes/:tune_id/users/:user_id/comments/:id', to: 'comments#destroy'

@@ -67,6 +67,19 @@ module Api
         Rails.logger.info "Rendering playlist with #{community.playlist_tunes.count} tunes."
         render json: @playlists
       end
+
+      # プレイリストの曲をレコメンドする
+      def create_recommend
+        tune = Tune.find_by(id: params[:tune_id])
+        community = Community.find_by(id: params[:community_id])
+        playlist_tune = Playlist.find_by(tune_id: tune.id, community_id: community.id)
+        if playlist_tune.update(recommend: true)
+          @playlists = community.playlist_tunes.order(added_at: :desc)
+          render json: @playlists
+        else
+          render json: playlist_tune.errors, status: :unprocessable_entity
+        end
+      end
     end
   end
 end

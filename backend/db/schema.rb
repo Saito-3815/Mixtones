@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_08_09_071509) do
+ActiveRecord::Schema[7.0].define(version: 2024_08_09_124519) do
   create_table "checks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "tune_id", null: false
@@ -66,7 +66,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_09_071509) do
   create_table "playlists", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "community_id", null: false
     t.bigint "tune_id", null: false
-    t.boolean "active"
+    t.boolean "recommend"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["community_id", "tune_id"], name: "index_playlists_on_community_id_and_tune_id", unique: true
