@@ -161,7 +161,7 @@ RSpec.describe User, type: :request do
       {
         name: 'Test User',
         email: 'test@example.com',
-        password: 'password',
+        password: 'password'
       }
     end
 
@@ -169,7 +169,7 @@ RSpec.describe User, type: :request do
       {
         name: 'Test User',
         email: 'invalid_email',
-        password: 'password',
+        password: 'password'
       }
     end
 
@@ -177,9 +177,9 @@ RSpec.describe User, type: :request do
     context 'with valid attributes' do
       # ユーザーが作成されること
       it 'creates a new user' do
-        expect {
+        expect do
           post '/api/v1/users/password', params: { user: valid_attributes }
-        }.to change(User, :count).by(1)
+        end.to change(User, :count).by(1)
       end
 
       # 201ステータスコードを返すこと
@@ -199,9 +199,9 @@ RSpec.describe User, type: :request do
     context 'with invalid attributes' do
       # ユーザーが作成されないこと
       it 'does not create a new user' do
-        expect {
+        expect do
           post '/api/v1/users/password', params: { user: invalid_attributes }
-        }.not_to change(User, :count)
+        end.not_to change(User, :count)
       end
 
       # 422ステータスコードを返すこと
@@ -213,7 +213,7 @@ RSpec.describe User, type: :request do
       # エラーメッセージが含まれること
       it 'returns the errors' do
         post '/api/v1/users/password', params: { user: invalid_attributes }
-        expect(JSON.parse(response.body)['email']).to include('は有効なメールアドレスではありません')
+        expect(response.parsed_body['email']).to include('は有効なメールアドレスではありません')
       end
     end
 

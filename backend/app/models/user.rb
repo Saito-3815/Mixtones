@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   include S3Presignable
 
-  has_secure_password  validations: false # デフォルトのバリデーションを無効化して、カスタムバリデーションを使用する
+  has_secure_password validations: false # デフォルトのバリデーションを無効化して、カスタムバリデーションを使用する
   has_many :memberships, dependent: :destroy
   has_many :communities, through: :memberships
   has_many :comments, dependent: :destroy
@@ -46,8 +46,7 @@ class User < ApplicationRecord
   # emailのフォーマットをチェックするカスタムバリデーション
   def email_format
     return if email.nil?
-    unless email.match?(/\A[^@\s]+@[^@\s]+\z/)
-      errors.add(:email, 'は有効なメールアドレスではありません')
-    end
+
+    errors.add(:email, 'は有効なメールアドレスではありません') unless email.match?(/\A[^@\s]+@[^@\s]+\z/)
   end
 end

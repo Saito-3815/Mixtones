@@ -41,7 +41,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="container flex flex-col bg-theme-black max-w-[890px] max-h-[840px] h-full mx-auto my-8 rounded-sm justify-center items-center overflow-hidden">
+    <div className="container flex flex-col bg-theme-black max-w-[890px] max-h-[940px] h-full mx-auto my-8 rounded-sm justify-center items-center overflow-hidden">
       <div className="w-full max-w-[550px] mx-auto items-center text-center">
         <h1 className="text-white text-2xl pt-24 ">
           サインアップにはSpotifyへのログインが必要です。

@@ -37,8 +37,13 @@ module Api
         restore_guest_data
         log_out
         ['localhost', 'web.mixtones.tech'].each do |domain|
-          response.set_cookie('_session_id', value: '', path: '/', domain: domain, expires: 1.year.ago,
-                             httponly: true, secure: (domain == 'web.mixtones.tech' && Rails.env.production?))
+          response.set_cookie(
+            '_session_id',
+            value: '',
+            path: '/', domain: domain, expires: 1.year.ago,
+            httponly: true,
+            secure: domain == 'web.mixtones.tech' && Rails.env.production?
+          )
         end
         render json: { message: 'Logged out' }, status: :ok
       end
@@ -51,7 +56,10 @@ module Api
         elsif current_user.spotify_id == 'guest_user' || current_user.spotify_id.nil?
           Rails.logger.info "current_user is a guest_user"
           # パスワード・ゲストユーザーの場合は、何も処理せずにユーザーデータを返却
-          # render json: { user: current_user.as_json(except: :refresh_token), message: ' not spotify user ' }, status: :ok
+          # render json: {
+          #   user: current_user.as_json(except: :refresh_token),
+          #   message: ' not spotify user '
+          # }, status: :ok
           render_user_json(current_user, nil)
         else
           Rails.logger.info "current_user is a regular user"

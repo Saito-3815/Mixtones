@@ -149,6 +149,7 @@ module Api
       def update_avatar
         @user = User.find_by(id: params[:user_id])
         return render json: { error: 'User not found' }, status: :not_found unless @user
+
         @user.avatar = params[:key]
         @user.save
         if @user.save
