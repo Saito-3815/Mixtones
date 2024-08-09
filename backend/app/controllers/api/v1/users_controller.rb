@@ -33,7 +33,7 @@ module Api
         render json: @user.as_json(only: [:name, :introduction, :avatar])
       end
 
-      # ユーザー作成
+      # spotifyユーザー作成
       # ユーザー作成時には、like_tunesも一緒に登録する
       def create
         decoded_code = Base64.decode64(spotify_login_params[:code])
@@ -114,6 +114,25 @@ module Api
         render json: { error: e.message }, status: :unprocessable_entity
       end
 
+      # パスワードユーザーの作成
+      def create_password_user
+        email = password_user_create_params[:email]
+        existing_user = User.find_by(email: email.downcase)
+
+        if existing_user
+          render json: { error: 'ユーザーは既に存在します' }, status: :unprocessable_entity
+        else
+          @user = User.new(password_user_create_params)
+          if @user.save
+            log_in(@user)
+            update_session_expiration(password_user_create_params[:is_persistent])
+            render_user_json(@user, nil, :created)
+          else
+            render json: @user.errors, status: :unprocessable_entity
+          end
+        end
+      end
+
       # テキスト情報のみ更新
       def update
         @user = User.find(params[:id])
@@ -128,10 +147,18 @@ module Api
 
       # 画像を更新
       def update_avatar
-        @user = User.find(params[:user_id])
+        @user = User.find_by(id: params[:user_id])
+        return render json: { error: 'User not found' }, status: :not_found unless @user
+
         @user.avatar = params[:key]
         @user.save
-        render json: @user, status: :ok
+        if @user.save
+          render_user_json(@user, nil)
+          # render json: @user, status: :ok
+          # render status: :ok
+        else
+          render json: @user.errors, status: :unprocessable_entity
+        end
       end
 
       def destroy
@@ -157,6 +184,10 @@ module Api
 
       def spotify_login_params
         params.require(:user).permit(:code, :code_verifier, :is_persistent)
+      end
+
+      def password_user_create_params
+        params.require(:user).permit(:name, :email, :password, :is_persistent)
       end
 
       def user_update_params

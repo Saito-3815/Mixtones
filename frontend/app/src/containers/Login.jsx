@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button/Button.jsx";
 import { Switch } from "@/components/ui/Switch/Switch";
 import { useGuestLogin } from "@/hooks/useGuestLogin";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   // isPersistent状態を追加
@@ -46,9 +47,11 @@ const Login = () => {
           Spotifyへログインしますか？
         </h1>
         <p className="text-theme-gray pt-12">
-          ログインすると最新のSpotifyのユーザープロフィールと「お気に入りの曲」がこのアプリケーションと連携されます。ログイン情報を保持するとSpotifyの更新が自動で連携されます。
+          ログインすると最新のSpotifyのユーザープロフィールと「お気に入りの曲」がこのアプリケーションと連携されます。Mixtonesに定期的にログインすることでSpotify上のアクティビティを自動で取得します。
           <br />
-          ゲストログインすると一部を除いたアプリケーションの全機能が使えるようになります。
+          emailログインする場合は、emailとパスワードを入力してください。
+          <br />
+          ゲストログインすると一部を除いたemailログイン時に利用できるアプリケーションの全機能が使えるようになります。
         </p>
       </div>
       <div className="w-full max-w-[550px] flex items-center justify-center space-x-10 pt-12">
@@ -61,9 +64,16 @@ const Login = () => {
           className="bg-theme-green hover:bg-theme-green/90 w-[290px]"
           onClick={handleLogin}
         />
+        <Link to="/passlogin" state={{ isPersistent }}>
+          <Button
+            label="emailでログインする"
+            className="bg-theme-orange hover:bg-theme-orange/90 w-[290px]"
+          />
+        </Link>
         <Button
           label="ゲストログインする"
-          className="bg-theme-orange w-[290px]"
+          className="w-[290px]"
+          variant="secondary"
           onClick={handleGuestLogin}
         />
       </div>

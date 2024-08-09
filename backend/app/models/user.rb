@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   include S3Presignable
 
+  has_secure_password validations: false # デフォルトのバリデーションを無効化して、カスタムバリデーションを使用する
   has_many :memberships, dependent: :destroy
   has_many :communities, through: :memberships
   has_many :comments, dependent: :destroy
@@ -11,10 +12,15 @@ class User < ApplicationRecord
 
   validates :name,          presence: true, length: { maximum: 40 }
   validates :introduction,  length: { maximum: 160 }
-  validates :spotify_id,    uniqueness: true
+  validates :spotify_id, uniqueness: true, allow_nil: true
+  validates :email, uniqueness: true, allow_nil: true
+  validate  :email_format
+
+  validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
 
   encrypts :spotify_id, deterministic: true, downcase: true
   encrypts :refresh_token
+  encrypts :email, deterministic: true, downcase: true
 
   def guest?
     spotify_id == 'guest_user'
@@ -33,5 +39,14 @@ class User < ApplicationRecord
   # spotify_idをフロントエンドに返却時、真偽値に変換
   def as_json(options = {})
     super(options).merge('spotify_id' => spotify_id_present)
+  end
+
+  private
+
+  # emailのフォーマットをチェックするカスタムバリデーション
+  def email_format
+    return if email.nil?
+
+    errors.add(:email, 'は有効なメールアドレスではありません') unless email.match?(/\A[^@\s]+@[^@\s]+\z/)
   end
 end

@@ -5,6 +5,7 @@ import { generateCodeChallenge } from "@/SpotifyAuth.js";
 
 import { accessUrl } from "@/SpotifyAuth.js";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   // isPersistent状態を追加
@@ -40,7 +41,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="container flex flex-col bg-theme-black max-w-[890px] max-h-[840px] h-full mx-auto my-8 rounded-sm justify-center items-center overflow-hidden">
+    <div className="container flex flex-col bg-theme-black max-w-[890px] max-h-[940px] h-full mx-auto my-8 rounded-sm justify-center items-center overflow-hidden">
       <div className="w-full max-w-[550px] mx-auto items-center text-center">
         <h1 className="text-white text-2xl pt-24 ">
           サインアップにはSpotifyへのログインが必要です。
@@ -48,9 +49,11 @@ const Signup = () => {
           ログインしますか？
         </h1>
         <p className="text-theme-gray pt-12">
-          ログインするとSpotifyのユーザープロフィールと「お気に入りの曲」がこのアプリケーションと連携されます。ログイン情報を保持するとSpotifyの更新が自動で連携されます。
+          SpotifyでログインするとSpotifyのユーザープロフィールと「お気に入りの曲」がこのアプリケーションと連携されます。Mixtonesに定期的にログインすることでSpotify上のアクティビティを自動で取得します。なお、この機能を利用する場合はSpotiifyのプレミアムプランに加入する必要があります。
           <br />
-          ゲストログインすると一部を除いたアプリケーションの全機能が使えるようになります。
+          emailでログインすると、あなたのemailとパスワードをMixtonesに登録します。emailでログインする場合は、楽曲のフル再生などのSpotifyと連携した一部機能が制限されます。
+          <br />
+          ゲストログインすると一部を除いたemailログイン時に利用できるアプリケーションの全機能が使えるようになります。
         </p>
       </div>
       <div className="w-full max-w-[550px] flex items-center justify-center space-x-10 pt-12">
@@ -64,9 +67,16 @@ const Signup = () => {
             className="bg-theme-green hover:bg-theme-green/90 w-[290px]"
           />
         </div>
+        <Link to="/passsignup" state={{ isPersistent }}>
+          <Button
+            label="emailでログインする"
+            className="bg-theme-orange hover:bg-theme-orange/90 w-[290px]"
+          />
+        </Link>
         <Button
           label="ゲストログインする"
-          className="bg-theme-orange w-[290px]"
+          className="w-[290px]"
+          variant="secondary"
           onClick={handleGuestLogin}
         />
       </div>

@@ -53,6 +53,58 @@ RSpec.describe "Sessions", type: :request do
     end
   end
 
+  # password_loginアクションのテスト
+  describe 'POST /api/v1/sessions/password' do
+    before do
+      @user = create(:user, name: 'Test', email: 'test@example.com', password: 'password')
+    end
+
+    # ユーザーが存在し、パスワードが正しい場合
+    context 'when user exists and password is correct' do
+      it 'returns a success status' do
+        post '/api/v1/sessions/password',
+             params: { user: { email: 'test@example.com', password: 'password', isPersistent: 'false' } }
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns a success message' do
+        post '/api/v1/sessions/password',
+             params: { user: { email: 'test@example.com', password: 'password', isPersistent: 'false' } }
+        expect(response.parsed_body['message']).to eq('Login successful')
+      end
+    end
+
+    # ユーザーが存在しない場合
+    context 'when user does not exist' do
+      it 'returns a not found status' do
+        post '/api/v1/sessions/password',
+             params: { user: { email: 'nonexistent@example.com', password: 'password', isPersistent: 'false' } }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'returns a not found message' do
+        post '/api/v1/sessions/password',
+             params: { user: { email: 'nonexistent@example.com', password: 'password', isPersistent: 'false' } }
+        expect(response.parsed_body['message']).to eq('User not found')
+      end
+    end
+
+    # パスワードが間違っている場合
+    context 'when password is incorrect' do
+      it 'returns an unauthorized status' do
+        post '/api/v1/sessions/password',
+             params: { user: { email: 'test@example.com', password: 'wrongpassword', isPersistent: 'false' } }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it 'returns an unauthorized message' do
+        post '/api/v1/sessions/password',
+             params: { user: { email: 'test@example.com', password: 'wrongpassword', isPersistent: 'false' } }
+        expect(response.parsed_body['message']).to eq('Password incorrect')
+      end
+    end
+  end
+
   # destroyアクションのテスト
   describe 'DELETE /api/v1/sessions' do
     before do

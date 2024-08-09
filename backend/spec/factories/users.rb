@@ -4,6 +4,8 @@ FactoryBot.define do
     introduction { "MyText" }
     avatar { "MyString" }
     spotify_id { SecureRandom.hex(10) }
+    sequence(:email) { |n| "user#{n}@example.com" }
+    password { "password" }
 
     trait :with_like_tunes do
       transient do

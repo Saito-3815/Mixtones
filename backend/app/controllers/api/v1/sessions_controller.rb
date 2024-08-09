@@ -36,8 +36,15 @@ module Api
       def destroy
         restore_guest_data
         log_out
-        response.set_cookie('_session_id', value: '', path: '/', domain: 'localhost', expires: 1.year.ago,
-                                           httponly: true)
+        ['localhost', 'web.mixtones.tech'].each do |domain|
+          response.set_cookie(
+            '_session_id',
+            value: '',
+            path: '/', domain: domain, expires: 1.year.ago,
+            httponly: true,
+            secure: domain == 'web.mixtones.tech' && Rails.env.production?
+          )
+        end
         render json: { message: 'Logged out' }, status: :ok
       end
 
@@ -46,15 +53,40 @@ module Api
         if current_user.nil?
           Rails.logger.info "current_user is nil"
           render json: { error: 'User not found' }, status: :not_found
-        elsif current_user.spotify_id == 'guest_user'
+        elsif current_user.spotify_id == 'guest_user' || current_user.spotify_id.nil?
           Rails.logger.info "current_user is a guest_user"
-          # ゲストユーザーの場合は、何も処理せずにユーザーデータを返却
-          render json: { user: current_user.as_json(except: :refresh_token), message: 'Guest user data' }, status: :ok
+          # パスワード・ゲストユーザーの場合は、何も処理せずにユーザーデータを返却
+          # render json: {
+          #   user: current_user.as_json(except: :refresh_token),
+          #   message: ' not spotify user '
+          # }, status: :ok
+          render_user_json(current_user, nil)
         else
           Rails.logger.info "current_user is a regular user"
           access_token = SpotifyAuth.refresh_access_token(current_user.refresh_token)
           Rails.logger.info "Access token refreshed for current_user"
           render_user_json(current_user, access_token)
+        end
+      end
+
+      # パスワードログイン
+      def password_login
+        email = password_login_params[:email].downcase
+        user = User.find_by(email: email)
+        # ユーザーが存在しない場合
+        if user.nil?
+          signup_url = "#{ENV.fetch('SPOTIFY_REDIRECT_URI', nil)}signup"
+          render json: { message: 'User not found', redirect_url: signup_url }, status: :not_found
+          return
+        end
+        # ユーザーが存在する場合、パスワードが一致するか確認
+        if user.authenticate(password_login_params[:password])
+          log_in(user)
+          update_session_expiration(spotify_login_params[:is_persistent])
+          # render json: { user: user.as_json(except: :refresh_token), message: 'Login successful' }, status: :ok
+          render_user_json(user, nil, :ok, 'Login successful')
+        else
+          render json: { message: 'Password incorrect' }, status: :unauthorized
         end
       end
 
@@ -106,6 +138,10 @@ module Api
 
       def spotify_login_params
         params.require(:user).permit(:code, :code_verifier, :is_persistent)
+      end
+
+      def password_login_params
+        params.require(:user).permit(:email, :password, :isPersistent)
       end
     end
   end

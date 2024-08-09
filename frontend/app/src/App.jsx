@@ -15,6 +15,8 @@ import { tuneAtom } from "./atoms/tuneAtom";
 import PrivacyPolicy from "./containers/PrivacyPolicy";
 import Terms from "./containers/Terms";
 import { Helmet } from "react-helmet-async";
+import PassSignup from "./containers/PassSignup";
+import PassLogin from "./containers/PassLogin";
 
 function App() {
   // セッションをチェックしてユーザー情報を取得
@@ -50,8 +52,12 @@ function App() {
             <Route path="/" element={<Top />} />
             {/* サインアップ */}
             <Route path="/signup" element={<Signup />} />
+            {/* パスワードサインアップ */}
+            <Route path="/passsignup" element={<PassSignup />} />
             {/* ログイン */}
             <Route path="/login" element={<Login />} />
+            {/* パスワードログイン */}
+            <Route path="/passlogin" element={<PassLogin />} />
             {/* コミュニティ情報 */}
             <Route
               path="/communities/:communityId"

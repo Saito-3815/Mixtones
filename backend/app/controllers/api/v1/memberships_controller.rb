@@ -17,6 +17,7 @@ module Api
           sorted_playlist_tunes = community.playlist_tunes.order('added_at DESC')
           community.update_member_avatars
           user.update_avatar_url
+          community.update_avatar_url
           render json: {
             community: community.as_json(
               include: ['members'],
@@ -25,7 +26,7 @@ module Api
               playlist_tunes: sorted_playlist_tunes.as_json
             ),
             user: user.as_json(
-              except: :refresh_token,
+              except: [:refresh_token, :email, :password_digest],
               include: {
                 communities: {
                   only: [:id]
@@ -66,7 +67,7 @@ module Api
             render json: {
               message: 'Community and membership successfully deleted.',
               user: user.as_json(
-                except: :refresh_token,
+                except: [:refresh_token, :email, :password_digest],
                 include: {
                   communities: {
                     only: [:id]
@@ -91,7 +92,7 @@ module Api
                 playlist_tunes: sorted_playlist_tunes.as_json
               ),
               user: user.as_json(
-                except: :refresh_token,
+                except: [:refresh_token, :email, :password_digest],
                 include: {
                   communities: {
                     only: [:id]

@@ -23,7 +23,8 @@ module UserLogin
           spotify_uri: like_tune[:spotify_uri],
           preview_url: like_tune[:preview_url],
           added_at: like_tune[:added_at],
-          time: like_tune[:time]
+          time: like_tune[:time],
+          external_url: like_tune[:external_url]
         )
       else
         existing_user.like_tunes << existing_record unless existing_user.like_tunes.exists?(existing_record.id)
