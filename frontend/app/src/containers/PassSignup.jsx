@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/Button/Button";
+// import { Button } from "@/components/ui/Button/Button.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
 import { loginUser, userAtom } from "@/atoms/userAtoms";
@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createPasswordUser } from "@/api/usersCreatePassword";
 import { Switch } from "@/components/ui/Switch/Switch";
 import { useState } from "react";
+import { Button } from "@/components/ui/Button/Button";
 // import { useEffect } from "react";
 
 const PassSignup = () => {
