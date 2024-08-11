@@ -18,6 +18,8 @@ import { CheckColorIcon } from "../ColorIcon/CheckColorIcon";
 import { useCheck } from "@/hooks/useCheck";
 import { useCheckDelete } from "@/hooks/useCheckDelete";
 import { faSpotify } from "@fortawesome/free-brands-svg-icons";
+import { useRecommend } from "@/hooks/useRecommend";
+import { useParams } from "react-router-dom";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -110,6 +112,24 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   const checkDelete = useCheckDelete();
   const handleCheckDelete = () => {
     checkDelete.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
+  };
+
+  // レコメンド機能の実装
+  const recommendValue =
+    tune.playlists && tune.playlists.length > 0
+      ? tune.playlists[0].recommend
+      : null;
+
+  // urlに含まれるcommunity_idを取得
+  const { communityId } = useParams();
+
+  const recommendTune = useRecommend();
+  const handleRecommendCreate = () => {
+    if (user) {
+      recommendTune.mutate({ communityId: communityId, tuneId: tune.id });
+    } else {
+      alert("レコメンド機能はログイン後にご利用いただけます");
+    }
   };
 
   // spotifyのリンクをクリックした際に、外部リンクを開く
@@ -217,10 +237,13 @@ export const TuneColumn = ({ tune, index, onClick }) => {
               onClick={isTuneChecked ? handleCheckDelete : handleCheckCreate}
             />
             {/* レコメンドボタン */}
-            <FontAwesomeIcon
+            <CheckColorIcon
               icon={faThumbsUp}
-              className="h-4 w-4 cursor-pointer text-theme-white"
-              onClick={() => alert("レコメンド機能は現在開発中です")}
+              // className="h-4 w-4 cursor-pointer text-theme-white"
+              isTuneChecked={recommendValue}
+              // onClick={() => alert("レコメンド機能は現在開発中です")}
+              onClick={handleRecommendCreate}
+              // onClick={recommendValue ? handleRecommendDelete : handleRecommendCreate}
             />
             {/* コメントボタン */}
             <FontAwesomeIcon
@@ -269,6 +292,7 @@ TuneColumn.propTypes = {
     time: PropTypes.string.isRequired,
     spotify_uri: PropTypes.string.isRequired,
     external_url: PropTypes.string,
+    playlists: PropTypes.array,
   }),
   index: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,

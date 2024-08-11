@@ -28,22 +28,66 @@ RSpec.describe Playlist, type: :request do
 
     context "when the recommendation is successful" do
       it "updates the recommendation and returns the playlists" do
-        post "/api/v1/communities/#{community.id}/playlists/#{tune.id}",
-        params: { tune_id: tune.id, community_id: community.id }
-
+        post "/api/v1/communities/#{community.id}/playlists/#{tune.id}"
         expect(response).to have_http_status(:ok)
+      end
+
+      it "returns the correct number of playlists" do
+        post "/api/v1/communities/#{community.id}/playlists/#{tune.id}"
         expect(JSON.parse(response.body).size).to eq(community.playlist_tunes.count)
+      end
+
+      it "updates the recommendation to be truthy" do
+        post "/api/v1/communities/#{community.id}/playlists/#{tune.id}"
         expect(playlist_tune.reload.recommend).to be_truthy
       end
     end
 
     context "when the recommendation fails" do
       it "returns an error message" do
-        post "/api/v1/communities/#{community.id}/playlists/#{tune.id}",
-        params: { tune_id: tune.id, community_id: community.id }
-
+        post "/api/v1/communities/#{community.id}/playlists/9999999"
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to eq(["Error message"])
+      end
+
+      it "returns the correct error message" do
+        post "/api/v1/communities/#{community.id}/playlists/9999999"
+        expect(JSON.parse(response.body)).to eq("error"=>"Tune or Community not found")
+      end
+    end
+  end
+
+  # destroy_recommendアクションのテスト
+  describe 'DELETE /api/v1/communities/:community_id/playlists/:tune_id' do
+    let(:tune) { create(:tune) }
+    let(:community) { create(:community) }
+    let!(:playlist_tune) { create(:playlist, tune: tune, community: community, recommend: true) }
+
+    context "when the unrecommendation is successful" do
+      it "updates the recommendation and returns the playlists" do
+        delete "/api/v1/communities/#{community.id}/playlists/#{tune.id}"
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns the correct number of playlists" do
+        delete "/api/v1/communities/#{community.id}/playlists/#{tune.id}"
+        expect(JSON.parse(response.body).size).to eq(community.playlist_tunes.count)
+      end
+
+      it "updates the recommendation to be falsy" do
+        delete "/api/v1/communities/#{community.id}/playlists/#{tune.id}"
+        expect(playlist_tune.reload.recommend).to be_falsy
+      end
+    end
+
+    context "when the unrecommendation fails" do
+      it "returns an error message" do
+        delete "/api/v1/communities/#{community.id}/playlists/9999999"
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "returns the correct error message" do
+        delete "/api/v1/communities/#{community.id}/playlists/9999999"
+        expect(JSON.parse(response.body)).to eq("error"=>"Tune or Community not found")
       end
     end
   end

@@ -21,6 +21,9 @@ export const communitiesUpdateAvatar = (communityId) =>
 // プレイリスト一覧
 export const playlistsIndex = (communityId) =>
   `${baseURL}/communities/${communityId}/playlists`;
+// レコメンドする
+export const playlistsRecommend = (communityId, tuneId) =>
+  `${baseURL}/communities/${communityId}/playlists/${tuneId}`;
 
 // コミュニティへ参加
 export const membershipsCreate = (communityId) =>

@@ -5,6 +5,10 @@ module Api
       include SessionsHelper
       include UserLogin
 
+      before_action :find_tune_and_community, only: [:create_recommend, :destroy_recommend]
+      before_action :find_playlist_tune, only: [:create_recommend, :destroy_recommend]
+
+      # コミュニティプレイリストを取得する
       def index
         community = Community.find_by(id: params[:community_id])
         Rails.logger.info "Found community with ID: #{community.id}" if community
@@ -63,21 +67,49 @@ module Api
           end
         end
 
-        @playlists = community.playlist_tunes.order(added_at: :desc)
+        @playlists = community.playlist_tunes.joins(:playlists).where(playlists: { community_id: community.id }).order(added_at: :desc)
         Rails.logger.info "Rendering playlist with #{community.playlist_tunes.count} tunes."
-        render json: @playlists
+        render json: @playlists.as_json(include: { playlists: { only: [:id, :name, :recommend] } })
       end
 
       # プレイリストの曲をレコメンドする
       def create_recommend
-        tune = Tune.find_by(id: params[:tune_id])
-        community = Community.find_by(id: params[:community_id])
-        playlist_tune = Playlist.find_by(tune_id: tune.id, community_id: community.id)
-        if playlist_tune.update(recommend: true)
-          @playlists = community.playlist_tunes.order(added_at: :desc)
-          render json: @playlists
+        if @playlist_tune.update(recommend: true)
+          @playlists = @community.playlist_tunes.joins(:playlists).where(playlists: { community_id: @community.id }).order(added_at: :desc)
+          Rails.logger.info "Rendering playlist with #{@community.playlist_tunes.count} tunes."
+          render json: @playlists.as_json(include: { playlists: { only: [:id, :name, :recommend] } })
         else
-          render json: playlist_tune.errors, status: :unprocessable_entity
+          render json: @playlist_tune.errors, status: :unprocessable_entity
+        end
+      end
+
+      # プレイリストの曲をアンレコメンドする
+      def destroy_recommend
+        if @playlist_tune.update(recommend: false)
+          @playlists = community.playlist_tunes.joins(:playlists).where(playlists: { community_id: community.id }).order(added_at: :desc)
+          Rails.logger.info "Rendering playlist with #{community.playlist_tunes.count} tunes."
+          render json: @playlists.as_json(include: { playlists: { only: [:id, :name, :recommend] } })
+        else
+          render json: @playlist_tune.errors, status: :unprocessable_entity
+        end
+      end
+
+      private
+
+      def find_tune_and_community
+        @tune = Tune.find_by(id: params[:tune_id])
+        @community = Community.find_by(id: params[:community_id])
+
+        if @tune.nil? || @community.nil?
+          render json: { error: "Tune or Community not found" }, status: :unprocessable_entity
+        end
+      end
+
+      def find_playlist_tune
+        @playlist_tune = Playlist.find_by(tune_id: @tune.id, community_id: @community.id)
+
+        if @playlist_tune.nil?
+          render json: { error: "Playlist tune not found" }, status: :unprocessable_entity
         end
       end
     end
