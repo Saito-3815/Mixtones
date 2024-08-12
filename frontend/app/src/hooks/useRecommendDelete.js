@@ -1,12 +1,12 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { createRecommend } from "@/api/playlistsRecommend";
+import { destroyRecommend } from "@/api/playlistsUnrecommend";
 
-export const useRecommend = (communityId) => {
+export const useRecommendDelete = (communityId) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createRecommend,
+    mutationFn: destroyRecommend,
     onSuccess: (data) => {
       if (data.status === 200) {
         // playlistデータを最新のデータで更新
@@ -16,7 +16,7 @@ export const useRecommend = (communityId) => {
           "playlist",
           communityId,
         ]);
-        console.log("Recommend success:", currentPlaylist);
+        console.log("Recommend delete:", currentPlaylist);
       }
     },
     onError: (error) => {

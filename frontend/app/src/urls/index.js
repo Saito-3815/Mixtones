@@ -24,6 +24,9 @@ export const playlistsIndex = (communityId) =>
 // レコメンドする
 export const playlistsRecommend = (communityId, tuneId) =>
   `${baseURL}/communities/${communityId}/playlists/${tuneId}`;
+// レコメンドを解除する
+export const playlistsUnrecommend = (communityId, tuneId) =>
+  `${baseURL}/communities/${communityId}/playlists/${tuneId}`;
 
 // コミュニティへ参加
 export const membershipsCreate = (communityId) =>

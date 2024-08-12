@@ -67,17 +67,25 @@ module Api
           end
         end
 
-        @playlists = community.playlist_tunes.joins(:playlists).where(playlists: { community_id: community.id }).order(added_at: :desc)
+        @playlists = community.playlist_tunes.with_recommend.order(added_at: :desc)
+
+        # デバッグ用のログを追加
+        Rails.logger.debug "Filtered playlists: #{@playlists.map(&:attributes)}"
+
         Rails.logger.info "Rendering playlist with #{community.playlist_tunes.count} tunes."
-        render json: @playlists.as_json(include: { playlists: { only: [:id, :name, :recommend] } })
+        render json: @playlists.as_json
       end
 
       # プレイリストの曲をレコメンドする
       def create_recommend
         if @playlist_tune.update(recommend: true)
-          @playlists = @community.playlist_tunes.joins(:playlists).where(playlists: { community_id: @community.id }).order(added_at: :desc)
-          Rails.logger.info "Rendering playlist with #{@community.playlist_tunes.count} tunes."
-          render json: @playlists.as_json(include: { playlists: { only: [:id, :name, :recommend] } })
+          @playlists = @community.playlist_tunes.with_recommend.order(added_at: :desc)
+
+        # デバッグ用のログを追加
+        Rails.logger.debug "Filtered playlists: #{@playlists.map(&:attributes)}"
+
+        Rails.logger.info "Rendering playlist with #{@community.playlist_tunes.count} tunes."
+        render json: @playlists.as_json
         else
           render json: @playlist_tune.errors, status: :unprocessable_entity
         end
@@ -86,9 +94,13 @@ module Api
       # プレイリストの曲をアンレコメンドする
       def destroy_recommend
         if @playlist_tune.update(recommend: false)
-          @playlists = community.playlist_tunes.joins(:playlists).where(playlists: { community_id: community.id }).order(added_at: :desc)
-          Rails.logger.info "Rendering playlist with #{community.playlist_tunes.count} tunes."
-          render json: @playlists.as_json(include: { playlists: { only: [:id, :name, :recommend] } })
+          @playlists = @community.playlist_tunes.with_recommend.order(added_at: :desc)
+
+        # デバッグ用のログを追加
+        Rails.logger.debug "Filtered playlists: #{@playlists.map(&:attributes)}"
+
+        Rails.logger.info "Rendering playlist with #{@community.playlist_tunes.count} tunes."
+        render json: @playlists.as_json
         else
           render json: @playlist_tune.errors, status: :unprocessable_entity
         end

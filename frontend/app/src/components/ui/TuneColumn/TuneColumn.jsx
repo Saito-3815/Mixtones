@@ -20,6 +20,8 @@ import { useCheckDelete } from "@/hooks/useCheckDelete";
 import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 import { useRecommend } from "@/hooks/useRecommend";
 import { useParams } from "react-router-dom";
+// import { i } from "vite/dist/node/types.d-aGj9QkWt";
+import { useRecommendDelete } from "@/hooks/useRecommendDelete";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -115,18 +117,26 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   };
 
   // レコメンド機能の実装
-  const recommendValue =
-    tune.playlists && tune.playlists.length > 0
-      ? tune.playlists[0].recommend
-      : null;
+  const recommendValue = tune.recommend ? true : false;
 
   // urlに含まれるcommunity_idを取得
   const { communityId } = useParams();
 
-  const recommendTune = useRecommend();
+  // 曲をレコメンドする
+  const recommendTune = useRecommend(communityId);
   const handleRecommendCreate = () => {
     if (user) {
       recommendTune.mutate({ communityId: communityId, tuneId: tune.id });
+    } else {
+      alert("レコメンド機能はログイン後にご利用いただけます");
+    }
+  };
+
+  // 曲をレコメンド解除する
+  const recommendDelete = useRecommendDelete(communityId);
+  const handleRecommendDelete = () => {
+    if (user) {
+      recommendDelete.mutate({ communityId: communityId, tuneId: tune.id });
     } else {
       alert("レコメンド機能はログイン後にご利用いただけます");
     }
@@ -242,8 +252,10 @@ export const TuneColumn = ({ tune, index, onClick }) => {
               // className="h-4 w-4 cursor-pointer text-theme-white"
               isTuneChecked={recommendValue}
               // onClick={() => alert("レコメンド機能は現在開発中です")}
-              onClick={handleRecommendCreate}
-              // onClick={recommendValue ? handleRecommendDelete : handleRecommendCreate}
+              // onClick={handleRecommendCreate}
+              onClick={
+                recommendValue ? handleRecommendDelete : handleRecommendCreate
+              }
             />
             {/* コメントボタン */}
             <FontAwesomeIcon
@@ -292,7 +304,7 @@ TuneColumn.propTypes = {
     time: PropTypes.string.isRequired,
     spotify_uri: PropTypes.string.isRequired,
     external_url: PropTypes.string,
-    playlists: PropTypes.array,
+    recommend: PropTypes.bool,
   }),
   index: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,
