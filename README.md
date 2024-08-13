@@ -75,6 +75,7 @@ Spotify を利用していないユーザーも登録することができ、サ
 #### 機能
 
 - Spotify API と連携したユーザー登録 / ログイン機能
+- 非 Spotify ユーザーも利用可能な email ユーザー登録 / ログイン機能
 - 主要機能テストのためのゲストログイン機能
 - ユーザー情報変更機能
 - 画像のアップロード機能
@@ -83,6 +84,7 @@ Spotify を利用していないユーザーも登録することができ、サ
 - ユーザー同士の「お気に入りの曲」プレイリストを統合したコミュニティプレイリストの自動作成機能
 - Spotify アプリ上のアクティビティに合わせた上記プレイリストの自動更新機能
 - 発見した楽曲をプロフィールページに保存できるチェック機能
+- プレイリスト内の楽曲を先頭へ優先表示できるレコメンド機能
 - ユーザー環境に合わせた楽曲の再生機能
   - PC: [Spotify Web Playback SDK](https://developer.spotify.com/documentation/web-playback-sdk)
   - モバイル: [Spotify app](https://apps.apple.com/us/app/spotify-music-and-podcasts/id32468458)
@@ -105,6 +107,10 @@ Spotify を利用していないユーザーも登録することができ、サ
     - CD: AWS ECS
   - フロントエンド
     - CI: ESLint / Prettier
+
+## インフラ構成図
+
+![インフラ構成図](./assets/Mixtones_infra.drawio.png)
 
 ## ER図
 
