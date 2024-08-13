@@ -34,7 +34,7 @@ RSpec.describe Playlist, type: :request do
 
       it "returns the correct number of playlists" do
         post "/api/v1/communities/#{community.id}/playlists/#{tune.id}"
-        expect(JSON.parse(response.body).size).to eq(community.playlist_tunes.count)
+        expect(response.parsed_body.size).to eq(community.playlist_tunes.count)
       end
 
       it "updates the recommendation to be truthy" do
@@ -51,7 +51,7 @@ RSpec.describe Playlist, type: :request do
 
       it "returns the correct error message" do
         post "/api/v1/communities/#{community.id}/playlists/9999999"
-        expect(JSON.parse(response.body)).to eq("error"=>"Tune or Community not found")
+        expect(response.parsed_body).to eq("error" => "Tune or Community not found")
       end
     end
   end
@@ -70,7 +70,7 @@ RSpec.describe Playlist, type: :request do
 
       it "returns the correct number of playlists" do
         delete "/api/v1/communities/#{community.id}/playlists/#{tune.id}"
-        expect(JSON.parse(response.body).size).to eq(community.playlist_tunes.count)
+        expect(response.parsed_body.size).to eq(community.playlist_tunes.count)
       end
 
       it "updates the recommendation to be falsy" do
@@ -87,7 +87,7 @@ RSpec.describe Playlist, type: :request do
 
       it "returns the correct error message" do
         delete "/api/v1/communities/#{community.id}/playlists/9999999"
-        expect(JSON.parse(response.body)).to eq("error"=>"Tune or Community not found")
+        expect(response.parsed_body).to eq("error" => "Tune or Community not found")
       end
     end
   end

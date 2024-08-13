@@ -70,7 +70,7 @@ module Api
         @playlists = community.playlist_tunes.with_recommend.order(added_at: :desc)
 
         # デバッグ用のログを追加
-        Rails.logger.debug "Filtered playlists: #{@playlists.map(&:attributes)}"
+        Rails.logger.debug { "Filtered playlists: #{@playlists.map(&:attributes)}" }
 
         Rails.logger.info "Rendering playlist with #{community.playlist_tunes.count} tunes."
         render json: @playlists.as_json
@@ -81,11 +81,11 @@ module Api
         if @playlist_tune.update(recommend: true)
           @playlists = @community.playlist_tunes.with_recommend.order(added_at: :desc)
 
-        # デバッグ用のログを追加
-        Rails.logger.debug "Filtered playlists: #{@playlists.map(&:attributes)}"
+          # デバッグ用のログを追加
+          Rails.logger.debug { "Filtered playlists: #{@playlists.map(&:attributes)}" }
 
-        Rails.logger.info "Rendering playlist with #{@community.playlist_tunes.count} tunes."
-        render json: @playlists.as_json
+          Rails.logger.info "Rendering playlist with #{@community.playlist_tunes.count} tunes."
+          render json: @playlists.as_json
         else
           render json: @playlist_tune.errors, status: :unprocessable_entity
         end
@@ -96,11 +96,11 @@ module Api
         if @playlist_tune.update(recommend: false)
           @playlists = @community.playlist_tunes.with_recommend.order(added_at: :desc)
 
-        # デバッグ用のログを追加
-        Rails.logger.debug "Filtered playlists: #{@playlists.map(&:attributes)}"
+          # デバッグ用のログを追加
+          Rails.logger.debug { "Filtered playlists: #{@playlists.map(&:attributes)}" }
 
-        Rails.logger.info "Rendering playlist with #{@community.playlist_tunes.count} tunes."
-        render json: @playlists.as_json
+          Rails.logger.info "Rendering playlist with #{@community.playlist_tunes.count} tunes."
+          render json: @playlists.as_json
         else
           render json: @playlist_tune.errors, status: :unprocessable_entity
         end
@@ -120,9 +120,7 @@ module Api
       def find_playlist_tune
         @playlist_tune = Playlist.find_by(tune_id: @tune.id, community_id: @community.id)
 
-        if @playlist_tune.nil?
-          render json: { error: "Playlist tune not found" }, status: :unprocessable_entity
-        end
+        render json: { error: "Playlist tune not found" }, status: :unprocessable_entity if @playlist_tune.nil?
       end
     end
   end

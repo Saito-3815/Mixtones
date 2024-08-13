@@ -79,13 +79,15 @@ RSpec.describe Community, type: :model do
 
     describe 'scopes' do
       let!(:community) { create(:community) }
-      let!(:playlist1) { create(:playlist, community: community, recommend: true) }
-      let!(:playlist2) { create(:playlist, community: community, recommend: false) }
-      let!(:tune1) { create(:tune, playlists: [playlist1]) }
-      let!(:tune2) { create(:tune, playlists: [playlist2]) }
+      let(:recommend_playlist) { create(:playlist, community: community, recommend: true) }
+      let(:non_recommend_playlist) { create(:playlist, community: community, recommend: false) }
+      let!(:recommend_tune) { create(:tune, playlists: [recommend_playlist]) }
+      let!(:non_recommend_tune) { create(:tune, playlists: [non_recommend_playlist]) }
 
       it 'orders playlist_tunes by recommend DESC' do
-        expect(community.playlist_tunes).to eq([tune1, tune2])
+        recommend_playlist
+        non_recommend_playlist
+        expect(community.playlist_tunes).to eq([recommend_tune, non_recommend_tune])
       end
     end
   end
