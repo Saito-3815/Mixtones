@@ -8,6 +8,9 @@ if [ "$RAILS_ENV" = "production" ]; then
 
   bundle exec rails db:migrate RAILS_ENV=production
 
+  # 既存のレコードにデフォルト値を設定するスクリプトを実行
+  bundle exec rails runner "Playlist.where(recommend: nil).update_all(recommend: false)"
+
   # DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:reset RAILS_ENV=production
 fi
 

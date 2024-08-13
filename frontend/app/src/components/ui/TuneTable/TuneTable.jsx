@@ -203,6 +203,7 @@ export const TuneTable = () => {
                     ...tune,
                     id: tune.id.toString(),
                     time: tune.time.toString(),
+                    recommend: !!tune.recommend,
                   }}
                   index={index}
                   key={index.toString()}
