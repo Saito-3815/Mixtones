@@ -20,7 +20,7 @@ jobs:
       - name: Install Dependencies
         run: |
           cd ./frontend/app
-          run: npm ci
+          npm ci
 
       - name: Build
         run: |
