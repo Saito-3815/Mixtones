@@ -15,7 +15,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": `${__dirname}/src`, // src ディレクトリの絶対パスを指定
+      "@/": `${__dirname}/src/`, // src ディレクトリの絶対パスを指定
     },
   },
 });
