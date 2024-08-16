@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: |
           cd ./frontend/app
-          npm run build  # React ビルド
+          npm run build
 
       - name: Deploy  # S3にデプロイ 
         env:
