@@ -28,6 +28,10 @@ jobs:
           cd frontend/app
           npm run build
 
+      - name: Verify Build Directory
+        run: |
+          ls -la frontend/app/dist
+
       - name: Deploy  # S3にデプロイ 
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
