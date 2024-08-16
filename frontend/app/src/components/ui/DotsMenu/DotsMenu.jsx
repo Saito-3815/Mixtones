@@ -235,7 +235,12 @@ export {
   DropdownMenuRadioGroup,
 };
 
-export function DotsMenu({ isTuneChecked, onClick }) {
+export function DotsMenu({
+  isTuneChecked,
+  onClickCheck,
+  recommendValue,
+  onClickRecommend,
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -244,17 +249,17 @@ export function DotsMenu({ isTuneChecked, onClick }) {
       <DropdownMenuContent>
         {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator /> */}
-        <DropdownMenuItem onClick={onClick}>
+        <DropdownMenuItem onClick={onClickCheck}>
           <FontAwesomeIcon icon={faCircleCheck} className="text-white" />
           <h1 className="ml-2">
             {isTuneChecked ? `チェックをはずす` : `チェックする`}
           </h1>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => alert("レコメンド機能は現在開発中です")}
-        >
+        <DropdownMenuItem onClick={onClickRecommend}>
           <FontAwesomeIcon icon={faThumbsUp} className="text-white" />
-          <h1 className="ml-2">レコメンドする</h1>
+          <h1 className="ml-2">
+            {recommendValue ? `レコメンドを解除` : `レコメンドする`}
+          </h1>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => alert("コメント機能は現在開発中です")}>
           <FontAwesomeIcon icon={faCommentDots} className="text-white" />
@@ -267,5 +272,7 @@ export function DotsMenu({ isTuneChecked, onClick }) {
 
 DotsMenu.propTypes = {
   isTuneChecked: PropTypes.bool,
-  onClick: PropTypes.func,
+  onClickCheck: PropTypes.func,
+  recommendValue: PropTypes.bool,
+  onClickRecommend: PropTypes.func,
 };

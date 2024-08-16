@@ -14,6 +14,7 @@ import { tuneAtom } from "@/atoms/tuneAtom";
 import usePreviewPlay from "@/hooks/usePreviewPlay";
 import { isLoggedInAtom } from "@/atoms/userAtoms";
 import { playerAtom } from "@/atoms/playerAtom";
+import { Skeleton } from "../Skeleton/Skeleton";
 
 export const TuneTableChecked = () => {
   const { userId } = useParams();
@@ -24,7 +25,7 @@ export const TuneTableChecked = () => {
   // チェックした楽曲を取得
   const {
     data: checkTunesData,
-    // status: checkTunesStatus,
+    status: checkTunesStatus,
     error: checkTunesError,
   } = useCheckTunes(userId);
 
@@ -156,18 +157,62 @@ export const TuneTableChecked = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredPlaylist.map((tune, index) => (
-            <TuneColumnChecked
-              tune={{
-                ...tune,
-                id: tune.id.toString(),
-                time: tune.time.toString(),
-              }}
-              index={index}
-              key={index.toString()}
-              onClick={() => handleColumnClick(index, tune)}
-            />
-          ))}
+          {checkTunesStatus === "pending" || !checkTunesData ? (
+            <>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <tr
+                  key={index}
+                  className="cursor-pointer bg-black hover:bg-theme-black text-theme-gray hover:text-white h-[56px] w-full"
+                >
+                  {/* 番号スケルトン */}
+                  <td className="h-[56px] w-[50px] hidden sm:table-cell">
+                    <Skeleton className="h-[18px] w-[18px] ml-5 hidden sm:flex" />
+                  </td>
+                  {/* 曲名セクションスケルトン */}
+                  <td className="h-[56px] w-[300px] max-w-[300px] items-center overflow-hidden">
+                    <div className="flex items-center w-full h-full ml-5 sm:ml-0">
+                      <Skeleton className="h-10 w-10 rounded-sm flex-shrink-0" />
+                      <div className="overflow-hidden ml-5 w-full flex-shrink">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-4 w-1/2 mt-2" />
+                      </div>
+                    </div>
+                  </td>
+                  {/* アルバムセクションスケルトン */}
+                  <td className="h-[56px] w-[300px] overflow-hidden hidden lg:table-cell">
+                    <Skeleton className="h-4 w-3/4 pl-5" />
+                  </td>
+                  {/* 追加日セクションスケルトン */}
+                  <td className="hidden h-[56px] w-[300px] sm:table-cell justify-between mx-5 overflow-hidden">
+                    <Skeleton className="h-4 w-1/4 pl-5" />
+                  </td>
+                  {/* 再生時間スケルトン */}
+                  <td className="mx-5 h-[56px] w-[150px] overflow-hidden hidden lg:table-cell">
+                    <Skeleton className="h-4 w-1/4" />
+                  </td>
+                  {/* ドットメニュースケルトン */}
+                  <td className="sm:hidden">
+                    <Skeleton className="h-4 w-4 justify-center px-4" />
+                  </td>
+                </tr>
+              ))}
+            </>
+          ) : (
+            <>
+              {filteredPlaylist.map((tune, index) => (
+                <TuneColumnChecked
+                  tune={{
+                    ...tune,
+                    id: tune.id.toString(),
+                    time: tune.time.toString(),
+                  }}
+                  index={index}
+                  key={index.toString()}
+                  onClick={() => handleColumnClick(index, tune)}
+                />
+              ))}
+            </>
+          )}
         </tbody>
       </table>
     </div>

@@ -108,12 +108,24 @@ export const TuneColumn = ({ tune, index, onClick }) => {
 
   const checkTune = useCheck();
   const handleCheckCreate = () => {
-    checkTune.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
+    if (user) {
+      checkTune.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
+    } else {
+      alert(
+        "このアイコンをクリックするとプロフィールページにお気に入りの楽曲を保存できます。この機能はログイン後にご利用いただけます",
+      );
+    }
   };
 
   const checkDelete = useCheckDelete();
   const handleCheckDelete = () => {
-    checkDelete.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
+    if (user) {
+      checkDelete.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
+    } else {
+      alert(
+        "このアイコンをクリックするとプロフィールページにお気に入りの楽曲を保存できます。この機能はログイン後にご利用いただけます",
+      );
+    }
   };
 
   // レコメンド機能の実装
@@ -128,7 +140,9 @@ export const TuneColumn = ({ tune, index, onClick }) => {
     if (user) {
       recommendTune.mutate({ communityId: communityId, tuneId: tune.id });
     } else {
-      alert("レコメンド機能はログイン後にご利用いただけます");
+      alert(
+        "このアイコンをクリックするとプレイリストの先頭へこの楽曲が優先表示されます。この機能はログイン後にご利用いただけます",
+      );
     }
   };
 
@@ -138,7 +152,9 @@ export const TuneColumn = ({ tune, index, onClick }) => {
     if (user) {
       recommendDelete.mutate({ communityId: communityId, tuneId: tune.id });
     } else {
-      alert("レコメンド機能はログイン後にご利用いただけます");
+      alert(
+        "このアイコンをクリックするとプレイリストの先頭へこの楽曲が優先表示されます。この機能はログイン後にご利用いただけます",
+      );
     }
   };
 
@@ -249,10 +265,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
             {/* レコメンドボタン */}
             <CheckColorIcon
               icon={faThumbsUp}
-              // className="h-4 w-4 cursor-pointer text-theme-white"
               isTuneChecked={recommendValue}
-              // onClick={() => alert("レコメンド機能は現在開発中です")}
-              // onClick={handleRecommendCreate}
               onClick={
                 recommendValue ? handleRecommendDelete : handleRecommendCreate
               }
@@ -285,7 +298,11 @@ export const TuneColumn = ({ tune, index, onClick }) => {
         <div className="md:hidden justify-center px-4">
           <DotsMenu
             isTuneChecked={isTuneChecked}
-            onClick={isTuneChecked ? handleCheckDelete : handleCheckCreate}
+            onClickCheck={isTuneChecked ? handleCheckDelete : handleCheckCreate}
+            recommendValue={recommendValue}
+            onClickRecommend={
+              recommendValue ? handleRecommendDelete : handleRecommendCreate
+            }
           />
         </div>
       </td>
