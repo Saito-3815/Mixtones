@@ -18,12 +18,14 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        working-directory: ./frontend/app
-        run: npm ci
+        run: |
+          cd frontend/app
+          npm ci
 
       - name: Build
-        working-directory: ./frontend/app
-        run: npm run build
+        run: |
+          cd frontend/app
+          npm run build
 
       - name: Deploy  # S3にデプロイ 
         env:
