@@ -1,8 +1,7 @@
 name: Build React on S3
 on:
   push:
-    branches:
-      - main
+    branches: ['main']
     # branches-ignore:
     #   - '**'  # すべてのブランチを無視
 jobs:
@@ -10,12 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@main  # リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
 
       - name: Install Dependencies
         run: |
           cd ./frontend/app
-          npm install
+          run: npm ci
 
       - name: Build
         run: |
