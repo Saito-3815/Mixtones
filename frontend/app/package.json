@@ -87,7 +87,8 @@
     "@swc/core-linux-x64-musl": "^1.5.7",
     "@swc/core-win32-arm64-msvc": "^1.5.7",
     "@swc/core-win32-ia32-msvc": "^1.5.7",
-    "@swc/core-win32-x64-msvc": "^1.5.7"
+    "@swc/core-win32-x64-msvc": "^1.5.7",
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
