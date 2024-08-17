@@ -1,4 +1,4 @@
-require 'rspotify'
+# require 'rspotify'
 
 module Api
   module V1
