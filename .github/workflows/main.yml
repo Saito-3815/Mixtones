@@ -39,3 +39,12 @@ jobs:
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
         run: |
           aws s3 cp --recursive --region ap-northeast-1 frontend/app/dist s3://$S3_BUCKET_NAME/
+
+      - name: Invalidate CloudFront Cache  # CloudFrontキャッシュを無効化
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          CFID=$(aws cloudfront list-distributions --query "DistributionList.Items[].{Id:Id,Origin:Origins.Items[0].DomainName}[?contains(Origin,'${{ secrets.AWS_S3_BUCKET_NAME }}.s3')] | [0].Id" | sed 's/"//g')
+          echo "aws cloudfront create-invalidation ${CFID}"
+          aws cloudfront create-invalidation --distribution-id ${CFID} --paths "/*"
