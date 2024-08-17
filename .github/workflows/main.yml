@@ -44,11 +44,6 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
         run: |
-          CFID=$(aws cloudfront list-distributions --query "DistributionList.Items[].{Id:Id,Origin:Origins.Items[0].DomainName}[?contains(Origin,'${{ secrets.AWS_S3_BUCKET_NAME }}.s3')].Id" --output text)
-          if [ -z "$CFID" ]; then
-            echo "Error: CloudFront distribution ID not found."
-            exit 1
-          fi
-          echo "Invalidating CloudFront distribution ID: ${CFID}"
-          aws cloudfront create-invalidation --distribution-id ${CFID} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
