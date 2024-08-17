@@ -37,8 +37,19 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          AWS_DEFAULT_REGION: ap-northeast-1
         run: |
-          aws s3 cp --recursive --region ap-northeast-1 frontend/app/dist s3://$S3_BUCKET_NAME/
+          aws s3 cp --recursive --region $AWS_DEFAULT_REGION frontend/app/dist s3://$S3_BUCKET_NAME/
+
+      - name: Configure AWS CLI  # AWS CLIの設定
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-1
+        run: |
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set default.region $AWS_DEFAULT_REGION
 
       - name: Invalidate CloudFront Cache  # CloudFrontキャッシュを無効化
         env:
@@ -47,5 +58,4 @@ jobs:
           CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
         run: |
           echo "Invalidating CloudFront distribution ID: $CLOUDFRONT_DISTRIBUTION_ID"
-          aws --version
           aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*" --debug
