@@ -286,6 +286,8 @@ export const TuneColumn = ({ tune, index, onClick }) => {
             <CommentModal
               isOpen={isModalOpen}
               onRequestClose={() => setIsModalOpen(false)}
+              communityId={communityId}
+              tuneId={tune.id}
             />
             {/* Spotifyリンク */}
             <FontAwesomeIcon

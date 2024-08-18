@@ -12,13 +12,6 @@ module Api
 
         render json: { url: presigned_url }
       end
-
-      # def save_image_community
-      #   @community = Community.find(params[:id])
-      #   @community.avatar = params[:key]
-      #   @community.save
-      #   render status: :ok
-      # end
     end
   end
 end

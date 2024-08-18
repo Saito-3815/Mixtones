@@ -35,6 +35,10 @@ export const membershipsCreate = (communityId) =>
 export const membershipsDestroy = (communityId) =>
   `${baseURL}/communities/${communityId}/memberships`;
 
+// コメント一覧
+export const commentsIndex = (communityId, tuneId) =>
+  `${baseURL}/communities/${communityId}/tunes/${tuneId}/comments`;
+
 // spotifyユーザーをデータベースへ登録
 export const usersCreate = `${baseURL}/users`;
 // パスワードユーザーをデータベースへ登録

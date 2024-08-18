@@ -7,7 +7,11 @@ module Api
           community_id: params[:community_id],
           tune_id: params[:tune_id]
         ).order(created_at: :asc).all
-        render json: comments, only: [:id, :body], include: { user: { only: [:name] } }, status: :ok
+        # コメントのuserのavatarをs3のURLに変換
+        comments.each do |comment|
+          comment.user.avatar = comment.user.generate_s3_url(comment.user.avatar) if comment.user.avatar.present? && comment.user.avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+        end
+        render json: comments, only: [:id, :body, :created_at], include: { user: { only: [:name, :avatar] } }, status: :ok
       end
 
       # コミュニティプレイリストの曲に対するコメントを作成し、既存と一緒に新しい順に取得
