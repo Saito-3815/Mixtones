@@ -1,14 +1,16 @@
-import { useForm } from 'react-hook-form';
+import { useForm } from "react-hook-form";
 import SendIcon from "@mui/icons-material/Send";
-import { useAtom } from 'jotai';
-import { userAtom } from '@/atoms/userAtoms';
+import { useAtom } from "jotai";
+import { userAtom } from "@/atoms/userAtoms";
 import PropTypes from "prop-types";
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createComments } from '@/api/commentsCreate';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createComments } from "@/api/commentsCreate";
+import { Input } from "@mui/material";
 
-const SendComment = ({communityId, tuneId}) => {
-  const [ user ] = useAtom(userAtom);
+const SendComment = ({ communityId, tuneId}) => {
+  const [user] = useAtom(userAtom);
   const userId = user.id;
+
 
   const {
     register,
@@ -27,13 +29,11 @@ const SendComment = ({communityId, tuneId}) => {
 
   const CommentCreate = useMutation({
     mutationFn: (dataWithId) => {
-      const { userId, communityId, tuneId, ...data } = dataWithId;
-      return createComments(data, userId, communityId, tuneId);
+      return createComments(dataWithId);
     },
     onSuccess: (data) => {
       if (data.status === 201) {
-        queryClient.setQueryData(["comment", communityId, tuneId], data);
-        // console.log(data);
+        queryClient.setQueryData(["comment", communityId, tuneId], data.data);
       }
     },
     onError: (error) => {
@@ -43,27 +43,25 @@ const SendComment = ({communityId, tuneId}) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <input
-          type="text"
-          id="comment"
-          className="p-1"
-          placeholder='コメントを入力してください'
-          {...register("comment", {
-          })}
+      <div className="flex items-center justify-center w-full border-t border-gray-300 ml-[-5px] p-2 pb-5 bg-gray-100">
+      <Input
+        type="text"
+        id="comment"
+        className="p-1 w-5/6 text-base font-semibold ml-1 mb-[-3px]"
+        placeholder="コメントを入力してください"
+        {...register("comment", {})}
         />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-1 ml-2"
-        >
-          <SendIcon size={24} />
-        </button>
+      <button type="submit" className="bg-theme-orange text-white p-1 ml-2">
+        <SendIcon size={24} />
+      </button>
+        </div>
     </form>
-  )
-}
+  );
+};
 
 SendComment.propTypes = {
   communityId: PropTypes.string.isRequired,
   tuneId: PropTypes.string.isRequired,
 };
 
-export default SendComment
+export default SendComment;

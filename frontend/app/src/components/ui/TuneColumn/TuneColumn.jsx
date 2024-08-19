@@ -279,8 +279,14 @@ export const TuneColumn = ({ tune, index, onClick }) => {
               icon={faCommentDots}
               className="h-4 w-4 cursor-pointer text-theme-white"
               onClick={() => {
+                if (!user) {
+                  alert(
+                    "こちらのアイコンをクリックすると楽曲にコメントを追加できます。この機能はログイン後にご利用いただけます"
+                  );
+                  return;}
                 setIsModalOpen(true);
-              }}
+              }
+            }
             />
             {/* コメントモーダル */}
             <CommentModal

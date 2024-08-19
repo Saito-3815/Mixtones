@@ -27,7 +27,7 @@ module Api
             community_id: params[:community_id],
             tune_id: params[:tune_id]
           ).order(created_at: :asc).all
-          render json: comments, only: [:id, :body], include: { user: { only: [:name] } }, status: :created
+          render json: comments, only: [:id, :body, :created_at], include: { user: { only: [:name, :avatar] } }, status: :created
         else
           render json: { message: 'Comment not created' }, status: :bad_request
         end

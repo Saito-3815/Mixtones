@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useRef } from "react";
 import Modal from "react-modal";
 import PropTypes from "prop-types";
 import { useComments } from "@/hooks/useComments";
 import { format } from "date-fns";
 import SendComment from "../SendComment/SendComment";
+
+// アプリケーションのルート要素を設定
+Modal.setAppElement("#root");
 
 const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
   const commentStyles = {
@@ -12,14 +15,14 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
       left: "50%",
       right: "auto",
       bottom: "auto",
-      marginRight: "-50%",
       transform: "translate(-50%, -50%)",
       backgroundColor: "#121212",
-      padding: "20px",
+      padding: "0px",
       borderRadius: "10px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      width: "30%",  
-      height: "60%", 
+      width: "30%",
+      height: "60%",
+      display: "flex", 
+      flexDirection: "column", 
     },
     overlay: {
       backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -32,10 +35,19 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
     refetch: refetchComments,
   } = useComments(communityId, tuneId);
 
+  const comments = Array.isArray(commentsData) ? commentsData : [];
+
+  const modalContentRef = useRef(null);
+
   // モーダルを開いた時にコメントを取得
   const handleAfterOpen = () => {
+    if (modalContentRef.current) {
+      modalContentRef.current.scrollTop = modalContentRef.current.scrollHeight;
+    }
     refetchComments();
-  }
+  };
+
+  // const scroll = useRef();
 
   return (
     <Modal
@@ -44,28 +56,38 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
       style={commentStyles}
       onAfterOpen={handleAfterOpen}
     >
+       <div className="flex-grow overflow-y-auto p-3"> 
       {commentsError ? (
-        <p className="text-red-500">エラーが発生しました: {commentsError.message}</p>
-      ) : commentsData ? (
-        commentsData.map(comment => (
+        <p className="text-red-500">
+          エラーが発生しました: {commentsError.message}
+        </p>
+      ) : comments.length > 0 ? (
+        comments.map((comment) => (
           <div key={comment.id} className="text-white">
             <p>{comment.body}</p>
             <p>by {comment.user.name}</p>
-            <p>at {format(new Date(comment.created_at), 'yyyy-MM-dd HH:mm:ss')}</p>
+            <p>
+              at {format(new Date(comment.created_at), "yyyy-MM-dd HH:mm:ss")}
+            </p>
             <img
-            src={comment.user.avatar}
-            alt="images"
-            className="object-cover h-10 w-10 rounded-sm flex-shrink-0"
-          />
+              src={comment.user.avatar}
+              alt="images"
+              className="object-cover h-10 w-10 rounded-sm flex-shrink-0"
+            />
           </div>
         ))
       ) : (
-        <p>コメント機能は現在開発中です</p>
+        <p className="text-white">コメント機能は現在開発中です</p>
       )}
-      <SendComment 
-        communityId={communityId}
-        tuneId={tuneId}
-      />
+      </div>
+      <div className="bg-gray-100">
+          <SendComment
+            communityId={communityId}
+            tuneId={tuneId}
+            // scroll={scroll}
+          />
+          {/* <div ref={scroll}></div> */}
+        </div>
     </Modal>
   );
 };
