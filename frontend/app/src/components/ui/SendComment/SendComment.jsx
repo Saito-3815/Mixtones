@@ -7,16 +7,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createComments } from "@/api/commentsCreate";
 import { Input } from "@mui/material";
 
-const SendComment = ({ communityId, tuneId}) => {
+const SendComment = ({ communityId, tuneId }) => {
   const [user] = useAtom(userAtom);
   const userId = user.id;
 
-
   const {
     register,
-    // setValue,
     handleSubmit,
-    // formState: { errors },
+    reset,
   } = useForm({ mode: "onChange" });
 
   const onSubmit = (data) => {
@@ -34,6 +32,7 @@ const SendComment = ({ communityId, tuneId}) => {
     onSuccess: (data) => {
       if (data.status === 201) {
         queryClient.setQueryData(["comment", communityId, tuneId], data.data);
+        reset();
       }
     },
     onError: (error) => {
@@ -44,17 +43,17 @@ const SendComment = ({ communityId, tuneId}) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex items-center justify-center w-full border-t border-gray-300 ml-[-5px] p-2 pb-5 bg-gray-100">
-      <Input
-        type="text"
-        id="comment"
-        className="p-1 w-5/6 text-base font-semibold ml-1 mb-[-3px]"
-        placeholder="コメントを入力してください"
-        {...register("comment", {})}
+        <Input
+          type="text"
+          id="comment"
+          className="p-1 w-5/6 text-base font-semibold ml-1 mb-[-3px]"
+          placeholder="コメントを入力してください"
+          {...register("comment", {})}
         />
-      <button type="submit" className="bg-theme-orange text-white p-1 ml-2">
-        <SendIcon size={24} />
-      </button>
-        </div>
+        <button type="submit" className="bg-theme-orange text-white p-1 ml-2">
+          <SendIcon size={24} />
+        </button>
+      </div>
     </form>
   );
 };
