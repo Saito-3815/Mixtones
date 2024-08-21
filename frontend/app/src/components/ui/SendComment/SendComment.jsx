@@ -42,15 +42,18 @@ const SendComment = ({ communityId, tuneId }) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex items-center justify-center w-full border-t border-gray-300 ml-[-5px] p-2 pb-5 bg-gray-100">
+      <div className="flex items-center justify-center w-full border-t border-gray-300 p-2 pb-5 bg-black">
         <Input
           type="text"
           id="comment"
-          className="p-1 w-5/6 text-base font-semibold ml-1 mb-[-3px]"
+          className="p-1 w-5/6 text-base font-semibold ml-1 mb-[-3px] bg-theme-black rounded-sm"
+          inputProps={{
+            style: { color: 'white' }
+          }}
           placeholder="コメントを入力してください"
           {...register("comment", {})}
         />
-        <button type="submit" className="bg-theme-orange text-white p-1 ml-2">
+        <button type="submit" className="text-theme-orange p-1 ml-2">
           <SendIcon size={24} />
         </button>
       </div>
