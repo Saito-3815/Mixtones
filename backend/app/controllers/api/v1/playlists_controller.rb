@@ -73,7 +73,12 @@ module Api
         Rails.logger.debug { "Filtered playlists: #{@playlists.map(&:attributes)}" }
 
         Rails.logger.info "Rendering playlist with #{community.playlist_tunes.count} tunes."
-        render json: @playlists.as_json
+
+        # commentsのtune_idのみを含める
+        comments_id = community.comments.select(:tune_id).distinct
+
+        # render json: @playlists.as_json
+        render json: { playlists: @playlists.as_json, comments_id: comments_id.as_json(only: [:tune_id]) }
       end
 
       # プレイリストの曲をレコメンドする

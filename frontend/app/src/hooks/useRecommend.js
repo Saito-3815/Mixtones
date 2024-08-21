@@ -10,13 +10,19 @@ export const useRecommend = (communityId) => {
     onSuccess: (data) => {
       if (data.status === 200) {
         // playlistデータを最新のデータで更新
-        queryClient.setQueryData(["playlist", communityId], data.data);
+        // queryClient.setQueryData(["playlist", communityId], data.data);
+        queryClient.setQueryData(["playlist", communityId], (oldData) => {
+          return {
+            ...oldData,
+            playlists: data.data,
+          };
+        });
 
-        const currentPlaylist = queryClient.getQueryData([
-          "playlist",
-          communityId,
-        ]);
-        console.log("Recommend success:", currentPlaylist);
+        // const currentPlaylist = queryClient.getQueryData([
+        //   "playlist",
+        //   communityId,
+        // ]);
+        // console.log("Recommend success:", currentPlaylist);
       }
     },
     onError: (error) => {

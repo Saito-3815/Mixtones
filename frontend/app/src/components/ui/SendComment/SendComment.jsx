@@ -33,6 +33,13 @@ const SendComment = ({ communityId, tuneId }) => {
       if (data.status === 201) {
         queryClient.setQueryData(["comment", communityId, tuneId], data.data);
         reset();
+        queryClient.setQueryData(["playlist", communityId], (oldData) => {
+          return {
+            ...oldData,
+            comments_id: data.data.comments_id
+          };
+        });
+        console.log("CommentCreate success:", data);
       }
     },
     onError: (error) => {

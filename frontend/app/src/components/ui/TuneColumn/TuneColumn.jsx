@@ -23,6 +23,7 @@ import { useParams } from "react-router-dom";
 // import { i } from "vite/dist/node/types.d-aGj9QkWt";
 import { useRecommendDelete } from "@/hooks/useRecommendDelete";
 import CommentModal from "../CommentModal/CommentModal";
+import { playlistAtom } from "@/atoms/playlistAtom";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -162,6 +163,23 @@ export const TuneColumn = ({ tune, index, onClick }) => {
   // コメント機能の実装
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handleCommentClick = () => {
+    if (!user) {
+      alert(
+        "こちらのアイコンをクリックすると楽曲にコメントを追加できます。この機能はログイン後にご利用いただけます"
+      );
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const [currentPlaylist] = useAtom(playlistAtom);
+
+  // plaulistData.commentsにtune.idが含まれているか確認
+  const isCommented = currentPlaylist?.comments_id.some(
+    (comment) => Number(comment.tune_id) === Number(tune.id)
+  );
+
   // spotifyのリンクをクリックした際に、外部リンクを開く
   const handleSpotifyClick = () => {
     if (tune.external_url) {
@@ -275,19 +293,16 @@ export const TuneColumn = ({ tune, index, onClick }) => {
               }
             />
             {/* コメントボタン */}
-            <FontAwesomeIcon
+            <CheckColorIcon
+              icon={faCommentDots}
+              isTuneChecked={isCommented}
+              onClick={handleCommentClick}
+            />
+            {/* <FontAwesomeIcon
               icon={faCommentDots}
               className="h-4 w-4 cursor-pointer text-theme-white"
-              onClick={() => {
-                if (!user) {
-                  alert(
-                    "こちらのアイコンをクリックすると楽曲にコメントを追加できます。この機能はログイン後にご利用いただけます"
-                  );
-                  return;}
-                setIsModalOpen(true);
-              }
-            }
-            />
+              onClick={handleCommentClick}
+            /> */}
             {/* コメントモーダル */}
             <CommentModal
               isOpen={isModalOpen}
@@ -322,6 +337,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
             onClickRecommend={
               recommendValue ? handleRecommendDelete : handleRecommendCreate
             }
+            handleCommentClick={handleCommentClick}
           />
         </div>
       </td>

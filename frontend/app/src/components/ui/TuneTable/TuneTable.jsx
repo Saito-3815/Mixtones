@@ -49,7 +49,7 @@ export const TuneTable = () => {
     setIsSearchVisible,
     filteredPlaylist,
     node,
-  } = useSearchPlaylist(playlistData || []); // playlistDataがundefinedの場合に空の配列を渡す
+  } = useSearchPlaylist(playlistData?.playlists || []); // playlistDataがundefinedの場合に空の配列を渡す
 
   // 楽曲を選択してグローバルステートへ
   const [tune, setTune] = useAtom(tuneAtom);

@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import SendComment from "../SendComment/SendComment";
 import { useAtom } from "jotai";
 import { userAtom } from "@/atoms/userAtoms";
+import { AvatarSet } from "../Avatar/Avatar";
 
 // アプリケーションのルート要素を設定
 Modal.setAppElement("#root");
@@ -21,7 +22,7 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
       backgroundColor: "#121212",
       padding: "0px",
       borderRadius: "10px",
-      width: "30%",
+      width: "70%",
       height: "60%",
       display: "flex",
       flexDirection: "column",
@@ -31,6 +32,23 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
     },
   };
 
+  // メディアクエリを追加してレスポンシブ対応
+  // const responsiveStyles = `
+  //   @media (min-width: 768px) {
+  //     .ReactModal__Content--after-open {
+  //       width: 50%;
+  //       height: 60%;
+  //     }
+  //   }
+
+  //   @media (min-width: 1024px) {
+  //     .ReactModal__Content--after-open {
+  //       width: 30%;
+  //       height: 60%;
+  //     }
+  //   }
+  // `;
+
   const [user] = useAtom(userAtom);
 
   const {
@@ -39,7 +57,7 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
     refetch: refetchComments,
   } = useComments(communityId, tuneId);
 
-  const comments = Array.isArray(commentsData) ? commentsData : [];
+  const comments = Array.isArray(commentsData?.comments) ? commentsData?.comments : [];
 
   // モーダルを開いた時にスクロールを最下部へ
   const scrollBottom = useCallback(
@@ -47,13 +65,19 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
       // 引数にnodeを受け取る
       if (!node) return; // nodeがnullの場合はリターンして処理終了
       node.scrollTop = node.scrollHeight;
+
+      // スタイルをドキュメントに追加
+      // const styleSheet = document.createElement("style");
+      // styleSheet.innerText = responsiveStyles;
+      // document.head.appendChild(styleSheet);
     },
     [commentsData]
   );
 
   // モーダルを開いた時にコメントを取得
   const handleAfterOpen = () => {
-    refetchComments();
+    refetchComments;
+    // console.log("commentsData:", commentsData);
   };
 
   return (
@@ -71,21 +95,26 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
         ) : comments.length > 0 ? (
           <div className="my-4 flex flex-col">
             {comments.map((comment) => (
-              <div key={comment.id} className="flex flex-col">
-                {/* <p>by {comment.user.name}</p> */}
-                <p className={`font-light text-sm text-theme-gray ${user && comment.user.id === user.id ? "flex-row-reverse text-end float-right" : "float-left"}`}>
+              <div
+                key={comment.id}
+                className={`flex items-end ${user && comment.user.id === user.id ? "justify-end" : "justify-end flex-row-reverse"}`}
+              >
+                <p className="font-light text-sm text-theme-gray mb-[10px]">
                   {format(new Date(comment.created_at), "yyyy/MM/dd HH:mm")}
                 </p>
                 <div
                   className={`flex p- pr-2.5 pb-0 pl-2 m-[10px] rounded-xl items-center
-              ${user && comment.user.id === user.id ? "bg-theme-orange text-black flex-row-reverse text-end float-right" : "bg-white float-left"}
-              `}
+        ${user && comment.user.id === user.id ? "bg-theme-orange text-black flex-row-reverse text-end" : "bg-white flex-row"}
+        `}
                 >
-                  <img
+                  {/* <img
                     src={comment.user.avatar}
                     alt="images"
                     className="rounded-full h-[45px] border-1 my-1 border-black"
-                  />
+                  /> */}
+                  <div className="border-1 my-1 border-black">
+                    <AvatarSet src={comment.user.avatar} size="8" />
+                  </div>
                   <p className="font-light text-sm my-[5px] ml-[5px] mr-[10px] break-words text-left">
                     {comment.body}
                   </p>
@@ -94,7 +123,7 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
             ))}
           </div>
         ) : (
-          <p className="text-white">コメント機能は現在開発中です</p>
+          <p className="text-white">コメントはまだありません。</p>
         )}
       </div>
       <div className="bg-gray-100">
