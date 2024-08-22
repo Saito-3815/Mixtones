@@ -9,14 +9,16 @@ module Api
         ).order(created_at: :asc).all
         # コメントのuserのavatarをs3のURLに変換
         comments.each do |comment|
-          comment.user.avatar = comment.user.generate_s3_url(comment.user.avatar) if comment.user.avatar.present? && comment.user.avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+          if comment.user.avatar.present? && comment.user.avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+            comment.user.avatar = comment.user.generate_s3_url(comment.user.avatar)
+          end
         end
-        # community = Community.find(params[:community_id])
-        # @playlists = community.playlist_tunes.with_recommend.order(added_at: :desc)
 
         render json: {
-          comments: comments.as_json(only: [:id, :body, :created_at], include: { user: { only: [:id, :name, :avatar] } }),
-          # playlists: @playlists.as_json
+          comments: comments.as_json(
+            only: [:id, :body, :created_at],
+            include: { user: { only: [:id, :name, :avatar] } }
+          )
         }, status: :ok
       end
 
@@ -35,12 +37,12 @@ module Api
           ).order(created_at: :asc).all
 
           community = Community.find(params[:community_id])
-          # @playlists = community.playlist_tunes.with_recommend.order(added_at: :desc)
           comments_id = community.comments.select(:tune_id).distinct
 
           render json: {
-            comments: comments.as_json(only: [:id, :body, :created_at], include: { user: { only: [:id, :name, :avatar] } }),
-            # playlists: @playlists.as_json,
+            comments: comments.as_json(only: [:id, :body, :created_at],
+                                       include: { user: { only: [:id, :name,
+                                                                 :avatar] } }),
             comments_id: comments_id.as_json(only: [:tune_id])
           }, status: :created
         else
@@ -64,7 +66,8 @@ module Api
             community_id: params[:community_id],
             tune_id: params[:tune_id]
           ).order(created_at: :asc).all
-          render json: comments, only: [:id, :body, :created_at], include: { user: { only: [:id, :name, :avatar] } }, status: :ok
+          render json: comments, only: [:id, :body, :created_at], include: { user: { only: [:id, :name, :avatar] } },
+                 status: :ok
         end
       end
 

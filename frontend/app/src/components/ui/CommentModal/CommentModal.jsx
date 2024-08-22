@@ -7,48 +7,12 @@ import SendComment from "../SendComment/SendComment";
 import { useAtom } from "jotai";
 import { userAtom } from "@/atoms/userAtoms";
 import { AvatarSet } from "../Avatar/Avatar";
+import "./CommentModal.css";
 
 // アプリケーションのルート要素を設定
 Modal.setAppElement("#root");
 
 const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
-  const commentStyles = {
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "auto",
-      bottom: "auto",
-      transform: "translate(-50%, -50%)",
-      backgroundColor: "#121212",
-      padding: "0px",
-      borderRadius: "10px",
-      width: "70%",
-      height: "60%",
-      display: "flex",
-      flexDirection: "column",
-    },
-    overlay: {
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
-  };
-
-  // メディアクエリを追加してレスポンシブ対応
-  // const responsiveStyles = `
-  //   @media (min-width: 768px) {
-  //     .ReactModal__Content--after-open {
-  //       width: 50%;
-  //       height: 60%;
-  //     }
-  //   }
-
-  //   @media (min-width: 1024px) {
-  //     .ReactModal__Content--after-open {
-  //       width: 30%;
-  //       height: 60%;
-  //     }
-  //   }
-  // `;
-
   const [user] = useAtom(userAtom);
 
   const {
@@ -57,7 +21,9 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
     refetch: refetchComments,
   } = useComments(communityId, tuneId);
 
-  const comments = Array.isArray(commentsData?.comments) ? commentsData?.comments : [];
+  const comments = Array.isArray(commentsData?.comments)
+    ? commentsData?.comments
+    : [];
 
   // モーダルを開いた時にスクロールを最下部へ
   const scrollBottom = useCallback(
@@ -65,11 +31,6 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
       // 引数にnodeを受け取る
       if (!node) return; // nodeがnullの場合はリターンして処理終了
       node.scrollTop = node.scrollHeight;
-
-      // スタイルをドキュメントに追加
-      // const styleSheet = document.createElement("style");
-      // styleSheet.innerText = responsiveStyles;
-      // document.head.appendChild(styleSheet);
     },
     [commentsData]
   );
@@ -77,14 +38,14 @@ const CommentModal = ({ isOpen, onRequestClose, communityId, tuneId }) => {
   // モーダルを開いた時にコメントを取得
   const handleAfterOpen = () => {
     refetchComments;
-    // console.log("commentsData:", commentsData);
   };
 
   return (
     <Modal
       isOpen={isOpen}
       onRequestClose={onRequestClose}
-      style={commentStyles}
+      className="Modal"
+      overlayClassName="Overlay"
       onAfterOpen={handleAfterOpen}
     >
       <div className="flex-grow overflow-y-auto p-3" ref={scrollBottom}>

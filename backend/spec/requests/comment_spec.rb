@@ -15,7 +15,8 @@ RSpec.describe Comment, type: :request do
     it 'returns user.name' do
       get "/api/v1/communities/#{community.id}/tunes/#{community.comments[0].tune.id}/comments"
       json = response.parsed_body
-      expect(json[0]['user']['name']).to eq(community.comments[0].user.name)
+      comments = json['comments']
+      expect(comments[0]['user']['name']).to eq(community.comments[0].user.name)
     end
   end
 
@@ -54,19 +55,22 @@ RSpec.describe Comment, type: :request do
       # userのコメントが作成された場合、同じcommunity, tuneの別のuserが作成したコメントも含めてコメントを返すこと
       it 'returns comments including comments created by other users' do
         json = response.parsed_body
-        expect(json.length).to eq(2)
+        comments = json['comments']
+        expect(comments.length).to eq(2)
       end
 
       # community.members[0]が作成したコメントが最初に表示されること
       it 'displays comments created by community.members[0] first' do
         json = response.parsed_body
-        expect(json[0]['user']['name']).to eq(community.members[0].name)
+        comments = json['comments']
+        expect(comments[0]['user']['name']).to eq(community.members[0].name)
       end
 
       # community.members[1]が作成したコメントが次に表示されること
       it 'displays comments created by community.members[1] next' do
         json = response.parsed_body
-        expect(json[1]['user']['name']).to eq(community.members[1].name)
+        comments = json['comments']
+        expect(comments[1]['user']['name']).to eq(community.members[1].name)
       end
     end
   end
@@ -104,14 +108,18 @@ RSpec.describe Comment, type: :request do
 
       post "/api/v1/communities/#{community.id}/tunes/#{tune.id}/users/#{user1.id}/comments",
            params: { comment: { body: 'test' } }
-      comment_id = response.parsed_body.first['id']
+      json = response.parsed_body
+      comments = json['comments']
+      comment_id = comments[0]['id']
 
       post "/api/v1/communities/#{community.id}/tunes/#{tune.id}/users/#{user2.id}/comments",
            params: { comment: { body: 'test' } }
 
       delete "/api/v1/communities/#{community.id}/tunes/#{tune.id}/users/#{user1.id}/comments/#{comment_id}"
 
+      # get "/api/v1/communities/#{community.id}/tunes/#{tune.id}/comments"
       json = response.parsed_body
+      # delete_comments = json['comments']
       expect(json.length).to eq(1)
     end
   end
