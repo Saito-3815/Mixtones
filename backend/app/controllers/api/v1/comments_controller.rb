@@ -7,7 +7,19 @@ module Api
           community_id: params[:community_id],
           tune_id: params[:tune_id]
         ).order(created_at: :asc).all
-        render json: comments, only: [:id, :body], include: { user: { only: [:name] } }, status: :ok
+        # コメントのuserのavatarをs3のURLに変換
+        comments.each do |comment|
+          if comment.user.avatar.present? && comment.user.avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+            comment.user.avatar = comment.user.generate_s3_url(comment.user.avatar)
+          end
+        end
+
+        render json: {
+          comments: comments.as_json(
+            only: [:id, :body, :created_at],
+            include: { user: { only: [:id, :name, :avatar] } }
+          )
+        }, status: :ok
       end
 
       # コミュニティプレイリストの曲に対するコメントを作成し、既存と一緒に新しい順に取得
@@ -23,7 +35,16 @@ module Api
             community_id: params[:community_id],
             tune_id: params[:tune_id]
           ).order(created_at: :asc).all
-          render json: comments, only: [:id, :body], include: { user: { only: [:name] } }, status: :created
+
+          community = Community.find(params[:community_id])
+          comments_id = community.comments.select(:tune_id).distinct
+
+          render json: {
+            comments: comments.as_json(only: [:id, :body, :created_at],
+                                       include: { user: { only: [:id, :name,
+                                                                 :avatar] } }),
+            comments_id: comments_id.as_json(only: [:tune_id])
+          }, status: :created
         else
           render json: { message: 'Comment not created' }, status: :bad_request
         end
@@ -45,7 +66,8 @@ module Api
             community_id: params[:community_id],
             tune_id: params[:tune_id]
           ).order(created_at: :asc).all
-          render json: comments, only: [:id, :body], include: { user: { only: [:name] } }, status: :ok
+          render json: comments, only: [:id, :body, :created_at], include: { user: { only: [:id, :name, :avatar] } },
+                 status: :ok
         end
       end
 

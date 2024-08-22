@@ -15,7 +15,8 @@ RSpec.describe Playlist, type: :request do
       community = create(:community, :with_playlist_tunes)
       get "/api/v1/communities/#{community.id}/playlists"
       # レスポンスボディ（JSON形式の文字列）をRubyのハッシュに変換
-      playlist = response.parsed_body
+      json = response.parsed_body
+      playlist = json['playlists']
       expect(playlist[0]['added_at']).to be > playlist[1]['added_at']
     end
   end

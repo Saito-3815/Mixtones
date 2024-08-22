@@ -22,6 +22,8 @@ import { useRecommend } from "@/hooks/useRecommend";
 import { useParams } from "react-router-dom";
 // import { i } from "vite/dist/node/types.d-aGj9QkWt";
 import { useRecommendDelete } from "@/hooks/useRecommendDelete";
+import CommentModal from "../CommentModal/CommentModal";
+import { playlistAtom } from "@/atoms/playlistAtom";
 
 export const TuneColumn = ({ tune, index, onClick }) => {
   if (!tune) {
@@ -103,7 +105,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
     user &&
     Array.isArray(user.check_tunes) &&
     user.check_tunes.some(
-      (tuneItem) => Number(tuneItem.id) === Number(tune.id),
+      (tuneItem) => Number(tuneItem.id) === Number(tune.id)
     );
 
   const checkTune = useCheck();
@@ -112,7 +114,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
       checkTune.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
     } else {
       alert(
-        "このアイコンをクリックするとプロフィールページにお気に入りの楽曲を保存できます。この機能はログイン後にご利用いただけます",
+        "このアイコンをクリックするとプロフィールページにお気に入りの楽曲を保存できます。この機能はログイン後にご利用いただけます"
       );
     }
   };
@@ -123,7 +125,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
       checkDelete.mutate({ userId: user.id, spotify_uri: tune.spotify_uri });
     } else {
       alert(
-        "このアイコンをクリックするとプロフィールページにお気に入りの楽曲を保存できます。この機能はログイン後にご利用いただけます",
+        "このアイコンをクリックするとプロフィールページにお気に入りの楽曲を保存できます。この機能はログイン後にご利用いただけます"
       );
     }
   };
@@ -141,7 +143,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
       recommendTune.mutate({ communityId: communityId, tuneId: tune.id });
     } else {
       alert(
-        "このアイコンをクリックするとプレイリストの先頭へこの楽曲が優先表示されます。この機能はログイン後にご利用いただけます",
+        "このアイコンをクリックするとプレイリストの先頭へこの楽曲が優先表示されます。この機能はログイン後にご利用いただけます"
       );
     }
   };
@@ -153,10 +155,30 @@ export const TuneColumn = ({ tune, index, onClick }) => {
       recommendDelete.mutate({ communityId: communityId, tuneId: tune.id });
     } else {
       alert(
-        "このアイコンをクリックするとプレイリストの先頭へこの楽曲が優先表示されます。この機能はログイン後にご利用いただけます",
+        "このアイコンをクリックするとプレイリストの先頭へこの楽曲が優先表示されます。この機能はログイン後にご利用いただけます"
       );
     }
   };
+
+  // コメント機能の実装
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCommentClick = () => {
+    if (!user) {
+      alert(
+        "こちらのアイコンをクリックすると楽曲にコメントを追加できます。この機能はログイン後にご利用いただけます"
+      );
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const [currentPlaylist] = useAtom(playlistAtom);
+
+  // plaulistData.commentsにtune.idが含まれているか確認
+  const isCommented = currentPlaylist?.comments_id.some(
+    (comment) => Number(comment.tune_id) === Number(tune.id)
+  );
 
   // spotifyのリンクをクリックした際に、外部リンクを開く
   const handleSpotifyClick = () => {
@@ -271,10 +293,22 @@ export const TuneColumn = ({ tune, index, onClick }) => {
               }
             />
             {/* コメントボタン */}
-            <FontAwesomeIcon
+            <CheckColorIcon
+              icon={faCommentDots}
+              isTuneChecked={isCommented}
+              onClick={handleCommentClick}
+            />
+            {/* <FontAwesomeIcon
               icon={faCommentDots}
               className="h-4 w-4 cursor-pointer text-theme-white"
-              onClick={() => alert("コメント機能は現在開発中です")}
+              onClick={handleCommentClick}
+            /> */}
+            {/* コメントモーダル */}
+            <CommentModal
+              isOpen={isModalOpen}
+              onRequestClose={() => setIsModalOpen(false)}
+              communityId={communityId}
+              tuneId={tune.id}
             />
             {/* Spotifyリンク */}
             <FontAwesomeIcon
@@ -303,6 +337,7 @@ export const TuneColumn = ({ tune, index, onClick }) => {
             onClickRecommend={
               recommendValue ? handleRecommendDelete : handleRecommendCreate
             }
+            handleCommentClick={handleCommentClick}
           />
         </div>
       </td>

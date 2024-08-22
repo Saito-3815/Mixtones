@@ -1,4 +1,4 @@
-require 'rspotify'
+# require 'rspotify'
 
 module Api
   module V1
@@ -154,8 +154,6 @@ module Api
         @user.save
         if @user.save
           render_user_json(@user, nil)
-          # render json: @user, status: :ok
-          # render status: :ok
         else
           render json: @user.errors, status: :unprocessable_entity
         end

@@ -1,4 +1,4 @@
-require 'rspotify'
+# require 'rspotify'
 
 module SpotifyAuth
   CLIENT_ID = ENV.fetch('SPOTIFY_CLIENT_ID', nil)
@@ -8,7 +8,7 @@ module SpotifyAuth
   # トークンの取得
   def self.fetch_spotify_tokens(code, code_verifier)
     # RSpotifyにクライアントIDとクライアントシークレットを設定
-    RSpotify.authenticate(CLIENT_ID, CLIENT_SECRET)
+    # RSpotify.authenticate(CLIENT_ID, CLIENT_SECRET)
 
     # フロントエンドから送信された認証コード
     auth_code = code

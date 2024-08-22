@@ -316,5 +316,5 @@ export function AvatarMenu({ userAvatar }) {
 }
 
 AvatarMenu.propTypes = {
-  userAvatar: PropTypes.string.isRequired, // userAvatarは文字列で、必須であることを指定
+  userAvatar: PropTypes.string.isRequired, 
 };
