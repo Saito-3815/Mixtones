@@ -36,6 +36,12 @@ module Api
             tune_id: params[:tune_id]
           ).order(created_at: :asc).all
 
+          comments.each do |comment|
+            if comment.user.avatar.present? && comment.user.avatar.match?(%r{^uploads/[a-f0-9\-]+/[^/]+$})
+              comment.user.avatar = comment.user.generate_s3_url(comment.user.avatar)
+            end
+          end
+
           community = Community.find(params[:community_id])
           comments_id = community.comments.select(:tune_id).distinct
 
