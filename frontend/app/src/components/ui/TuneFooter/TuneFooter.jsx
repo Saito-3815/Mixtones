@@ -47,12 +47,12 @@ export const TuneFooter = () => {
   // 次のトラックを取得
   const nextTrack = () => {
     let nextIndex = tune.index + 1; // tune.indexを増やす前に次のインデックスを計算
-    if (nextIndex >= playlistData.length) {
+    if (nextIndex >= playlistData.playlists.length) {
       // playlistDataの範囲を超えるかチェック
       nextIndex = 0; // 範囲を超える場合は最初に戻る
     }
     tune.index = nextIndex; // tune.indexを更新
-    return { index: tune.index, tune: playlistData[nextIndex] };
+    return { index: tune.index, tune: playlistData.playlists[nextIndex] };
   };
 
   // 前のトラックを取得
@@ -60,10 +60,10 @@ export const TuneFooter = () => {
     let prevIndex = tune.index - 1; // tune.indexを減らす前に前のインデックスを計算
     if (prevIndex < 0) {
       // 0未満になるかチェック
-      prevIndex = playlistData.length - 1; // 0未満になる場合は最後に戻る
+      prevIndex = playlistData.playlists.length - 1; // 0未満になる場合は最後に戻る
     }
     tune.index = prevIndex; // tune.indexを更新
-    return { index: tune.index, tune: playlistData[prevIndex] };
+    return { index: tune.index, tune: playlistData.playlists[prevIndex] };
   };
 
   // プレイリストデータのコピーを保持
@@ -73,10 +73,10 @@ export const TuneFooter = () => {
 
   useEffect(() => {
     if (playlistData.length > 0 && isInitialMount.current) {
-      setOriginalPlaylistData([...playlistData]);
+      setOriginalPlaylistData([...playlistData.playlists]);
       isInitialMount.current = false; // 初回マウント後はフラグをfalseに設定
     }
-  }, [playlistData]);
+  }, [playlistData.playlists]);
 
   // useEffect(() => {
   //   console.log("originalPlaylistData:", originalPlaylistData);
@@ -116,7 +116,7 @@ export const TuneFooter = () => {
   // }, [playlistData]);
 
   // プレイリストデータからSpotify URIを取得
-  const spotifyUris = playlistData.map((track) => track.spotify_uri);
+  const spotifyUris = playlistData.playlists.map((track) => track.spotify_uri);
 
   // プレイリストのデータからpreviewUrlを取得
   // const previewUrls = playlistData.map((track) => track.preview_url);
