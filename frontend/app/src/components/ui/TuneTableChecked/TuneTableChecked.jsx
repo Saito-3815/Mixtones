@@ -40,9 +40,18 @@ export const TuneTableChecked = () => {
   }, [checkTunesError]);
 
   // チェックした楽曲データが取得できた場合、グローバルステートで管理する
+  // useEffect(() => {
+  //   if (checkTunesData) {
+  //     setCurrentPlaylist(checkTunesData);
+  //   }
+  // }, [checkTunesData]);
+
   useEffect(() => {
     if (checkTunesData) {
-      setCurrentPlaylist(checkTunesData);
+      setCurrentPlaylist((prevState) => ({
+        ...prevState,
+        playlists: checkTunesData,
+      }));
     }
   }, [checkTunesData]);
 
@@ -83,7 +92,7 @@ export const TuneTableChecked = () => {
   // プレイリストの再生コントロール
   const handlePlay = () => {
     if (!tune) {
-      setTune({ index: 0, tune: currentPlaylist[0] });
+      setTune({ index: 0, tune: currentPlaylist.playlists[0] });
     }
     // playerが存在し、togglePlayメソッドがある場合にのみ実行
     if (tune && player && typeof player.togglePlay === "function") {
@@ -228,6 +237,6 @@ TuneTableChecked.propTypes = {
       images: PropTypes.string,
       added_at: PropTypes.string,
       time: PropTypes.string,
-    }),
+    })
   ).isRequired,
 };
