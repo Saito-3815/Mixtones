@@ -67,10 +67,16 @@ const Community = () => {
           data.data.community,
         );
         // playlistデータを最新のデータで更新
-        queryClient.setQueryData(
-          ["playlist", communityId],
-          data.data.community.playlist_tunes,
-        );
+        // queryClient.setQueryData(
+        //   ["playlist", communityId],
+        //   data.data.community.playlist_tunes,
+        // );
+        queryClient.setQueryData(["playlist", communityId], (oldData) => {
+          return {
+            ...oldData,
+            playlists: data.data.community.playlist_tunes,
+          };
+        });
       }
       console.log(data);
     },
@@ -98,10 +104,16 @@ const Community = () => {
             data.data.community,
           );
           // playlistデータを最新のデータで更新
-          queryClient.setQueryData(
-            ["playlist", communityId],
-            data.data.community.playlist_tunes,
-          );
+          // queryClient.setQueryData(
+          //   ["playlist", communityId],
+          //   data.data.community.playlist_tunes,
+          // );
+          queryClient.setQueryData(["playlist", communityId], (oldData) => {
+            return {
+              ...oldData,
+              playlists: data.data.community.playlist_tunes,
+            };
+          });
           break;
         case 202:
           // コミュニティが削除された場合、ユーザー情報を更新
