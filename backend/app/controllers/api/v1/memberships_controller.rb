@@ -14,7 +14,7 @@ module Api
           community.reload
           # userのspotify_idが'guest_user'でない場合のみplaylistの更新処理を実行
           add_like_tunes_to_community_playlist(community, user) unless user.spotify_id == 'guest_user'
-          sorted_playlist_tunes = community.playlist_tunes.order('added_at DESC')
+          sorted_playlist_tunes = community.playlist_tunes.with_recommend.order('added_at DESC')
           community.update_member_avatars
           user.update_avatar_url
           community.update_avatar_url
@@ -58,7 +58,7 @@ module Api
           @membership.destroy
           remove_like_tunes_from_playlist(current_user, community) if current_user&.like_tunes.present?
           add_missing_like_tunes_to_playlist(community)
-          sorted_playlist_tunes = community.playlist_tunes.order('added_at DESC')
+          sorted_playlist_tunes = community.playlist_tunes.with_recommend.order('added_at DESC')
 
           # コミュニティのメンバーがいなくなった場合、コミュニティを削除
           if community.members.empty?
