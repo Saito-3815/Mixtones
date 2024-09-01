@@ -4,7 +4,7 @@ import { useGuestLogin } from "@/hooks/useGuestLogin";
 import { generateCodeChallenge } from "@/SpotifyAuth.js";
 
 import { accessUrl } from "@/SpotifyAuth.js";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Signup = () => {
@@ -15,10 +15,6 @@ const Signup = () => {
   const toggleIsPersistent = () => {
     setIsPersistent(!isPersistent);
   };
-  // isPersistentの状態を監視してログに表示
-  useEffect(() => {
-    console.log("isPersistent:", isPersistent);
-  }, [isPersistent]);
 
   // ログインボタンをクリックしたときにコードチャレンジを生成してSpotifyのログインページにリダイレクトする
   const handleSignup = async () => {
