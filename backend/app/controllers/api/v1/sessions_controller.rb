@@ -55,11 +55,6 @@ module Api
           render json: { error: 'User not found' }, status: :not_found
         elsif current_user.spotify_id == 'guest_user' || current_user.spotify_id.nil?
           Rails.logger.info "current_user is a guest_user"
-          # パスワード・ゲストユーザーの場合は、何も処理せずにユーザーデータを返却
-          # render json: {
-          #   user: current_user.as_json(except: :refresh_token),
-          #   message: ' not spotify user '
-          # }, status: :ok
           render_user_json(current_user, nil)
         else
           Rails.logger.info "current_user is a regular user"
@@ -76,17 +71,16 @@ module Api
         # ユーザーが存在しない場合
         if user.nil?
           signup_url = "#{ENV.fetch('SPOTIFY_REDIRECT_URI', nil)}signup"
-          render json: { message: 'User not found', redirect_url: signup_url }, status: :not_found
+          render json: { message: 'このメールアドレスのユーザーは存在しません。', redirect_url: signup_url }, status: :not_found
           return
         end
         # ユーザーが存在する場合、パスワードが一致するか確認
         if user.authenticate(password_login_params[:password])
           log_in(user)
           update_session_expiration(spotify_login_params[:is_persistent])
-          # render json: { user: user.as_json(except: :refresh_token), message: 'Login successful' }, status: :ok
           render_user_json(user, nil, :ok, 'Login successful')
         else
-          render json: { message: 'Password incorrect' }, status: :unauthorized
+          render json: { message: 'パスワードが間違っています。' }, status: :unauthorized
         end
       end
 

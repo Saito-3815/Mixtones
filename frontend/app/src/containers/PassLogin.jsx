@@ -7,7 +7,6 @@ import { useMutation } from "@tanstack/react-query";
 import { Switch } from "@/components/ui/Switch/Switch";
 import { useState } from "react";
 import { createPasswordSession } from "@/api/sessionsCreatePassword";
-// import { useEffect } from "react";
 
 const PassLogin = () => {
   const navigate = useNavigate();
@@ -19,14 +18,9 @@ const PassLogin = () => {
 
   const [isPersistent, setIsPersistent] = useState(isPersistentFromState);
 
-  // isPersistentの状態を監視してログに表示
-  // useEffect(() => {
-  //   console.log("isPersistent:", isPersistent);
-  // }, [isPersistent]);
-
   const {
     register,
-    watch,
+    // watch,
     handleSubmit,
     formState: { errors },
   } = useForm({ mode: "onChange" });
@@ -42,7 +36,6 @@ const PassLogin = () => {
     },
     onSuccess: (data) => {
       if (data.status === 200) {
-        // console.log(data);
         if (!user) {
           loginUser(setUser, data.data.user);
           navigate(`/`);
@@ -52,11 +45,13 @@ const PassLogin = () => {
     onError: (error) => {
       if (error.response) {
         console.error("サーバーからのエラーメッセージ:", error.response.data);
+        alert(`${error.response.data.message}`);
         if (error.response.status === 404) {
           navigate("/signup");
         }
       } else {
         console.error("エラー:", error.message);
+        alert(`エラー: ${error.message}`);
       }
     },
   });
@@ -109,10 +104,10 @@ const PassLogin = () => {
           <p className="text-red-500">{errors.password.message}</p>
         )}
         {/* password confirmation */}
-        <label
+        {/* <label
           htmlFor="passwordConfirmation"
-          className="text-white pt-8 text-lg"
-        >
+          className="text-white pt-8 text-lg" */}
+        {/* >
           パスワード（確認）
         </label>
         <input
@@ -124,10 +119,10 @@ const PassLogin = () => {
             validate: (value) =>
               value === watch("password") || "パスワードが一致しません",
           })}
-        />
-        {errors.passwordConfirmation && (
+        /> */}
+        {/* {errors.passwordConfirmation && (
           <p className="text-red-500">{errors.passwordConfirmation.message}</p>
-        )}
+        )} */}
         {/* ログイン状態を保持ボタン */}
         <div className="w-full max-w-[550px] flex items-center justify-center space-x-10 pt-12">
           <Switch checked={isPersistent} onChange={toggleIsPersistent} />
