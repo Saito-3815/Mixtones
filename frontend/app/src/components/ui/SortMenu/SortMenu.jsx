@@ -228,8 +228,13 @@ export {
   DropdownMenuRadioGroup,
 };
 
-export function SortMenu() {
 
+export function SortMenu({ sortPlaylist }) {
+  // ソート関数
+  const handleSort = (key, order) => {
+    sortPlaylist(key, order);
+  };
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -239,10 +244,10 @@ export function SortMenu() {
         <DropdownMenuLabel>並べ替え</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <span>新しい順</span>
+          <span onClick={() => handleSort('added_at', 'asc')}>新しい順</span>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <span>古い順</span>
+          <span onClick={() => handleSort('added_at', 'desc')}>古い順</span>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <span>自分以外のお気に入り</span>
@@ -256,5 +261,5 @@ export function SortMenu() {
 }
 
 SortMenu.propTypes = {
-
+  sortPlaylist: PropTypes.func.isRequired,
 };

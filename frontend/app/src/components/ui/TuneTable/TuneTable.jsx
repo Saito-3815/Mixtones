@@ -52,6 +52,39 @@ export const TuneTable = () => {
     node,
   } = useSearchPlaylist(playlistData?.playlists || []); // playlistDataがundefinedの場合に空の配列を渡す
 
+  // ソート機能
+  // ソートメニューをクリックしたときにソートする
+  // const [sortKey, setSortKey] = useState("name");
+  // const [sortOrder, setSortOrder] = useState("asc");
+
+  // useEffect(() => {
+  //   console.log("sortKey:", sortKey);
+  //   console.log("sortOrder:", sortOrder);
+  // }, [sortKey, sortOrder]);
+
+  // ソート関数
+  const sortPlaylist = (key, order) => {
+    const sortedPlaylist = [...currentPlaylist.playlists].sort((a, b) => {
+      if (order === "asc") {
+        return a[key] > b[key] ? 1 : -1;
+      } else if (order === "desc") {
+        return a[key] < b[key] ? 1 : -1;
+      }
+    });
+    setCurrentPlaylist({
+      ...currentPlaylist,
+      playlists: sortedPlaylist
+    });
+  };
+
+  // // ソートメニューの選択肢
+  // const sortOptions = [
+  //   { key: "added_at", label: "新しいz新しいz" },
+  //   { key: "name", label: "タイトル" },
+  //   { key: "album", label: "アルバム" },
+  // ];
+
+
   // 楽曲を選択してグローバルステートへ
   const [tune, setTune] = useAtom(tuneAtom);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -127,7 +160,9 @@ export const TuneTable = () => {
               onClick={() => setIsSearchVisible(!isSearchVisible)}
             />
           )}
-          <SortMenu />
+          <SortMenu
+            sortPlaylist={sortPlaylist}
+          />
         </div>
       </div>
       {/* データテーブルセクション */}
@@ -199,6 +234,7 @@ export const TuneTable = () => {
           ) : (
             <>
               {filteredPlaylist.map((tune, index) => (
+              // {/* {currentPlaylist.map((tune, index) => ( */}
                 <TuneColumn
                   tune={{
                     ...tune,
