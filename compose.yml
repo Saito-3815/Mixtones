@@ -36,6 +36,7 @@ services:
       - ./frontend/app:/front
     ports:
       - 3000:5173
+      - 6006:6006 # Storybookのポート
     # コンテナの標準入出力を有効
     tty: true
     stdin_open: true

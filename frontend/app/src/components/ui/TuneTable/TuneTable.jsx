@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { TuneColumn } from "@/components/ui/TuneColumn/TuneColumn";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faList, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
 import { useAtom } from "jotai";
 import { tuneAtom } from "@/atoms/tuneAtom";
@@ -14,6 +14,7 @@ import { playerAtom } from "@/atoms/playerAtom";
 import { userAtom } from "@/atoms/userAtoms";
 import usePreviewPlay from "@/hooks/usePreviewPlay";
 import useSearchPlaylist from "@/hooks/useSearchPlaylist";
+import { SortMenu } from "../SortMenu/SortMenu";
 
 export const TuneTable = () => {
   const { communityId } = useParams();
@@ -126,7 +127,7 @@ export const TuneTable = () => {
               onClick={() => setIsSearchVisible(!isSearchVisible)}
             />
           )}
-          <FontAwesomeIcon icon={faList} className="text-theme-gray" />
+          <SortMenu />
         </div>
       </div>
       {/* データテーブルセクション */}
