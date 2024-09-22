@@ -229,10 +229,11 @@ export {
 };
 
 
-export function SortMenu({ sortPlaylist }) {
+export function SortMenu({ setSortKey, setSortOrder }) {
   // ソート関数
   const handleSort = (key, order) => {
-    sortPlaylist(key, order);
+    setSortKey(key);
+    setSortOrder(order);
   };
   
   return (
@@ -244,10 +245,13 @@ export function SortMenu({ sortPlaylist }) {
         <DropdownMenuLabel>並べ替え</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <span onClick={() => handleSort('added_at', 'asc')}>新しい順</span>
+          <span onClick={() => handleSort('', 'default')}>元の順</span>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <span onClick={() => handleSort('added_at', 'desc')}>古い順</span>
+          <span onClick={() => handleSort('added_at', 'desc')}>新しい順</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <span onClick={() => handleSort('added_at', 'asc')}>古い順</span>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <span>自分以外のお気に入り</span>
@@ -262,4 +266,6 @@ export function SortMenu({ sortPlaylist }) {
 
 SortMenu.propTypes = {
   sortPlaylist: PropTypes.func.isRequired,
+  setSortKey: PropTypes.func.isRequired,
+  setSortOrder: PropTypes.func.isRequired,
 };

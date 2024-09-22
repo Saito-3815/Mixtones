@@ -73,7 +73,8 @@ module SpotifyAuth
 
   # ユーザーの保存したトラックを取得
   def self.fetch_saved_tracks(spotify_id, access_token, user_create_params)
-    uri = URI("https://api.spotify.com/v1/users/#{spotify_id}/tracks?limit=50")
+    # uri = URI("https://api.spotify.com/v1/users/#{spotify_id}/tracks?limit=50")
+    uri = URI("https://api.spotify.com/v1/me/tracks?limit=50")
     req = Net::HTTP::Get.new(uri)
     req['Authorization'] = "Bearer #{access_token}"
 
@@ -83,7 +84,7 @@ module SpotifyAuth
 
     saved_tracks = JSON.parse(res.body)
 
-    # Rails.logger.info "Fetched saved tracks: #{saved_tracks}"
+    Rails.logger.info "Fetched saved tracks: #{saved_tracks}"
 
     # 保存したトラックの情報を抽出
     like_tunes = saved_tracks['items'].map do |item|
@@ -134,7 +135,8 @@ module SpotifyAuth
   def self.fetch_latest_saved_track(user, access_token)
     latest_added_at = user.like_tunes.last.added_at
 
-    uri = URI("https://api.spotify.com/v1/users/#{user.spotify_id}/tracks?limit=50")
+    # uri = URI("https://api.spotify.com/v1/users/#{user.spotify_id}/tracks?limit=50")
+    uri = URI("https://api.spotify.com/v1/me/tracks?limit=50")
     req = Net::HTTP::Get.new(uri)
     req['Authorization'] = "Bearer #{access_token}"
 

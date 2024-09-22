@@ -15,6 +15,7 @@ import { userAtom } from "@/atoms/userAtoms";
 import usePreviewPlay from "@/hooks/usePreviewPlay";
 import useSearchPlaylist from "@/hooks/useSearchPlaylist";
 import { SortMenu } from "../SortMenu/SortMenu";
+import useSortPlaylist from "@/hooks/useSortPlaylist";
 
 export const TuneTable = () => {
   const { communityId } = useParams();
@@ -54,35 +55,7 @@ export const TuneTable = () => {
 
   // ソート機能
   // ソートメニューをクリックしたときにソートする
-  // const [sortKey, setSortKey] = useState("name");
-  // const [sortOrder, setSortOrder] = useState("asc");
-
-  // useEffect(() => {
-  //   console.log("sortKey:", sortKey);
-  //   console.log("sortOrder:", sortOrder);
-  // }, [sortKey, sortOrder]);
-
-  // ソート関数
-  const sortPlaylist = (key, order) => {
-    const sortedPlaylist = [...currentPlaylist.playlists].sort((a, b) => {
-      if (order === "asc") {
-        return a[key] > b[key] ? 1 : -1;
-      } else if (order === "desc") {
-        return a[key] < b[key] ? 1 : -1;
-      }
-    });
-    setCurrentPlaylist({
-      ...currentPlaylist,
-      playlists: sortedPlaylist
-    });
-  };
-
-  // // ソートメニューの選択肢
-  // const sortOptions = [
-  //   { key: "added_at", label: "新しいz新しいz" },
-  //   { key: "name", label: "タイトル" },
-  //   { key: "album", label: "アルバム" },
-  // ];
+  const { sortedPlaylist, setSortKey, setSortOrder } = useSortPlaylist(filteredPlaylist);
 
 
   // 楽曲を選択してグローバルステートへ
@@ -112,7 +85,7 @@ export const TuneTable = () => {
   const handlePlay = () => {
     if (!user || !user.spotify_id) {
       alert(
-        "プレイリストの再生はSpotifyアカウントが必要です。楽曲データをクリックするとプレビューが再生されます。",
+        "プレイリストの再生はSpotifyアカウントが必要です。楽曲データをクリックするとプレビューが再生されます。"
       );
       return;
     }
@@ -160,9 +133,7 @@ export const TuneTable = () => {
               onClick={() => setIsSearchVisible(!isSearchVisible)}
             />
           )}
-          <SortMenu
-            sortPlaylist={sortPlaylist}
-          />
+          <SortMenu setSortKey={setSortKey} setSortOrder={setSortOrder}/>
         </div>
       </div>
       {/* データテーブルセクション */}
@@ -233,8 +204,7 @@ export const TuneTable = () => {
             </>
           ) : (
             <>
-              {filteredPlaylist.map((tune, index) => (
-              // {/* {currentPlaylist.map((tune, index) => ( */}
+              {sortedPlaylist.map((tune, index) => (
                 <TuneColumn
                   tune={{
                     ...tune,
