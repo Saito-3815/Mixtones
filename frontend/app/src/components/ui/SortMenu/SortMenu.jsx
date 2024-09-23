@@ -27,14 +27,14 @@ const DropdownMenuSubTrigger = React.forwardRef(
       className={cn(
         "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent",
         inset && "pl-8",
-        className,
+        className
       )}
       {...props}
     >
       {children}
       <ChevronRight className="ml-auto h-4 w-4" />
     </DropdownMenuPrimitive.SubTrigger>
-  ),
+  )
 );
 DropdownMenuSubTrigger.displayName =
   DropdownMenuPrimitive.SubTrigger.displayName;
@@ -45,11 +45,11 @@ const DropdownMenuSubContent = React.forwardRef(
       ref={ref}
       className={cn(
         "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        className,
+        className
       )}
       {...props}
     />
-  ),
+  )
 );
 DropdownMenuSubContent.displayName =
   DropdownMenuPrimitive.SubContent.displayName;
@@ -62,12 +62,12 @@ const DropdownMenuContent = React.forwardRef(
         sideOffset={sideOffset}
         className={cn(
           "z-50 min-w-[8rem] overflow-hidden rounded-sm border bg-black/70 p-1 text-white shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          className,
+          className
         )}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
-  ),
+  )
 );
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
@@ -78,11 +78,11 @@ const DropdownMenuItem = React.forwardRef(
       className={cn(
         "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-black/40 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         inset && "pl-8",
-        className,
+        className
       )}
       {...props}
     />
-  ),
+  )
 );
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 
@@ -92,7 +92,7 @@ const DropdownMenuCheckboxItem = React.forwardRef(
       ref={ref}
       className={cn(
         "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        className,
+        className
       )}
       checked={checked}
       {...props}
@@ -104,7 +104,7 @@ const DropdownMenuCheckboxItem = React.forwardRef(
       </span>
       {children}
     </DropdownMenuPrimitive.CheckboxItem>
-  ),
+  )
 );
 DropdownMenuCheckboxItem.displayName =
   DropdownMenuPrimitive.CheckboxItem.displayName;
@@ -115,7 +115,7 @@ const DropdownMenuRadioItem = React.forwardRef(
       ref={ref}
       className={cn(
         "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        className,
+        className
       )}
       {...props}
     >
@@ -126,7 +126,7 @@ const DropdownMenuRadioItem = React.forwardRef(
       </span>
       {children}
     </DropdownMenuPrimitive.RadioItem>
-  ),
+  )
 );
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
@@ -137,11 +137,11 @@ const DropdownMenuLabel = React.forwardRef(
       className={cn(
         "px-2 py-1.5 text-sm font-semibold",
         inset && "pl-8",
-        className,
+        className
       )}
       {...props}
     />
-  ),
+  )
 );
 DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
 
@@ -152,7 +152,7 @@ const DropdownMenuSeparator = React.forwardRef(
       className={cn("-mx-1 my-1 h-px bg-muted", className)}
       {...props}
     />
-  ),
+  )
 );
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
 
@@ -228,14 +228,13 @@ export {
   DropdownMenuRadioGroup,
 };
 
-
 export function SortMenu({ setSortKey, setSortOrder }) {
   // ソート関数
   const handleSort = (key, order) => {
     setSortKey(key);
     setSortOrder(order);
   };
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -245,19 +244,23 @@ export function SortMenu({ setSortKey, setSortOrder }) {
         <DropdownMenuLabel>並べ替え</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <span onClick={() => handleSort('', 'default')}>元の順</span>
+          <span onClick={() => handleSort("", "default")}>元の順</span>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <span onClick={() => handleSort('added_at', 'desc')}>新しい順</span>
+          <span onClick={() => handleSort("added_at", "desc")}>新しい順</span>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <span onClick={() => handleSort('added_at', 'asc')}>古い順</span>
+          <span onClick={() => handleSort("added_at", "asc")}>古い順</span>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <span>自分以外のお気に入り</span>
+          <span onClick={() => handleSort("", "memberLikes")}>
+            自分以外のお気に入り
+          </span>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <span>コメントあり</span>
+          <span onClick={() => handleSort("", "showComments")}>
+            コメントあり
+          </span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
