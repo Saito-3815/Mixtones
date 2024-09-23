@@ -1,7 +1,7 @@
-// useSearchPlaylist.js
 import { useState, useEffect, useRef } from "react";
 
 const useSearchPlaylist = (playlistData) => {
+  // const [currentPlaylist, setCurrentPlaylist] = useAtom(playlistAtom);
   const [searchText, setSearchText] = useState("");
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const node = useRef();

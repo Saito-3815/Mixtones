@@ -1,5 +1,5 @@
 import { atom } from "jotai";
 
-const playlistAtom = atom(null);
+const playlistAtom = atom([]);
 
 export { playlistAtom };
