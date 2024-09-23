@@ -3,7 +3,7 @@ import { TuneColumnChecked } from "@/components/ui/TuneColumnChecked/TuneColumnC
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
-import { faList, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { PlayIcon } from "../PlayIcon/PlayIcon";
 import { useParams } from "react-router-dom";
 import { useCheckTunes } from "@/hooks/ useCheckTunes";
@@ -15,6 +15,8 @@ import usePreviewPlay from "@/hooks/usePreviewPlay";
 import { isLoggedInAtom } from "@/atoms/userAtoms";
 import { playerAtom } from "@/atoms/playerAtom";
 import { Skeleton } from "../Skeleton/Skeleton";
+import useSortPlaylist from "@/hooks/useSortPlaylist";
+import { SortMenuChecked } from "../SortMenuChecked/SortMenuChecked";
 
 export const TuneTableChecked = () => {
   const { userId } = useParams();
@@ -65,6 +67,10 @@ export const TuneTableChecked = () => {
     filteredPlaylist,
     node,
   } = useSearchPlaylist(checkTunesData || []); // playlistDataがundefinedの場合に空の配列を渡す
+
+  // ソート機能
+  // ソートメニューをクリックしたときにソートする
+  const { sortedPlaylist, setSortKey, setSortOrder } = useSortPlaylist(filteredPlaylist);
 
   // 楽曲を選択してグローバルステートへ
   const [tune, setTune] = useAtom(tuneAtom);
@@ -137,7 +143,7 @@ export const TuneTableChecked = () => {
               onClick={() => setIsSearchVisible(!isSearchVisible)}
             />
           )}
-          <FontAwesomeIcon icon={faList} className="text-theme-gray" />
+          <SortMenuChecked setSortKey={setSortKey} setSortOrder={setSortOrder}/>
         </div>
       </div>
       {/* データテーブルセクション */}
@@ -208,7 +214,7 @@ export const TuneTableChecked = () => {
             </>
           ) : (
             <>
-              {filteredPlaylist.map((tune, index) => (
+              {sortedPlaylist.map((tune, index) => (
                 <TuneColumnChecked
                   tune={{
                     ...tune,
