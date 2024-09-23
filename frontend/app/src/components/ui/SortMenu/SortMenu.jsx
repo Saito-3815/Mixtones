@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faList } from "@fortawesome/free-solid-svg-icons";
+import { userAtom } from "@/atoms/userAtoms";
+import { useAtom } from "jotai";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -229,6 +231,8 @@ export {
 };
 
 export function SortMenu({ setSortKey, setSortOrder }) {
+  const [user] = useAtom(userAtom);
+
   // ソート関数
   const handleSort = (key, order) => {
     setSortKey(key);
@@ -252,11 +256,13 @@ export function SortMenu({ setSortKey, setSortOrder }) {
         <DropdownMenuItem>
           <span onClick={() => handleSort("added_at", "asc")}>古い順</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <span onClick={() => handleSort("", "memberLikes")}>
-            自分以外のお気に入り
-          </span>
-        </DropdownMenuItem>
+        {user && user.like_tunes && (
+          <DropdownMenuItem>
+            <span onClick={() => handleSort("", "memberLikes")}>
+              自分以外のお気に入り
+            </span>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem>
           <span onClick={() => handleSort("", "showComments")}>
             コメントあり
