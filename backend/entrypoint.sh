@@ -4,6 +4,8 @@ set -e
 rm -f /api/tmp/pids/server.pid
 
 if [ "$RAILS_ENV" = "production" ]; then
+  export RAILS_LOG_TO_STDOUT=true  # ログを標準出力にリダイレクト
+
   # bundle exec rails db:create RAILS_ENV=production
 
   bundle exec rails db:migrate RAILS_ENV=production
