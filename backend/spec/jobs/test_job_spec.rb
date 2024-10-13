@@ -17,6 +17,9 @@ RSpec.describe TestJob, type: :job do
     # Redisのインスタンスをモックする
     allow(Redis).to receive(:new).and_return(redis_instance)
 
+    # メール送信をモックする
+    allow(SystemHealthMailer).to receive_message_chain(:with, :health_check_email, :deliver_now)
+
     # ジョブを即座に実行する
     Sidekiq::Testing.inline! do
       TestJob.perform_later("テストパラメータ")
@@ -51,5 +54,14 @@ RSpec.describe TestJob, type: :job do
 
   it 'ジョブの実行内容を確認する - システム健全性チェック完了' do
     expect(Rails.logger).to have_received(:info).with("システム健全性チェック完了")
+  end
+
+  it 'システム健全性チェック完了後にメールを送信する' do
+    expect(SystemHealthMailer).to have_received(:with).with(
+      memory_usage: instance_of(Float),
+      redis_response: "PONG",
+      retrieved_value: "test_value"
+    )
+    expect(SystemHealthMailer.with(memory_usage: instance_of(Float), redis_response: "PONG", retrieved_value: "test_value").health_check_email).to have_received(:deliver_now)
   end
 end

@@ -1,6 +1,6 @@
 # app/mailers/system_health_mailer.rb
 class SystemHealthMailer < ApplicationMailer
-  default to: 'sai.engineer3815@gmail.com'
+  default to: ENV['GMAIL_USERNAME']
 
   def health_check_email
     @memory_usage = params[:memory_usage]
