@@ -1,0 +1,11 @@
+:concurrency: 5
+:queues:
+  - default
+:verbose: true
+:logging: true
+:dead_max_jobs: 10000
+:dead_timeout_in_seconds: 2592000 # 30 days
+:schedule:
+  test_job:
+    cron: "0 0 * * *" # 毎日0時に実行
+    class: TestJob

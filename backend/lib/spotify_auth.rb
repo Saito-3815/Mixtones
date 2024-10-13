@@ -72,7 +72,7 @@ module SpotifyAuth
   end
 
   # ユーザーの保存したトラックを取得
-  def self.fetch_saved_tracks(spotify_id, access_token, user_create_params)
+  def self.fetch_saved_tracks(_spotify_id, access_token, user_create_params)
     # uri = URI("https://api.spotify.com/v1/users/#{spotify_id}/tracks?limit=50")
     uri = URI("https://api.spotify.com/v1/me/tracks?limit=50")
     req = Net::HTTP::Get.new(uri)

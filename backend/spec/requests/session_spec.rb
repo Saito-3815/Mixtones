@@ -85,7 +85,7 @@ RSpec.describe "Sessions", type: :request do
       it 'returns a not found message' do
         post '/api/v1/sessions/password',
              params: { user: { email: 'nonexistent@example.com', password: 'password', isPersistent: 'false' } }
-        expect(response.parsed_body['message']).to eq('User not found')
+        expect(response.parsed_body['message']).to eq('このメールアドレスのユーザーは存在しません。')
       end
     end
 
@@ -100,7 +100,7 @@ RSpec.describe "Sessions", type: :request do
       it 'returns an unauthorized message' do
         post '/api/v1/sessions/password',
              params: { user: { email: 'test@example.com', password: 'wrongpassword', isPersistent: 'false' } }
-        expect(response.parsed_body['message']).to eq('Password incorrect')
+        expect(response.parsed_body['message']).to eq('パスワードが間違っています。')
       end
     end
   end

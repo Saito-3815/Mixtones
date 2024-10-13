@@ -29,6 +29,8 @@ services:
       - redis
     tty: true
     stdin_open: true
+    environment:
+      SIDEKIQ_REDIS_URL: ${SIDEKIQ_REDIS_URL}
 
   front:
     build: ./frontend/
