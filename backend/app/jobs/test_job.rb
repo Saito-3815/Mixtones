@@ -4,8 +4,6 @@ class TestJob < ApplicationJob
   queue_as :default
 
   def perform(*_args)
-    # sleep 5 # ジョブの実行時間を設定
-
     Rails.logger.info "システム健全性チェック開始"
 
     memory_usage = GetProcessMem.new.mb
@@ -31,5 +29,8 @@ class TestJob < ApplicationJob
     end
 
     Rails.logger.info "システム健全性チェック完了"
+
+    # メール送信
+    SystemHealthMailer.with(memory_usage: memory_usage, redis_response: redis_response, retrieved_value: retrieved_value).health_check_email.deliver_now
   end
 end

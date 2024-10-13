@@ -50,9 +50,11 @@ gem 'redis-actionpack'
 gem 'sidekiq'
 gem 'redis' # sidekiqの依存関係
 
-gem 'sidekiq-scheduler'
-gem 'base64'
-gem 'mutex_m'
+gem 'sidekiq-cron'
+
+# sidekiqの警告からの対応
+gem 'base64', '~> 0.2.0'
+gem 'mutex_m', '~> 0.2.0'
 
 # Rubyプロセスのメモリ使用量を取得するための軽量なライブラリ(sidekiqのテストジョブ内で使用)
 gem 'get_process_mem'
@@ -68,7 +70,6 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'factory_bot_rails'
   gem 'rails-controller-testing'
-  gem 'rspec-sidekiq' # sidekiqのテスト用
 
 end
 
@@ -85,6 +86,12 @@ group :development do
   # bin/rspecコマンドが作成され、起動にspringが使われて速くなる
   gem 'spring-commands-rspec'
 
+end
+
+group :test do
+  # sidekiqのテスト用
+  # developmentに配置すると、development環境でtesting APIが起動するため、test環境でのみ読み込む
+  gem 'rspec-sidekiq', require: false
 end
 
 group :production do

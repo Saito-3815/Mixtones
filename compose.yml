@@ -30,7 +30,8 @@ services:
     tty: true
     stdin_open: true
     environment:
-      SIDEKIQ_REDIS_URL: ${SIDEKIQ_REDIS_URL}
+      - RAILS_ENV=development
+      - SIDEKIQ_REDIS_URL=${SIDEKIQ_REDIS_URL}
 
   front:
     build: ./frontend/

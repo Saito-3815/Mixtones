@@ -290,24 +290,21 @@ GEM
     rubocop-rspec (3.1.0)
       rubocop (~> 1.61)
     ruby-progressbar (1.13.0)
-    rufus-scheduler (3.9.2)
-      fugit (~> 1.1, >= 1.11.1)
     sidekiq (7.3.2)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       logger
       rack (>= 2.2.4)
       redis-client (>= 0.22.2)
-    sidekiq-scheduler (5.0.6)
-      rufus-scheduler (~> 3.2)
-      sidekiq (>= 6, < 8)
-      tilt (>= 1.4.0, < 3)
+    sidekiq-cron (1.12.0)
+      fugit (~> 1.8)
+      globalid (>= 1.0.1)
+      sidekiq (>= 6)
     spring (4.2.1)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
     stringio (3.1.1)
     thor (1.3.2)
-    tilt (2.4.0)
     timeout (0.4.1)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -337,14 +334,14 @@ PLATFORMS
 
 DEPENDENCIES
   aws-sdk-s3
-  base64
+  base64 (~> 0.2.0)
   bcrypt (~> 3.1.7)
   bootsnap
   debug
   dotenv-rails
   factory_bot_rails
   get_process_mem
-  mutex_m
+  mutex_m (~> 0.2.0)
   mysql2 (~> 0.5)
   puma (~> 5.0)
   rack-cors
@@ -359,7 +356,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   sidekiq
-  sidekiq-scheduler
+  sidekiq-cron
   spring
   spring-commands-rspec
   tzinfo-data
