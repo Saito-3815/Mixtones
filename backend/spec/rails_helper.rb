@@ -5,6 +5,29 @@ require_relative "../config/environment"
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require "rspec/rails"
+
+if Rails.env.test?
+# sidekiqのテストジョブを使用するために追加
+  require 'sidekiq/testing'
+  require 'rspec-sidekiq'
+
+  RSpec.configure do |config|
+    config.before do
+      Sidekiq::Worker.clear_all
+    end
+
+    config.include RSpec::Sidekiq::Matchers
+
+    RSpec::Sidekiq.configure do |config|
+      config.warn_when_jobs_not_processed_by_sidekiq = false
+    end
+  end
+
+  Sidekiq::Testing.fake! # ジョブを実行せずにキューに追加する
+else
+  Sidekiq::Testing.disable! # テストAPIを無効にする
+end
+
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in

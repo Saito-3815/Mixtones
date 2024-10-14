@@ -14,6 +14,9 @@ if [ "$RAILS_ENV" = "production" ]; then
   bundle exec rails runner "Playlist.where(recommend: nil).update_all(recommend: false)"
 
   # DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:reset RAILS_ENV=production
+  # Start Unicorn and Sidekiq
+  bundle exec unicorn -p 3000 -c /app/config/unicorn.rb -E production &
+  bundle exec sidekiq -C /app/sidekiq.yml
 fi
 
 exec "$@"

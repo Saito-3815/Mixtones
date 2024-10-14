@@ -36,11 +36,33 @@ gem 'bootsnap', require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'
 
+# dotenvの読み込み
 gem 'dotenv-rails'
+
+# spotify api
 # gem 'rspotify'
+
+# redisセッションストア
 # gem 'redis-rails'
 gem 'redis-actionpack'
 
+# sidekiq
+gem 'sidekiq'
+gem 'redis' # sidekiqの依存関係
+
+gem 'sidekiq-cron'
+
+gem 'sidekiq-unique-jobs'
+
+
+# sidekiqの警告からの対応
+gem 'base64', '~> 0.2.0'
+gem 'mutex_m', '~> 0.2.0'
+
+# Rubyプロセスのメモリ使用量を取得するための軽量なライブラリ(sidekiqのテストジョブ内で使用)
+gem 'get_process_mem'
+
+# aws
 gem 'aws-sdk-s3'
 
 group :development, :test do
@@ -67,6 +89,12 @@ group :development do
   # bin/rspecコマンドが作成され、起動にspringが使われて速くなる
   gem 'spring-commands-rspec'
 
+end
+
+group :test do
+  # sidekiqのテスト用
+  # developmentに配置すると、development環境でtesting APIが起動するため、test環境でのみ読み込む
+  gem 'rspec-sidekiq', require: false
 end
 
 group :production do

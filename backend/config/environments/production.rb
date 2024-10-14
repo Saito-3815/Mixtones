@@ -55,8 +55,6 @@ Rails.application.configure do
   # config.active_job.queue_adapter     = :resque
   # config.active_job.queue_name_prefix = "api_production"
 
-  config.action_mailer.perform_caching = false
-
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
@@ -92,6 +90,32 @@ Rails.application.configure do
   # 本番環境のRedis
   ENV["REDIS_URL"] = ENV["ELASTICACHE_REDIS_URL"]
 
-  # 本番環境のセッションストアをElastiCacheに設定
-  Rails.application.config.session_store :action_dispatch_session_redis_store, servers: ENV["REDIS_URL"], expire_after: 90.minutes
+  Rails.application.config.session_store :action_dispatch_session_redis_store,
+  servers: [
+    {
+      url: ENV["REDIS_URL"],
+      namespace: 'session',
+    }
+  ],
+  expire_after: 90.minutes
+
+  # action_mailerの設定
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.gmail.com',
+    port: 587,
+    domain: 'gmail.com',
+    user_name: ENV['GMAIL_USERNAME'],
+    password: ENV['GMAIL_PASSWORD'],
+    authentication: 'plain',
+    enable_starttls_auto: true
+  }
+
+  # メール送信元のデフォルトURLオプション
+  config.action_mailer.default_url_options = { host: ENV['MIXTONES_URL'], protocol: 'https' }
+
+  # メール送信エラーを無視しない
+  config.action_mailer.raise_delivery_errors = true
+
+  config.action_mailer.perform_caching = false
 end
