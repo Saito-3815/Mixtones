@@ -1,5 +1,5 @@
 daily_test_job:
-  cron: "0 0 * * *"  # 毎日0時に実行
+  cron: "0 19 * * *"  # 毎日19時に実行
   # cron: "* * * * *"  # 毎分実行（テスト用）
   class: "TestJob"
   queue: default

@@ -7,5 +7,5 @@
 :dead_timeout_in_seconds: 2592000 # 30 days
 :schedule:
   test_job:
-    cron: "0 0 * * *" # 毎日0時に実行
+    cron: "0 19 * * *" # 毎日19時に実行
     class: TestJob

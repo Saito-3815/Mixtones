@@ -52,6 +52,9 @@ gem 'redis' # sidekiqの依存関係
 
 gem 'sidekiq-cron'
 
+gem 'sidekiq-unique-jobs'
+
+
 # sidekiqの警告からの対応
 gem 'base64', '~> 0.2.0'
 gem 'mutex_m', '~> 0.2.0'

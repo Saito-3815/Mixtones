@@ -1,7 +1,5 @@
 require_relative "boot"
-
 require "rails/all"
-
 require 'dotenv/load'
 
 # Require the gems listed in Gemfile, including any gems
@@ -18,7 +16,12 @@ module Api
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
+    config.time_zone = 'Tokyo'
+    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+    config.i18n.default_locale = :ja
+    config.i18n.available_locales = [:en, :ja]  # 利用可能なロケールを設定
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}').to_s] # ロードパス設定
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Only loads a smaller set of middleware suitable for API only apps.
