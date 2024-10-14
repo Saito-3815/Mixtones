@@ -1,4 +1,9 @@
+require 'sidekiq/web'
+require 'sidekiq/cron/web'
+
 Rails.application.routes.draw do
+  mount Sidekiq::Web => '/sidekiq' # sidekiqの管理画面
+
   get '/health_check', to: 'health_checks#index'
 
   namespace :api do
@@ -33,6 +38,9 @@ Rails.application.routes.draw do
       post 'sessions/password', to: 'sessions#password_login'
 
       post 'images', to: 'images#create'
+
+      # テストエンドポイント
+      post 'test_job', to: 'jobs#create'
     end
   end
 end

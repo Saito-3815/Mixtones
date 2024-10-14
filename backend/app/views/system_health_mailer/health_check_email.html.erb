@@ -1,0 +1,5 @@
+<!-- app/views/system_health_mailer/health_check_email.html.erb -->
+<p>システム健全性チェック結果:</p>
+<p>現在のメモリ使用量: <%= @memory_usage.round(2) %> MB</p>
+<p>Redis ping response: <%= @redis_response %></p>
+<p>Redisから取得したバリュー: <%= @retrieved_value %></p>
