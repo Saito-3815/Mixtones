@@ -18,7 +18,8 @@ class TestJob < ApplicationJob
       Rails.logger.info "Redis ping response: #{redis_response}"
 
       # ハッシュタグを使用してRedisにテストキーとバリューをセット
-      test_key = "{test_namespace}:test_key"
+      namespace = "test_job"
+      test_key = "#{namespace}:test_key"
       test_value = "test_value"
       redis.set(test_key, test_value)
       Rails.logger.info "Redisにセットしたキー: #{test_key}, バリュー: #{test_value}"

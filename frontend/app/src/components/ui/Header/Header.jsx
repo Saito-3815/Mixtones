@@ -47,7 +47,7 @@ export const Header = () => {
   });
 
   return (
-    <header className="mx-1 my-1">
+    <header className="mx-1 my-1 fixed top-0 left-0 right-0 z-50 w-full">
       <div className="flex justify-between items-center px-4 py-5 bg-theme-black rounded-sm h-16">
         <Link to="/">
           <div className="flex space-x-2 items-center">

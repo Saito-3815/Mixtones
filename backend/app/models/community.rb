@@ -15,6 +15,15 @@ class Community < ApplicationRecord
     def with_recommend
       select(:recommend, arel_table[Arel.star])
     end
+
+    # JSON出力時にrecommendをboolean型に変換(通常のJSON出力では1 or 0)
+    def as_json(options = {})
+      super(options).map do |tune|
+        tune.tap do |hash|
+          hash['recommend'] = hash['recommend'] == 1
+        end
+      end
+    end
   end
   has_many :comments, dependent: :destroy
 

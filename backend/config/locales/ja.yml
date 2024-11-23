@@ -3,3 +3,38 @@ ja:
   errors:
     messages:
       record_invalid: "バリデーションに失敗しました: %{errors}"
+      blank: "can't be blank"
+      too_long: "is too long (maximum is %{count} characters)"
+      taken: "has already been taken"
+  activerecord:
+    errors:
+      models:
+        tune:
+          attributes:
+            name:
+              blank: "can't be blank"
+            artist:
+              blank: "can't be blank"
+            album:
+              blank: "can't be blank"
+            added_at:
+              blank: "can't be blank"
+            spotify_uri:
+              blank: "can't be blank"
+              taken: "has already been taken"
+        community:
+          attributes:
+            name:
+              blank: "can't be blank"
+              too_long: "is too long (maximum is 40 characters)"
+            introduction:
+              too_long: "is too long (maximum is 160 characters)"
+        user:
+          attributes:
+            name:
+              blank: "can't be blank"
+              too_long: "is too long (maximum is 40 characters)"
+            introduction:
+              too_long: "is too long (maximum is 160 characters)"
+            spotify_id:
+              taken: "has already been taken"
