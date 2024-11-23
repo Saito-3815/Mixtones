@@ -23,9 +23,6 @@ module Api
             access_token = SpotifyAuth.refresh_access_token(member.refresh_token)
             like_tunes = SpotifyAuth.fetch_latest_saved_track(member, access_token)
 
-            # 既存のトラックに新しいカラムのデータをフェッチして挿入
-            # SpotifyAuth.update_existing_tracks_with_external_url(member, access_token)
-
             extract_first_image_url(like_tunes)
 
             like_tunes.each do |like_tune|
@@ -90,6 +87,7 @@ module Api
           Rails.logger.debug { "Filtered playlists: #{@playlists.map(&:attributes)}" }
 
           Rails.logger.info "Rendering playlist with #{@community.playlist_tunes.count} tunes."
+          
           render json: @playlists.as_json
         else
           render json: @playlist_tune.errors, status: :unprocessable_entity
