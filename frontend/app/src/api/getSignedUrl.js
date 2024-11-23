@@ -1,8 +1,5 @@
-// import { useGetSignedUrl } from "@/hooks/useGetSignedUrl";
-// import { createSignedUrl } from "./imagesCreate";
 
 export const fetchSignedUrl = (file, getSignedUrl) => {
-  // const getSignedUrl = useGetSignedUrl(createSignedUrl);
 
   return new Promise((resolve, reject) => {
     getSignedUrl.mutate(file, {

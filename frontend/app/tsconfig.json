@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    // 基本設定（必須）
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    
+    // 段階的移行のための設定
+    "allowJs": true,          // JSファイルの許可
+    "checkJs": false,         // JSファイルの型チェックを無効化
+    "noEmit": true,          // Viteが変換を行うので出力不要
+    
+    // 必須の安全設定
+    "esModuleInterop": true,  // import文の互換性確保
+    "skipLibCheck": true,     // 型定義ファイルのチェックをスキップ
+    "isolatedModules": true,  // 単一ファイルでの変換を保証
+    
+    // 現段階で必要な緩和設定
+    "strict": false,          // 初期は緩めに設定
+    "noUnusedLocals": false,  // 未使用変数のチェックを一時的に無効化
+    "noUnusedParameters": false, // 未使用パラメータのチェックを一時的に無効化
+    
+  },
+  "include": ["src"],  // srcディレクトリ全体を含める
+}

@@ -45,7 +45,7 @@ RSpec.describe TestJob, type: :job do
   end
 
   it 'ジョブの実行内容を確認する - Redisにセットしたキー' do
-    expect(Rails.logger).to have_received(:info).with("Redisにセットしたキー: test_key, バリュー: test_value")
+    expect(Rails.logger).to have_received(:info).with("Redisにセットしたキー: test_job:test_key, バリュー: test_value")
   end
 
   it 'ジョブの実行内容を確認する - Redisから取得したバリュー' do

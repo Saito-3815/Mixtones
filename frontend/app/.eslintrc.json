@@ -6,9 +6,10 @@
   },
   "extends": [
     "eslint:recommended",
-    "plugin:react/recommended"
-    // "airbnb"
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended"  // TypeScript用
   ],
+  "parser": "@typescript-eslint/parser",    // TypeScriptパーサーを指定
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
@@ -18,7 +19,7 @@
   },
   "overrides": [
     {
-      "files": ["**/*.js", "**/*.jsx"]
+      "files": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"]
     }
   ],
   "settings": {
@@ -27,9 +28,14 @@
     }
   },
   "plugins": [
-    "react"
+    "react",
+    "@typescript-eslint"
   ],
   "rules": {
-    "react/react-in-jsx-scope": "off" // React 17以降は不要
+    "react/react-in-jsx-scope": "off", // React 17以降は省略可能なので不要
+    "@typescript-eslint/no-explicit-any": "warn",     // any型の使用を警告
+    "@typescript-eslint/no-unused-vars": "warn",      // 未使用変数を警告
+    "@typescript-eslint/explicit-function-return-type": "off",  // 関数の戻り値の型指定を強制しない
+    "@typescript-eslint/no-empty-interface": "warn"    // 空のインターフェースを警告
   }
 }
